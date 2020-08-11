@@ -13,7 +13,7 @@
   "homepage": "https://github.com/pixijs/pixi-ui",
   "license": "MIT",
   "main": "lib/puxi-core.js",
-  "module": "lib/puxi-core.mjs",
+  "module": "lib/puxi-core.js",
   "bundle": "dist/puxi-core.js",
   "directories": {
     "lib": "lib",

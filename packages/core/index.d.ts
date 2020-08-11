@@ -498,10 +498,10 @@ declare class DragManager extends EventManager {
     protected movementX: number;
     protected movementY: number;
     protected cancel: boolean;
-    onPress: (e: PIXI.interaction.InteractionEvent, isPressed: boolean) => void;
-    onDragStart: (e: PIXI.interaction.InteractionEvent) => void;
-    onDragMove: (e: PIXI.interaction.InteractionEvent, dragOffset: PIXI.Point) => void;
-    onDragEnd: (e: PIXI.interaction.InteractionEvent) => void;
+    onPress: (e: PIXI.InteractionEvent, isPressed: boolean) => void;
+    onDragStart: (e: PIXI.InteractionEvent) => void;
+    onDragMove: (e: PIXI.InteractionEvent, dragOffset: PIXI.Point) => void;
+    onDragEnd: (e: PIXI.InteractionEvent) => void;
     constructor(target: Widget);
     startEvent(): void;
     stopEvent(): void;
@@ -511,14 +511,14 @@ declare class DragManager extends EventManager {
 }
 
 export declare namespace Ease {
-    { Linear };
+    var Linear: any;
     export namespace Power0 {
-        { Linear as easeNone };
+        var Linear: any;
     }
     export namespace Power1 {
-        { easeInFunction as easeIn };
-        { easeOutFunction as easeOut };
-        { easeInOutFunction as easeInOut };
+        var easeInFunction: any;
+        var easeOutFunction: any;
+        var easeInOutFunction: any;
     }
     export namespace Quad { }
     export namespace Power2 { }
@@ -1487,7 +1487,9 @@ export declare class SortableList extends InteractiveGroup {
     items: any[];
     _sortTimeout: NodeJS.Timeout;
     constructor(desc: any, tweenTime: any, tweenEase: any);
+    // @ts-ignore
     addChild(UIObject: any, fnValue?: any, fnThenBy?: any): void;
+    // @ts-ignore
     removeChild(UIObject: any): void;
     sort(instant?: boolean): void;
     _sort(): void;
@@ -1539,7 +1541,9 @@ export declare class Stage extends PIXI.Container {
     setBackground(bg: PIXI.Container): void;
     private update;
     render(renderer: PIXI.Renderer): void;
+    // @ts-ignore
     addChild(UIObject: Widget): void;
+    // @ts-ignore
     removeChild(UIObject: Widget): void;
     resize(width?: number, height?: number): void;
     get width(): number;
@@ -1840,7 +1844,7 @@ export declare class Ticker extends PIXI.utils.EventEmitter {
  * @param [Height=Texture.height] {number} Height of tiling sprite
  */
 export declare class TilingSprite extends Widget {
-    protected sprite: PIXI.extras.TilingSprite;
+    protected sprite: PIXI.TilingSprite;
     constructor(t: any, width: number, height: number);
     /**
      * Updates the text
@@ -2216,7 +2220,7 @@ export declare class Widget extends PIXI.utils.EventEmitter implements IMeasurab
      * Makes this widget `droppable`.
      */
     makeDroppable(): Widget;
-    protected onDrop: (e: PIXI.interaction.InteractionEvent) => void;
+    protected onDrop: (e: PIXI.InteractionEvent) => void;
     /**
      * Makes this widget not `droppable`.
      */

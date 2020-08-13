@@ -676,7 +676,7 @@ export declare class FastLayoutOptions extends LayoutOptions {
  * @extends PUXI.Widget
  * @memberof PUXI
  */
-declare abstract class FocusableWidget extends InteractiveGroup {
+export declare abstract class FocusableWidget extends InteractiveGroup {
     _isFocused: boolean;
     _isMousePressed: boolean;
     tabIndex: number;

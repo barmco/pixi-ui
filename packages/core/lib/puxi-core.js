@@ -17795,7 +17795,7 @@ class SliceSprite extends Widget {
         const { t, ff, fl, fr, ft, fb } = this;
         // make sprites
         this.sf = this.tile
-            ? new extras.TilingSprite(new Texture$1(t, ff))
+            ? new TilingSprite(new Texture$1(t, ff))
             : new Sprite$1(new Texture$1(t, ff));
         this.contentContainer.addChildAt(this.sf, 0);
         if (this.vs && this.hs) {
@@ -17810,20 +17810,20 @@ class SliceSprite extends Widget {
         }
         if (hs) {
             this.sl = this.tile
-                ? new extras.TilingSprite(new Texture$1(t, fl))
+                ? new TilingSprite(new Texture$1(t, fl))
                 : new Sprite$1(new Texture$1(t, fl));
             this.sr = this.tile
-                ? new extras.TilingSprite(new Texture$1(t, fr))
+                ? new TilingSprite(new Texture$1(t, fr))
                 : new Sprite$1(new Texture$1(t, fr));
             this.contentContainer.addChildAt(this.sl, 0);
             this.contentContainer.addChildAt(this.sr, 0);
         }
         if (this.vs) {
             this.st = this.tile
-                ? new extras.TilingSprite(new Texture$1(t, ft))
+                ? new TilingSprite(new Texture$1(t, ft))
                 : new Sprite$1(new Texture$1(t, ft));
             this.sb = this.tile
-                ? new extras.TilingSprite(new Texture$1(t, fb))
+                ? new TilingSprite(new Texture$1(t, fb))
                 : new Sprite$1(new Texture$1(t, fb));
             this.contentContainer.addChildAt(this.st, 0);
             this.contentContainer.addChildAt(this.sb, 0);
@@ -19242,7 +19242,7 @@ class TextInput extends FocusableWidget {
  */
 class TilingSprite extends Widget {
     constructor(t, width, height) {
-        const sprite = new extras.TilingSprite(t);
+        const sprite = new TilingSprite(t);
         super(width || sprite.width, height || sprite.height);
         this.sprite = sprite;
         this.contentContainer.addChild(this.sprite);
@@ -19339,55 +19339,4 @@ class Ticker$1 extends utils.EventEmitter {
 Ticker$1.shared = new Ticker$1(true);
 
 export { ALIGN, AnchorLayout, AnchorLayoutOptions, BorderLayout, BorderLayoutOptions, Button, CheckBox, ClickManager, Ease, EventBroker, EventManager, FastLayout, FastLayoutOptions, FocusableWidget, Helpers, ImageButton, ImageWidget, Insets, InteractiveGroup, LayoutOptions, LinearLayout, MeasureMode, ScrollBar, ScrollManager, ScrollWidget, SliceSprite, Slider, SortableList, Sprite, Stage, Style, StyleSheet, TEXT_STYLE_PROPERTIES, TextInput, TextWidget, Ticker$1 as Ticker, TilingSprite, Widget, WidgetGroup, create, wrapEase };
-//# sourceMappingURL=puxi-core.js.map
-ontext);
-    }
-    static once(event, fn, context) {
-        Ticker$1.shared.once(event, fn, context);
-    }
-    static removeListener(event, fn) {
-        Ticker$1.shared.removeListener(event, fn);
-    }
-}
-Ticker$1.shared = new Ticker$1(true);
-
-exports.AnchorLayout = AnchorLayout;
-exports.AnchorLayoutOptions = AnchorLayoutOptions;
-exports.BorderLayout = BorderLayout;
-exports.BorderLayoutOptions = BorderLayoutOptions;
-exports.Button = Button;
-exports.CheckBox = CheckBox;
-exports.ClickManager = ClickManager;
-exports.Ease = Ease;
-exports.EventBroker = EventBroker;
-exports.EventManager = EventManager;
-exports.FastLayout = FastLayout;
-exports.FastLayoutOptions = FastLayoutOptions;
-exports.FocusableWidget = FocusableWidget;
-exports.Helpers = Helpers;
-exports.ImageButton = ImageButton;
-exports.ImageWidget = ImageWidget;
-exports.Insets = Insets;
-exports.InteractiveGroup = InteractiveGroup;
-exports.LayoutOptions = LayoutOptions;
-exports.LinearLayout = LinearLayout;
-exports.ScrollBar = ScrollBar;
-exports.ScrollManager = ScrollManager;
-exports.ScrollWidget = ScrollWidget;
-exports.SliceSprite = SliceSprite;
-exports.Slider = Slider;
-exports.SortableList = SortableList;
-exports.Sprite = Sprite;
-exports.Stage = Stage;
-exports.Style = Style;
-exports.StyleSheet = StyleSheet;
-exports.TEXT_STYLE_PROPERTIES = TEXT_STYLE_PROPERTIES;
-exports.TextInput = TextInput;
-exports.TextWidget = TextWidget;
-exports.Ticker = Ticker$1;
-exports.TilingSprite = TilingSprite;
-exports.Widget = Widget;
-exports.WidgetGroup = WidgetGroup;
-exports.create = create;
-exports.wrapEase = wrapEase;
 //# sourceMappingURL=puxi-core.js.map

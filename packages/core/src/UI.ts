@@ -24,3 +24,4 @@ export * from './layout-manager';
 export * from './layout-options';
 export * from './IMeasurable';
 export * from './WidgetGroup';
+export * from './FocusableWidget';

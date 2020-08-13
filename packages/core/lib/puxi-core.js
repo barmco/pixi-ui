@@ -1,17 +1,13 @@
 /*!
  * @puxi/core - v1.0.1
- * Compiled Sun, 26 Jul 2020 02:14:25 UTC
+ * Compiled Thu, 13 Aug 2020 09:22:45 UTC
  *
  * @puxi/core is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
  */
-// cjs
-'use strict';
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
-var PIXI = require('pixi.js');
-var filterDropShadow = require('@pixi/filter-drop-shadow');
+// mjs
+import { Point as Point$1, utils, Container, BLEND_MODES as BLEND_MODES$1, Graphics, Rectangle as Rectangle$1, Text, TextStyle, Sprite as Sprite$1, Texture as Texture$1, BaseTexture as BaseTexture$1, Ticker as Ticker$2, extras } from 'pixi.js';
+import { DropShadowFilter } from '@pixi/filter-drop-shadow';
 
 const _items = [];
 const DragDropController = {
@@ -108,11 +104,12 @@ class Insets {
  * @property {number} EXACTLY - the entity should set its dimension to the one passed to it.
  * @property {number} AT_MOST - the entity should find an optimal dimension below the one passed to it.
  */
+var MeasureMode;
 (function (MeasureMode) {
     MeasureMode[MeasureMode["UNBOUNDED"] = 0] = "UNBOUNDED";
     MeasureMode[MeasureMode["EXACTLY"] = 1] = "EXACTLY";
     MeasureMode[MeasureMode["AT_MOST"] = 2] = "AT_MOST";
-})(exports.MeasureMode || (exports.MeasureMode = {}));
+})(MeasureMode || (MeasureMode = {}));
 /**
  * Any renderable entity that can be used in a widget hierarchy must be
  * measurable.
@@ -332,8 +329,8 @@ class ClickManager extends EventManager {
         this.bound = false;
         this.id = 0;
         this.ishover = false;
-        this.mouse = new PIXI.Point();
-        this.offset = new PIXI.Point();
+        this.mouse = new Point$1();
+        this.offset = new Point$1();
         this.movementX = 0;
         this.movementY = 0;
         this._includeHover = typeof includeHover === 'undefined' ? true : includeHover;
@@ -450,9 +447,9 @@ class DragManager extends EventManager {
         this.isBound = false;
         this.isDragging = false;
         this.id = 0;
-        this.dragStart = new PIXI.Point();
-        this.dragOffset = new PIXI.Point();
-        this.lastCursor = new PIXI.Point();
+        this.dragStart = new Point$1();
+        this.dragOffset = new Point$1();
+        this.lastCursor = new Point$1();
         this.movementX = 0;
         this.movementY = 0;
         this.cancel = false;
@@ -569,7 +566,7 @@ class ScrollManager extends EventManager {
             // Default onMouseScroll.
         };
         this.bound = false;
-        this.delta = new PIXI.Point();
+        this.delta = new Point$1();
         this.preventDefault = preventDefault;
         this.startEvent();
     }
@@ -613,7 +610,7 @@ const TEXT_STYLE_PROPERTIES = [
  * @extends PIXI.utils.EventEmitter
  * @implements PUXI.IMeasurable
  */
-class Widget extends PIXI.utils.EventEmitter {
+class Widget extends utils.EventEmitter {
     constructor() {
         super();
         /**
@@ -621,14 +618,14 @@ class Widget extends PIXI.utils.EventEmitter {
          * @member {PIXI.Container}
          * @readonly
          */
-        this.insetContainer = new PIXI.Container();
+        this.insetContainer = new Container();
         /**
          * This container holds the content of this widget. Subclasses should add
          * renderable display-objects to this container.
          * @member {PIXI.Container}
          * @readonly
          */
-        this.contentContainer = this.insetContainer.addChild(new PIXI.Container());
+        this.contentContainer = this.insetContainer.addChild(new Container());
         /**
          * Children of this widget. Use `WidgetGroup` to position children.
          * @member {PUXI.Widget[]}
@@ -661,7 +658,7 @@ class Widget extends PIXI.utils.EventEmitter {
         this._paddingBottom = 0;
         this._elevation = 0;
         this.tint = 0;
-        this.blendMode = PIXI.BLEND_MODES.NORMAL;
+        this.blendMode = BLEND_MODES$1.NORMAL;
         this.draggable = false;
         this.droppable = false;
         this.singleClickTimeout = null;
@@ -741,24 +738,24 @@ class Widget extends PIXI.utils.EventEmitter {
         const naturalWidth = this.contentContainer.width + this.paddingHorizontal;
         const naturalHeight = this.contentContainer.height + this.paddingVertical;
         switch (widthMode) {
-            case exports.MeasureMode.EXACTLY:
+            case MeasureMode.EXACTLY:
                 this._measuredWidth = width;
                 break;
-            case exports.MeasureMode.UNBOUNDED:
+            case MeasureMode.UNBOUNDED:
                 this._measuredWidth = naturalWidth;
                 break;
-            case exports.MeasureMode.AT_MOST:
+            case MeasureMode.AT_MOST:
                 this._measuredWidth = Math.min(width, naturalWidth);
                 break;
         }
         switch (heightMode) {
-            case exports.MeasureMode.EXACTLY:
+            case MeasureMode.EXACTLY:
                 this._measuredHeight = height;
                 break;
-            case exports.MeasureMode.UNBOUNDED:
+            case MeasureMode.UNBOUNDED:
                 this._measuredHeight = naturalHeight;
                 break;
-            case exports.MeasureMode.AT_MOST:
+            case MeasureMode.AT_MOST:
                 this._measuredHeight = Math.min(height, naturalHeight);
                 break;
         }
@@ -1100,10 +1097,10 @@ class Widget extends PIXI.utils.EventEmitter {
             this.insetContainer.removeChild(this.background);
         }
         if (typeof bg === 'string') {
-            bg = PIXI.utils.string2hex(bg);
+            bg = utils.string2hex(bg);
         }
         if (typeof bg === 'number') {
-            bg = new PIXI.Graphics()
+            bg = new Graphics()
                 .beginFill(bg)
                 .drawRect(0, 0, 1, 1)
                 .endFill();
@@ -1181,7 +1178,7 @@ class Widget extends PIXI.utils.EventEmitter {
                 if (this.background && !this.background.filters) {
                     this.background.filters = [];
                 }
-                this._dropShadow = new filterDropShadow.DropShadowFilter({ distance: val });
+                this._dropShadow = new DropShadowFilter({ distance: val });
                 if (this.background) {
                     this.background.filters.push(this._dropShadow);
                 }
@@ -1300,8 +1297,8 @@ class Widget extends PIXI.utils.EventEmitter {
             return;
         }
         this.dragInitialized = true;
-        const realPosition = new PIXI.Point();
-        const dragPosition = new PIXI.Point();
+        const realPosition = new Point$1();
+        const dragPosition = new Point$1();
         const dnd = this.eventBroker.dnd;
         const { insetContainer } = this;
         dnd.onDragStart = (e) => {
@@ -1396,10 +1393,10 @@ class Widget extends PIXI.utils.EventEmitter {
      * @param {PUXI.MeasureMode} mode - measurement mode passed by parent
      */
     static resolveMeasuredDimen(natural, limit, mode) {
-        if (mode === exports.MeasureMode.EXACTLY) {
+        if (mode === MeasureMode.EXACTLY) {
             return limit;
         }
-        else if (mode === exports.MeasureMode.AT_MOST) {
+        else if (mode === MeasureMode.AT_MOST) {
             return Math.min(limit, natural);
         }
         return natural;
@@ -1416,6 +1413,7 @@ Widget.CLICK_DELAY = 300;
  * @memberof PUXI
  * @enum
  */
+var ALIGN;
 (function (ALIGN) {
     ALIGN[ALIGN["LEFT"] = 0] = "LEFT";
     ALIGN[ALIGN["TOP"] = 0] = "TOP";
@@ -1424,7 +1422,7 @@ Widget.CLICK_DELAY = 300;
     ALIGN[ALIGN["RIGHT"] = 1048561] = "RIGHT";
     ALIGN[ALIGN["BOTTOM"] = 1048561] = "BOTTOM";
     ALIGN[ALIGN["NONE"] = 4294967295] = "NONE";
-})(exports.ALIGN || (exports.ALIGN = {}));
+})(ALIGN || (ALIGN = {}));
 
 /**
  * This are the base constraints that you can apply on a `PUXI.Widget` under any
@@ -1644,8 +1642,8 @@ class AnchorLayoutOptions extends LayoutOptions {
         this.anchorTop = options.anchorTop || 0;
         this.anchorBottom = options.anchorBottom || 0;
         this.anchorRight = options.anchorRight || 0;
-        this.horizontalAlign = options.horizontalAlign || exports.ALIGN.LEFT;
-        this.verticalAlign = options.verticalAlign || exports.ALIGN.CENTER;
+        this.horizontalAlign = options.horizontalAlign || ALIGN.LEFT;
+        this.verticalAlign = options.verticalAlign || ALIGN.CENTER;
     }
 }
 
@@ -1700,8 +1698,8 @@ class FastLayoutOptions extends LayoutOptions {
         this.anchor = options.anchor || FastLayoutOptions.DEFAULT_ANCHOR.clone();
     }
 }
-FastLayoutOptions.DEFAULT_ANCHOR = new PIXI.Point(0, 0);
-FastLayoutOptions.CENTER_ANCHOR = new PIXI.Point(0.5, 0.5); // fragile, shouldn't be modified
+FastLayoutOptions.DEFAULT_ANCHOR = new Point$1(0, 0);
+FastLayoutOptions.CENTER_ANCHOR = new Point$1(0.5, 0.5); // fragile, shouldn't be modified
 
 /**
  * @memberof PUXI
@@ -1756,13 +1754,13 @@ class BorderLayoutOptions extends LayoutOptions {
          * @member {PUXI.ALIGN}
          * @default {PUXI.ALIGN.LEFT}
          */
-        this.horizontalAlign = options.horizontalAlign || exports.ALIGN.LEFT;
+        this.horizontalAlign = options.horizontalAlign || ALIGN.LEFT;
         /**
          * Alignment of the widget vertically in its region.
          * @member {PUXI.ALIGN}
          * @default {PUXI.ALIGN.TOP}
          */
-        this.verticalAlign = options.verticalAlign || exports.ALIGN.TOP;
+        this.verticalAlign = options.verticalAlign || ALIGN.TOP;
     }
 }
 /**
@@ -1859,12 +1857,12 @@ class FastLayout {
     getChildMeasureMode(dimen, parentMeasureMode) {
         if (dimen === LayoutOptions.WRAP_CONTENT) {
             // No MeasureMode.EXACTLY!
-            return parentMeasureMode === exports.MeasureMode.UNBOUNDED ? exports.MeasureMode.UNBOUNDED : exports.MeasureMode.AT_MOST;
+            return parentMeasureMode === MeasureMode.UNBOUNDED ? MeasureMode.UNBOUNDED : MeasureMode.AT_MOST;
         }
         return parentMeasureMode;
     }
     measureWidthReach(parentWidthLimit, widthMode) {
-        if (widthMode === exports.MeasureMode.EXACTLY) {
+        if (widthMode === MeasureMode.EXACTLY) {
             return parentWidthLimit;
         }
         const children = this.host.widgetChildren;
@@ -1880,13 +1878,13 @@ class FastLayout {
             const minr = (Math.abs(x) < 1 ? (1 - anchor.x) * childWidth / (1 - x) : x + childWidth);
             measuredWidth = Math.max(measuredWidth, minr);
         }
-        if (widthMode === exports.MeasureMode.AT_MOST) {
+        if (widthMode === MeasureMode.AT_MOST) {
             measuredWidth = Math.min(parentWidthLimit, measuredWidth);
         }
         return measuredWidth;
     }
     measureHeightReach(parentHeightLimit, heightMode) {
-        if (heightMode === exports.MeasureMode.EXACTLY) {
+        if (heightMode === MeasureMode.EXACTLY) {
             return parentHeightLimit;
         }
         const children = this.host.widgetChildren;
@@ -1900,7 +1898,7 @@ class FastLayout {
             const minb = (Math.abs(y) < 1 ? (1 - anchor.y) * childHeight / (1 - y) : y + childHeight);
             measuredHeight = Math.max(measuredHeight, minb);
         }
-        if (heightMode === exports.MeasureMode.AT_MOST) {
+        if (heightMode === MeasureMode.AT_MOST) {
             measuredHeight = Math.min(parentHeightLimit, measuredHeight);
         }
         return measuredHeight;
@@ -1919,7 +1917,7 @@ class FastLayout {
                 loptHeight = widget.getMeasuredHeight();
             }
             if (lopt.width === LayoutOptions.FILL_PARENT || lopt.height === LayoutOptions.FILL_PARENT) {
-                widget.measure(lopt.width === LayoutOptions.FILL_PARENT ? this._measuredWidth : loptWidth, lopt.height === LayoutOptions.FILL_PARENT ? this._measuredHeight : loptHeight, exports.MeasureMode.EXACTLY, exports.MeasureMode.EXACTLY);
+                widget.measure(lopt.width === LayoutOptions.FILL_PARENT ? this._measuredWidth : loptWidth, lopt.height === LayoutOptions.FILL_PARENT ? this._measuredHeight : loptHeight, MeasureMode.EXACTLY, MeasureMode.EXACTLY);
             }
         }
     }
@@ -2014,7 +2012,7 @@ class WidgetGroup extends Widget {
 class InteractiveGroup extends WidgetGroup {
     constructor() {
         super();
-        this.hitArea = new PIXI.Rectangle();
+        this.hitArea = new Rectangle$1();
         this.insetContainer.hitArea = this.hitArea;
     }
     update() {
@@ -2155,7 +2153,7 @@ class TextWidget extends Widget {
      */
     constructor(text, textStyle) {
         super();
-        this.textDisplay = new PIXI.Text(text, textStyle);
+        this.textDisplay = new Text(text, textStyle);
         this.contentContainer.addChild(this.textDisplay);
     }
     update() {
@@ -2234,7 +2232,7 @@ class Button extends FocusableWidget {
         super(options);
         this.isHover = false;
         if (typeof options.text === 'string') {
-            options.text = new TextWidget(options.text, new PIXI.TextStyle());
+            options.text = new TextWidget(options.text, new TextStyle());
         }
         this.textWidget = options.text.setLayoutOptions(new FastLayoutOptions({
             width: LayoutOptions.WRAP_CONTENT,
@@ -2719,7 +2717,7 @@ const Helpers = {
 class Sprite extends Widget {
     constructor(texture) {
         super();
-        this.spriteDisplay = new PIXI.Sprite(texture);
+        this.spriteDisplay = new Sprite$1(texture);
         this.contentContainer.addChild(this.spriteDisplay);
     }
     update() {
@@ -2731,61 +2729,228 @@ class Sprite extends Widget {
         }
     }
     static fromImage(imageUrl) {
-        return new Sprite(new PIXI.Texture(new PIXI.BaseTexture(imageUrl)));
+        return new Sprite(new Texture$1(new BaseTexture$1(imageUrl)));
     }
 }
 const ImageWidget = Sprite;
 
-var appleIphone = /iPhone/i;
-var appleIpod = /iPod/i;
-var appleTablet = /iPad/i;
-var appleUniversal = /\biOS-universal(?:.+)Mac\b/i;
-var androidPhone = /\bAndroid(?:.+)Mobile\b/i;
-var androidTablet = /Android/i;
-var amazonPhone = /(?:SD4930UR|\bSilk(?:.+)Mobile\b)/i;
-var amazonTablet = /Silk/i;
-var windowsPhone = /Windows Phone/i;
-var windowsTablet = /\bWindows(?:.+)ARM\b/i;
-var otherBlackBerry = /BlackBerry/i;
-var otherBlackBerry10 = /BB10/i;
-var otherOpera = /Opera Mini/i;
-var otherChrome = /\b(CriOS|Chrome)(?:.+)Mobile/i;
-var otherFirefox = /Mobile(?:.+)Firefox\b/i;
-var isAppleTabletOnIos13 = function (navigator) {
-    return (typeof navigator !== 'undefined' &&
-        navigator.platform === 'MacIntel' &&
-        typeof navigator.maxTouchPoints === 'number' &&
-        navigator.maxTouchPoints > 1 &&
-        typeof MSStream === 'undefined');
-};
-function createMatch(userAgent) {
-    return function (regex) { return regex.test(userAgent); };
-}
-function isMobile(param) {
-    var nav = {
-        userAgent: '',
-        platform: '',
-        maxTouchPoints: 0
+/*!
+ * @pixi/runner - v5.2.1
+ * Compiled Tue, 28 Jan 2020 23:33:11 UTC
+ *
+ * @pixi/runner is licensed under the MIT License.
+ * http://www.opensource.org/licenses/mit-license
+ */
+/**
+ * A Runner is a highly performant and simple alternative to signals. Best used in situations
+ * where events are dispatched to many objects at high frequency (say every frame!)
+ *
+ *
+ * like a signal..
+ * ```
+ * import { Runner } from '@pixi/runner';
+ *
+ * const myObject = {
+ *     loaded: new Runner('loaded')
+ * }
+ *
+ * const listener = {
+ *     loaded: function(){
+ *         // thin
+ *     }
+ * }
+ *
+ * myObject.update.add(listener);
+ *
+ * myObject.loaded.emit();
+ * ```
+ *
+ * Or for handling calling the same function on many items
+ * ```
+ * import { Runner } from '@pixi/runner';
+ *
+ * const myGame = {
+ *     update: new Runner('update')
+ * }
+ *
+ * const gameObject = {
+ *     update: function(time){
+ *         // update my gamey state
+ *     }
+ * }
+ *
+ * myGame.update.add(gameObject1);
+ *
+ * myGame.update.emit(time);
+ * ```
+ * @class
+ * @memberof PIXI
+ */
+var Runner = /** @class */ (function () {
+    /**
+     *  @param {string} name the function name that will be executed on the listeners added to this Runner.
+     */
+    function Runner(name) {
+        this.items = [];
+        this._name = name;
+        this._aliasCount = 0;
+    }
+    /**
+     * Dispatch/Broadcast Runner to all listeners added to the queue.
+     * @param {...any} params - optional parameters to pass to each listener
+     * @return {PIXI.Runner}
+     */
+    Runner.prototype.emit = function (a0, a1, a2, a3, a4, a5, a6, a7) {
+        if (arguments.length > 8) {
+            throw new Error('max arguments reached');
+        }
+        var _a = this, name = _a.name, items = _a.items;
+        this._aliasCount++;
+        for (var i = 0, len = items.length; i < len; i++) {
+            items[i][name](a0, a1, a2, a3, a4, a5, a6, a7);
+        }
+        if (items === this.items) {
+            this._aliasCount--;
+        }
+        return this;
     };
-    if (!param && typeof navigator !== 'undefined') {
-        nav = {
-            userAgent: navigator.userAgent,
-            platform: navigator.platform,
-            maxTouchPoints: navigator.maxTouchPoints || 0
-        };
-    }
-    else if (typeof param === 'string') {
-        nav.userAgent = param;
-    }
-    else if (param && param.userAgent) {
-        nav = {
-            userAgent: param.userAgent,
-            platform: param.platform,
-            maxTouchPoints: param.maxTouchPoints || 0
-        };
-    }
-    var userAgent = nav.userAgent;
-    var tmp = userAgent.split('[FBAN');
+    Runner.prototype.ensureNonAliasedItems = function () {
+        if (this._aliasCount > 0 && this.items.length > 1) {
+            this._aliasCount = 0;
+            this.items = this.items.slice(0);
+        }
+    };
+    /**
+     * Add a listener to the Runner
+     *
+     * Runners do not need to have scope or functions passed to them.
+     * All that is required is to pass the listening object and ensure that it has contains a function that has the same name
+     * as the name provided to the Runner when it was created.
+     *
+     * Eg A listener passed to this Runner will require a 'complete' function.
+     *
+     * ```
+     * import { Runner } from '@pixi/runner';
+     *
+     * const complete = new Runner('complete');
+     * ```
+     *
+     * The scope used will be the object itself.
+     *
+     * @param {any} item - The object that will be listening.
+     * @return {PIXI.Runner}
+     */
+    Runner.prototype.add = function (item) {
+        if (item[this._name]) {
+            this.ensureNonAliasedItems();
+            this.remove(item);
+            this.items.push(item);
+        }
+        return this;
+    };
+    /**
+     * Remove a single listener from the dispatch queue.
+     * @param {any} item - The listenr that you would like to remove.
+     * @return {PIXI.Runner}
+     */
+    Runner.prototype.remove = function (item) {
+        var index = this.items.indexOf(item);
+        if (index !== -1) {
+            this.ensureNonAliasedItems();
+            this.items.splice(index, 1);
+        }
+        return this;
+    };
+    /**
+     * Check to see if the listener is already in the Runner
+     * @param {any} item - The listener that you would like to check.
+     */
+    Runner.prototype.contains = function (item) {
+        return this.items.indexOf(item) !== -1;
+    };
+    /**
+     * Remove all listeners from the Runner
+     * @return {PIXI.Runner}
+     */
+    Runner.prototype.removeAll = function () {
+        this.ensureNonAliasedItems();
+        this.items.length = 0;
+        return this;
+    };
+    /**
+     * Remove all references, don't use after this.
+     */
+    Runner.prototype.destroy = function () {
+        this.removeAll();
+        this.items = null;
+        this._name = null;
+    };
+    Object.defineProperty(Runner.prototype, "empty", {
+        /**
+         * `true` if there are no this Runner contains no listeners
+         *
+         * @member {boolean}
+         * @readonly
+         */
+        get: function () {
+            return this.items.length === 0;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Runner.prototype, "name", {
+        /**
+         * The name of the runner.
+         *
+         * @member {string}
+         * @readonly
+         */
+        get: function () {
+            return this._name;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    return Runner;
+}());
+Object.defineProperties(Runner.prototype, {
+    /**
+     * Alias for `emit`
+     * @memberof PIXI.Runner#
+     * @method dispatch
+     * @see PIXI.Runner#emit
+     */
+    dispatch: { value: Runner.prototype.emit },
+    /**
+     * Alias for `emit`
+     * @memberof PIXI.Runner#
+     * @method run
+     * @see PIXI.Runner#emit
+     */
+    run: { value: Runner.prototype.emit },
+});
+
+const appleIphone = /iPhone/i;
+const appleIpod = /iPod/i;
+const appleTablet = /iPad/i;
+const androidPhone = /\bAndroid(?:.+)Mobile\b/i;
+const androidTablet = /Android/i;
+const amazonPhone = /(?:SD4930UR|\bSilk(?:.+)Mobile\b)/i;
+const amazonTablet = /Silk/i;
+const windowsPhone = /Windows Phone/i;
+const windowsTablet = /\bWindows(?:.+)ARM\b/i;
+const otherBlackBerry = /BlackBerry/i;
+const otherBlackBerry10 = /BB10/i;
+const otherOpera = /Opera Mini/i;
+const otherChrome = /\b(CriOS|Chrome)(?:.+)Mobile/i;
+const otherFirefox = /Mobile(?:.+)Firefox\b/i;
+function match(regex, userAgent) {
+    return regex.test(userAgent);
+}
+function isMobile(userAgent) {
+    userAgent =
+        userAgent || (typeof navigator !== 'undefined' ? navigator.userAgent : '');
+    let tmp = userAgent.split('[FBAN');
     if (typeof tmp[1] !== 'undefined') {
         userAgent = tmp[0];
     }
@@ -2793,61 +2958,57 @@ function isMobile(param) {
     if (typeof tmp[1] !== 'undefined') {
         userAgent = tmp[0];
     }
-    var match = createMatch(userAgent);
-    var result = {
+    const result = {
         apple: {
-            phone: match(appleIphone) && !match(windowsPhone),
-            ipod: match(appleIpod),
-            tablet: !match(appleIphone) &&
-                (match(appleTablet) || isAppleTabletOnIos13(nav)) &&
-                !match(windowsPhone),
-            universal: match(appleUniversal),
-            device: (match(appleIphone) ||
-                match(appleIpod) ||
-                match(appleTablet) ||
-                match(appleUniversal) ||
-                isAppleTabletOnIos13(nav)) &&
-                !match(windowsPhone)
+            phone: match(appleIphone, userAgent) && !match(windowsPhone, userAgent),
+            ipod: match(appleIpod, userAgent),
+            tablet: !match(appleIphone, userAgent) &&
+                match(appleTablet, userAgent) &&
+                !match(windowsPhone, userAgent),
+            device: (match(appleIphone, userAgent) ||
+                match(appleIpod, userAgent) ||
+                match(appleTablet, userAgent)) &&
+                !match(windowsPhone, userAgent),
         },
         amazon: {
-            phone: match(amazonPhone),
-            tablet: !match(amazonPhone) && match(amazonTablet),
-            device: match(amazonPhone) || match(amazonTablet)
+            phone: match(amazonPhone, userAgent),
+            tablet: !match(amazonPhone, userAgent) && match(amazonTablet, userAgent),
+            device: match(amazonPhone, userAgent) || match(amazonTablet, userAgent),
         },
         android: {
-            phone: (!match(windowsPhone) && match(amazonPhone)) ||
-                (!match(windowsPhone) && match(androidPhone)),
-            tablet: !match(windowsPhone) &&
-                !match(amazonPhone) &&
-                !match(androidPhone) &&
-                (match(amazonTablet) || match(androidTablet)),
-            device: (!match(windowsPhone) &&
-                (match(amazonPhone) ||
-                    match(amazonTablet) ||
-                    match(androidPhone) ||
-                    match(androidTablet))) ||
-                match(/\bokhttp\b/i)
+            phone: (!match(windowsPhone, userAgent) && match(amazonPhone, userAgent)) ||
+                (!match(windowsPhone, userAgent) && match(androidPhone, userAgent)),
+            tablet: !match(windowsPhone, userAgent) &&
+                !match(amazonPhone, userAgent) &&
+                !match(androidPhone, userAgent) &&
+                (match(amazonTablet, userAgent) || match(androidTablet, userAgent)),
+            device: (!match(windowsPhone, userAgent) &&
+                (match(amazonPhone, userAgent) ||
+                    match(amazonTablet, userAgent) ||
+                    match(androidPhone, userAgent) ||
+                    match(androidTablet, userAgent))) ||
+                match(/\bokhttp\b/i, userAgent),
         },
         windows: {
-            phone: match(windowsPhone),
-            tablet: match(windowsTablet),
-            device: match(windowsPhone) || match(windowsTablet)
+            phone: match(windowsPhone, userAgent),
+            tablet: match(windowsTablet, userAgent),
+            device: match(windowsPhone, userAgent) || match(windowsTablet, userAgent),
         },
         other: {
-            blackberry: match(otherBlackBerry),
-            blackberry10: match(otherBlackBerry10),
-            opera: match(otherOpera),
-            firefox: match(otherFirefox),
-            chrome: match(otherChrome),
-            device: match(otherBlackBerry) ||
-                match(otherBlackBerry10) ||
-                match(otherOpera) ||
-                match(otherFirefox) ||
-                match(otherChrome)
+            blackberry: match(otherBlackBerry, userAgent),
+            blackberry10: match(otherBlackBerry10, userAgent),
+            opera: match(otherOpera, userAgent),
+            firefox: match(otherFirefox, userAgent),
+            chrome: match(otherChrome, userAgent),
+            device: match(otherBlackBerry, userAgent) ||
+                match(otherBlackBerry10, userAgent) ||
+                match(otherOpera, userAgent) ||
+                match(otherFirefox, userAgent) ||
+                match(otherChrome, userAgent),
         },
         any: false,
         phone: false,
-        tablet: false
+        tablet: false,
     };
     result.any =
         result.apple.device ||
@@ -2862,15 +3023,16 @@ function isMobile(param) {
 }
 
 /*!
- * @pixi/settings - v5.3.1
- * Compiled Fri, 24 Jul 2020 20:56:48 UTC
+ * @pixi/settings - v5.2.1
+ * Compiled Tue, 28 Jan 2020 23:33:11 UTC
  *
  * @pixi/settings is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
  */
 
 // The ESM/CJS versions of ismobilejs only
-var isMobile$1 = isMobile(window.navigator);
+
+var isMobile$1 = isMobile();
 
 /**
  * The maximum recommended texture units to use.
@@ -2885,30 +3047,46 @@ var isMobile$1 = isMobile(window.navigator);
  * @param {number} max
  * @returns {number}
  */
-function maxRecommendedTextures(max) {
+function maxRecommendedTextures(max)
+{
     var allowMax = true;
-    if (isMobile$1.tablet || isMobile$1.phone) {
-        if (isMobile$1.apple.device) {
+
+    if (isMobile$1.tablet || isMobile$1.phone)
+    {
+        allowMax = false;
+
+        if (isMobile$1.apple.device)
+        {
             var match = (navigator.userAgent).match(/OS (\d+)_(\d+)?/);
-            if (match) {
+
+            if (match)
+            {
                 var majorVersion = parseInt(match[1], 10);
-                // Limit texture units on devices below iOS 11, which will be older hardware
-                if (majorVersion < 11) {
-                    allowMax = false;
+
+                // All texture units can be used on devices that support ios 11 or above
+                if (majorVersion >= 11)
+                {
+                    allowMax = true;
                 }
             }
         }
-        if (isMobile$1.android.device) {
-            var match = (navigator.userAgent).match(/Android\s([0-9.]*)/);
-            if (match) {
-                var majorVersion = parseInt(match[1], 10);
-                // Limit texture units on devices below Android 7 (Nougat), which will be older hardware
-                if (majorVersion < 7) {
-                    allowMax = false;
+        if (isMobile$1.android.device)
+        {
+            var match$1 = (navigator.userAgent).match(/Android\s([0-9.]*)/);
+
+            if (match$1)
+            {
+                var majorVersion$1 = parseInt(match$1[1], 10);
+
+                // All texture units can be used on devices that support Android 7 (Nougat) or above
+                if (majorVersion$1 >= 7)
+                {
+                    allowMax = true;
                 }
             }
         }
     }
+
     return allowMax ? max : 4;
 }
 
@@ -2920,7 +3098,8 @@ function maxRecommendedTextures(max) {
  * @private
  * @returns {boolean}
  */
-function canUploadSameBuffer() {
+function canUploadSameBuffer()
+{
     return !isMobile$1.apple.device;
 }
 
@@ -2937,6 +3116,7 @@ function canUploadSameBuffer() {
  * @namespace PIXI.settings
  */
 var settings = {
+
     /**
      * If set to true WebGL will attempt make textures mimpaped by default.
      * Mipmapping will only succeed if the base texture uploaded has power of two dimensions.
@@ -2948,6 +3128,7 @@ var settings = {
      * @default PIXI.MIPMAP_MODES.POW2
      */
     MIPMAP_TEXTURES: 1,
+
     /**
      * Default anisotropic filtering level of textures.
      * Usually from 0 to 16
@@ -2959,6 +3140,7 @@ var settings = {
      * @default 0
      */
     ANISOTROPIC_LEVEL: 0,
+
     /**
      * Default resolution / device pixel ratio of the renderer.
      *
@@ -2969,6 +3151,7 @@ var settings = {
      * @default 1
      */
     RESOLUTION: 1,
+
     /**
      * Default filter resolution.
      *
@@ -2979,6 +3162,7 @@ var settings = {
      * @default 1
      */
     FILTER_RESOLUTION: 1,
+
     /**
      * The maximum textures that this device supports.
      *
@@ -2989,8 +3173,10 @@ var settings = {
      * @default 32
      */
     SPRITE_MAX_TEXTURES: maxRecommendedTextures(32),
+
     // TODO: maybe change to SPRITE.BATCH_SIZE: 2000
     // TODO: maybe add PARTICLE.BATCH_SIZE: 15000
+
     /**
      * The default sprite batch size.
      *
@@ -3003,6 +3189,7 @@ var settings = {
      * @default 4096
      */
     SPRITE_BATCH_SIZE: 4096,
+
     /**
      * The default render options if none are supplied to {@link PIXI.Renderer}
      * or {@link PIXI.CanvasRenderer}.
@@ -3014,6 +3201,7 @@ var settings = {
      * @property {HTMLCanvasElement} view=null
      * @property {number} resolution=1
      * @property {boolean} antialias=false
+     * @property {boolean} forceFXAA=false
      * @property {boolean} autoDensity=false
      * @property {boolean} transparent=false
      * @property {number} backgroundColor=0x000000
@@ -3026,6 +3214,7 @@ var settings = {
     RENDER_OPTIONS: {
         view: null,
         antialias: false,
+        forceFXAA: false,
         autoDensity: false,
         transparent: false,
         backgroundColor: 0x000000,
@@ -3035,6 +3224,7 @@ var settings = {
         height: 600,
         legacy: false,
     },
+
     /**
      * Default Garbage Collection mode.
      *
@@ -3045,6 +3235,7 @@ var settings = {
      * @default PIXI.GC_MODES.AUTO
      */
     GC_MODE: 0,
+
     /**
      * Default Garbage Collection max idle.
      *
@@ -3055,6 +3246,7 @@ var settings = {
      * @default 3600
      */
     GC_MAX_IDLE: 60 * 60,
+
     /**
      * Default Garbage Collection maximum check count.
      *
@@ -3065,6 +3257,7 @@ var settings = {
      * @default 600
      */
     GC_MAX_CHECK_COUNT: 60 * 10,
+
     /**
      * Default wrap modes that are supported by pixi.
      *
@@ -3075,6 +3268,7 @@ var settings = {
      * @default PIXI.WRAP_MODES.CLAMP
      */
     WRAP_MODE: 33071,
+
     /**
      * Default scale mode for textures.
      *
@@ -3085,6 +3279,7 @@ var settings = {
      * @default PIXI.SCALE_MODES.LINEAR
      */
     SCALE_MODE: 1,
+
     /**
      * Default specify float precision in vertex shader.
      *
@@ -3095,6 +3290,7 @@ var settings = {
      * @default PIXI.PRECISION.HIGH
      */
     PRECISION_VERTEX: 'highp',
+
     /**
      * Default specify float precision in fragment shader.
      * iOS is best set at highp due to https://github.com/pixijs/pixi.js/issues/3742
@@ -3106,6 +3302,7 @@ var settings = {
      * @default PIXI.PRECISION.MEDIUM
      */
     PRECISION_FRAGMENT: isMobile$1.apple.device ? 'highp' : 'mediump',
+
     /**
      * Can we upload the same buffer in a single frame?
      *
@@ -3115,6 +3312,7 @@ var settings = {
      * @type {boolean}
      */
     CAN_UPLOAD_SAME_BUFFER: canUploadSameBuffer(),
+
     /**
      * Enables bitmap creation before image load. This feature is experimental.
      *
@@ -3125,6 +3323,7 @@ var settings = {
      * @default false
      */
     CREATE_IMAGE_BITMAP: false,
+
     /**
      * If true PixiJS will Math.floor() x/y values when rendering, stopping pixel interpolation.
      * Advantages can include sharper image quality (like text) and faster rendering on canvas.
@@ -3138,446 +3337,6 @@ var settings = {
      */
     ROUND_PIXELS: false,
 };
-
-/*!
- * @pixi/constants - v5.3.1
- * Compiled Fri, 24 Jul 2020 20:56:48 UTC
- *
- * @pixi/constants is licensed under the MIT License.
- * http://www.opensource.org/licenses/mit-license
- */
-/**
- * Different types of environments for WebGL.
- *
- * @static
- * @memberof PIXI
- * @name ENV
- * @enum {number}
- * @property {number} WEBGL_LEGACY - Used for older v1 WebGL devices. PixiJS will aim to ensure compatibility
- *  with older / less advanced devices. If you experience unexplained flickering prefer this environment.
- * @property {number} WEBGL - Version 1 of WebGL
- * @property {number} WEBGL2 - Version 2 of WebGL
- */
-var ENV;
-(function (ENV) {
-    ENV[ENV["WEBGL_LEGACY"] = 0] = "WEBGL_LEGACY";
-    ENV[ENV["WEBGL"] = 1] = "WEBGL";
-    ENV[ENV["WEBGL2"] = 2] = "WEBGL2";
-})(ENV || (ENV = {}));
-/**
- * Constant to identify the Renderer Type.
- *
- * @static
- * @memberof PIXI
- * @name RENDERER_TYPE
- * @enum {number}
- * @property {number} UNKNOWN - Unknown render type.
- * @property {number} WEBGL - WebGL render type.
- * @property {number} CANVAS - Canvas render type.
- */
-var RENDERER_TYPE;
-(function (RENDERER_TYPE) {
-    RENDERER_TYPE[RENDERER_TYPE["UNKNOWN"] = 0] = "UNKNOWN";
-    RENDERER_TYPE[RENDERER_TYPE["WEBGL"] = 1] = "WEBGL";
-    RENDERER_TYPE[RENDERER_TYPE["CANVAS"] = 2] = "CANVAS";
-})(RENDERER_TYPE || (RENDERER_TYPE = {}));
-/**
- * Bitwise OR of masks that indicate the buffers to be cleared.
- *
- * @static
- * @memberof PIXI
- * @name BUFFER_BITS
- * @enum {number}
- * @property {number} COLOR - Indicates the buffers currently enabled for color writing.
- * @property {number} DEPTH - Indicates the depth buffer.
- * @property {number} STENCIL - Indicates the stencil buffer.
- */
-var BUFFER_BITS;
-(function (BUFFER_BITS) {
-    BUFFER_BITS[BUFFER_BITS["COLOR"] = 16384] = "COLOR";
-    BUFFER_BITS[BUFFER_BITS["DEPTH"] = 256] = "DEPTH";
-    BUFFER_BITS[BUFFER_BITS["STENCIL"] = 1024] = "STENCIL";
-})(BUFFER_BITS || (BUFFER_BITS = {}));
-/**
- * Various blend modes supported by PIXI.
- *
- * IMPORTANT - The WebGL renderer only supports the NORMAL, ADD, MULTIPLY and SCREEN blend modes.
- * Anything else will silently act like NORMAL.
- *
- * @memberof PIXI
- * @name BLEND_MODES
- * @enum {number}
- * @property {number} NORMAL
- * @property {number} ADD
- * @property {number} MULTIPLY
- * @property {number} SCREEN
- * @property {number} OVERLAY
- * @property {number} DARKEN
- * @property {number} LIGHTEN
- * @property {number} COLOR_DODGE
- * @property {number} COLOR_BURN
- * @property {number} HARD_LIGHT
- * @property {number} SOFT_LIGHT
- * @property {number} DIFFERENCE
- * @property {number} EXCLUSION
- * @property {number} HUE
- * @property {number} SATURATION
- * @property {number} COLOR
- * @property {number} LUMINOSITY
- * @property {number} NORMAL_NPM
- * @property {number} ADD_NPM
- * @property {number} SCREEN_NPM
- * @property {number} NONE
- * @property {number} SRC_IN
- * @property {number} SRC_OUT
- * @property {number} SRC_ATOP
- * @property {number} DST_OVER
- * @property {number} DST_IN
- * @property {number} DST_OUT
- * @property {number} DST_ATOP
- * @property {number} SUBTRACT
- * @property {number} SRC_OVER
- * @property {number} ERASE
- * @property {number} XOR
- */
-var BLEND_MODES;
-(function (BLEND_MODES) {
-    BLEND_MODES[BLEND_MODES["NORMAL"] = 0] = "NORMAL";
-    BLEND_MODES[BLEND_MODES["ADD"] = 1] = "ADD";
-    BLEND_MODES[BLEND_MODES["MULTIPLY"] = 2] = "MULTIPLY";
-    BLEND_MODES[BLEND_MODES["SCREEN"] = 3] = "SCREEN";
-    BLEND_MODES[BLEND_MODES["OVERLAY"] = 4] = "OVERLAY";
-    BLEND_MODES[BLEND_MODES["DARKEN"] = 5] = "DARKEN";
-    BLEND_MODES[BLEND_MODES["LIGHTEN"] = 6] = "LIGHTEN";
-    BLEND_MODES[BLEND_MODES["COLOR_DODGE"] = 7] = "COLOR_DODGE";
-    BLEND_MODES[BLEND_MODES["COLOR_BURN"] = 8] = "COLOR_BURN";
-    BLEND_MODES[BLEND_MODES["HARD_LIGHT"] = 9] = "HARD_LIGHT";
-    BLEND_MODES[BLEND_MODES["SOFT_LIGHT"] = 10] = "SOFT_LIGHT";
-    BLEND_MODES[BLEND_MODES["DIFFERENCE"] = 11] = "DIFFERENCE";
-    BLEND_MODES[BLEND_MODES["EXCLUSION"] = 12] = "EXCLUSION";
-    BLEND_MODES[BLEND_MODES["HUE"] = 13] = "HUE";
-    BLEND_MODES[BLEND_MODES["SATURATION"] = 14] = "SATURATION";
-    BLEND_MODES[BLEND_MODES["COLOR"] = 15] = "COLOR";
-    BLEND_MODES[BLEND_MODES["LUMINOSITY"] = 16] = "LUMINOSITY";
-    BLEND_MODES[BLEND_MODES["NORMAL_NPM"] = 17] = "NORMAL_NPM";
-    BLEND_MODES[BLEND_MODES["ADD_NPM"] = 18] = "ADD_NPM";
-    BLEND_MODES[BLEND_MODES["SCREEN_NPM"] = 19] = "SCREEN_NPM";
-    BLEND_MODES[BLEND_MODES["NONE"] = 20] = "NONE";
-    BLEND_MODES[BLEND_MODES["SRC_OVER"] = 0] = "SRC_OVER";
-    BLEND_MODES[BLEND_MODES["SRC_IN"] = 21] = "SRC_IN";
-    BLEND_MODES[BLEND_MODES["SRC_OUT"] = 22] = "SRC_OUT";
-    BLEND_MODES[BLEND_MODES["SRC_ATOP"] = 23] = "SRC_ATOP";
-    BLEND_MODES[BLEND_MODES["DST_OVER"] = 24] = "DST_OVER";
-    BLEND_MODES[BLEND_MODES["DST_IN"] = 25] = "DST_IN";
-    BLEND_MODES[BLEND_MODES["DST_OUT"] = 26] = "DST_OUT";
-    BLEND_MODES[BLEND_MODES["DST_ATOP"] = 27] = "DST_ATOP";
-    BLEND_MODES[BLEND_MODES["ERASE"] = 26] = "ERASE";
-    BLEND_MODES[BLEND_MODES["SUBTRACT"] = 28] = "SUBTRACT";
-    BLEND_MODES[BLEND_MODES["XOR"] = 29] = "XOR";
-})(BLEND_MODES || (BLEND_MODES = {}));
-/**
- * Various webgl draw modes. These can be used to specify which GL drawMode to use
- * under certain situations and renderers.
- *
- * @memberof PIXI
- * @static
- * @name DRAW_MODES
- * @enum {number}
- * @property {number} POINTS
- * @property {number} LINES
- * @property {number} LINE_LOOP
- * @property {number} LINE_STRIP
- * @property {number} TRIANGLES
- * @property {number} TRIANGLE_STRIP
- * @property {number} TRIANGLE_FAN
- */
-var DRAW_MODES;
-(function (DRAW_MODES) {
-    DRAW_MODES[DRAW_MODES["POINTS"] = 0] = "POINTS";
-    DRAW_MODES[DRAW_MODES["LINES"] = 1] = "LINES";
-    DRAW_MODES[DRAW_MODES["LINE_LOOP"] = 2] = "LINE_LOOP";
-    DRAW_MODES[DRAW_MODES["LINE_STRIP"] = 3] = "LINE_STRIP";
-    DRAW_MODES[DRAW_MODES["TRIANGLES"] = 4] = "TRIANGLES";
-    DRAW_MODES[DRAW_MODES["TRIANGLE_STRIP"] = 5] = "TRIANGLE_STRIP";
-    DRAW_MODES[DRAW_MODES["TRIANGLE_FAN"] = 6] = "TRIANGLE_FAN";
-})(DRAW_MODES || (DRAW_MODES = {}));
-/**
- * Various GL texture/resources formats.
- *
- * @memberof PIXI
- * @static
- * @name FORMATS
- * @enum {number}
- * @property {number} RGBA=6408
- * @property {number} RGB=6407
- * @property {number} ALPHA=6406
- * @property {number} LUMINANCE=6409
- * @property {number} LUMINANCE_ALPHA=6410
- * @property {number} DEPTH_COMPONENT=6402
- * @property {number} DEPTH_STENCIL=34041
- */
-var FORMATS;
-(function (FORMATS) {
-    FORMATS[FORMATS["RGBA"] = 6408] = "RGBA";
-    FORMATS[FORMATS["RGB"] = 6407] = "RGB";
-    FORMATS[FORMATS["ALPHA"] = 6406] = "ALPHA";
-    FORMATS[FORMATS["LUMINANCE"] = 6409] = "LUMINANCE";
-    FORMATS[FORMATS["LUMINANCE_ALPHA"] = 6410] = "LUMINANCE_ALPHA";
-    FORMATS[FORMATS["DEPTH_COMPONENT"] = 6402] = "DEPTH_COMPONENT";
-    FORMATS[FORMATS["DEPTH_STENCIL"] = 34041] = "DEPTH_STENCIL";
-})(FORMATS || (FORMATS = {}));
-/**
- * Various GL target types.
- *
- * @memberof PIXI
- * @static
- * @name TARGETS
- * @enum {number}
- * @property {number} TEXTURE_2D=3553
- * @property {number} TEXTURE_CUBE_MAP=34067
- * @property {number} TEXTURE_2D_ARRAY=35866
- * @property {number} TEXTURE_CUBE_MAP_POSITIVE_X=34069
- * @property {number} TEXTURE_CUBE_MAP_NEGATIVE_X=34070
- * @property {number} TEXTURE_CUBE_MAP_POSITIVE_Y=34071
- * @property {number} TEXTURE_CUBE_MAP_NEGATIVE_Y=34072
- * @property {number} TEXTURE_CUBE_MAP_POSITIVE_Z=34073
- * @property {number} TEXTURE_CUBE_MAP_NEGATIVE_Z=34074
- */
-var TARGETS;
-(function (TARGETS) {
-    TARGETS[TARGETS["TEXTURE_2D"] = 3553] = "TEXTURE_2D";
-    TARGETS[TARGETS["TEXTURE_CUBE_MAP"] = 34067] = "TEXTURE_CUBE_MAP";
-    TARGETS[TARGETS["TEXTURE_2D_ARRAY"] = 35866] = "TEXTURE_2D_ARRAY";
-    TARGETS[TARGETS["TEXTURE_CUBE_MAP_POSITIVE_X"] = 34069] = "TEXTURE_CUBE_MAP_POSITIVE_X";
-    TARGETS[TARGETS["TEXTURE_CUBE_MAP_NEGATIVE_X"] = 34070] = "TEXTURE_CUBE_MAP_NEGATIVE_X";
-    TARGETS[TARGETS["TEXTURE_CUBE_MAP_POSITIVE_Y"] = 34071] = "TEXTURE_CUBE_MAP_POSITIVE_Y";
-    TARGETS[TARGETS["TEXTURE_CUBE_MAP_NEGATIVE_Y"] = 34072] = "TEXTURE_CUBE_MAP_NEGATIVE_Y";
-    TARGETS[TARGETS["TEXTURE_CUBE_MAP_POSITIVE_Z"] = 34073] = "TEXTURE_CUBE_MAP_POSITIVE_Z";
-    TARGETS[TARGETS["TEXTURE_CUBE_MAP_NEGATIVE_Z"] = 34074] = "TEXTURE_CUBE_MAP_NEGATIVE_Z";
-})(TARGETS || (TARGETS = {}));
-/**
- * Various GL data format types.
- *
- * @memberof PIXI
- * @static
- * @name TYPES
- * @enum {number}
- * @property {number} UNSIGNED_BYTE=5121
- * @property {number} UNSIGNED_SHORT=5123
- * @property {number} UNSIGNED_SHORT_5_6_5=33635
- * @property {number} UNSIGNED_SHORT_4_4_4_4=32819
- * @property {number} UNSIGNED_SHORT_5_5_5_1=32820
- * @property {number} FLOAT=5126
- * @property {number} HALF_FLOAT=36193
- */
-var TYPES;
-(function (TYPES) {
-    TYPES[TYPES["UNSIGNED_BYTE"] = 5121] = "UNSIGNED_BYTE";
-    TYPES[TYPES["UNSIGNED_SHORT"] = 5123] = "UNSIGNED_SHORT";
-    TYPES[TYPES["UNSIGNED_SHORT_5_6_5"] = 33635] = "UNSIGNED_SHORT_5_6_5";
-    TYPES[TYPES["UNSIGNED_SHORT_4_4_4_4"] = 32819] = "UNSIGNED_SHORT_4_4_4_4";
-    TYPES[TYPES["UNSIGNED_SHORT_5_5_5_1"] = 32820] = "UNSIGNED_SHORT_5_5_5_1";
-    TYPES[TYPES["FLOAT"] = 5126] = "FLOAT";
-    TYPES[TYPES["HALF_FLOAT"] = 36193] = "HALF_FLOAT";
-})(TYPES || (TYPES = {}));
-/**
- * The scale modes that are supported by pixi.
- *
- * The {@link PIXI.settings.SCALE_MODE} scale mode affects the default scaling mode of future operations.
- * It can be re-assigned to either LINEAR or NEAREST, depending upon suitability.
- *
- * @memberof PIXI
- * @static
- * @name SCALE_MODES
- * @enum {number}
- * @property {number} LINEAR Smooth scaling
- * @property {number} NEAREST Pixelating scaling
- */
-var SCALE_MODES;
-(function (SCALE_MODES) {
-    SCALE_MODES[SCALE_MODES["NEAREST"] = 0] = "NEAREST";
-    SCALE_MODES[SCALE_MODES["LINEAR"] = 1] = "LINEAR";
-})(SCALE_MODES || (SCALE_MODES = {}));
-/**
- * The wrap modes that are supported by pixi.
- *
- * The {@link PIXI.settings.WRAP_MODE} wrap mode affects the default wrapping mode of future operations.
- * It can be re-assigned to either CLAMP or REPEAT, depending upon suitability.
- * If the texture is non power of two then clamp will be used regardless as WebGL can
- * only use REPEAT if the texture is po2.
- *
- * This property only affects WebGL.
- *
- * @name WRAP_MODES
- * @memberof PIXI
- * @static
- * @enum {number}
- * @property {number} CLAMP - The textures uvs are clamped
- * @property {number} REPEAT - The texture uvs tile and repeat
- * @property {number} MIRRORED_REPEAT - The texture uvs tile and repeat with mirroring
- */
-var WRAP_MODES;
-(function (WRAP_MODES) {
-    WRAP_MODES[WRAP_MODES["CLAMP"] = 33071] = "CLAMP";
-    WRAP_MODES[WRAP_MODES["REPEAT"] = 10497] = "REPEAT";
-    WRAP_MODES[WRAP_MODES["MIRRORED_REPEAT"] = 33648] = "MIRRORED_REPEAT";
-})(WRAP_MODES || (WRAP_MODES = {}));
-/**
- * Mipmap filtering modes that are supported by pixi.
- *
- * The {@link PIXI.settings.MIPMAP_TEXTURES} affects default texture filtering.
- * Mipmaps are generated for a baseTexture if its `mipmap` field is `ON`,
- * or its `POW2` and texture dimensions are powers of 2.
- * Due to platform restriction, `ON` option will work like `POW2` for webgl-1.
- *
- * This property only affects WebGL.
- *
- * @name MIPMAP_MODES
- * @memberof PIXI
- * @static
- * @enum {number}
- * @property {number} OFF - No mipmaps
- * @property {number} POW2 - Generate mipmaps if texture dimensions are pow2
- * @property {number} ON - Always generate mipmaps
- */
-var MIPMAP_MODES;
-(function (MIPMAP_MODES) {
-    MIPMAP_MODES[MIPMAP_MODES["OFF"] = 0] = "OFF";
-    MIPMAP_MODES[MIPMAP_MODES["POW2"] = 1] = "POW2";
-    MIPMAP_MODES[MIPMAP_MODES["ON"] = 2] = "ON";
-})(MIPMAP_MODES || (MIPMAP_MODES = {}));
-/**
- * How to treat textures with premultiplied alpha
- *
- * @name ALPHA_MODES
- * @memberof PIXI
- * @static
- * @enum {number}
- * @property {number} NO_PREMULTIPLIED_ALPHA - Source is not premultiplied, leave it like that.
- *  Option for compressed and data textures that are created from typed arrays.
- * @property {number} PREMULTIPLY_ON_UPLOAD - Source is not premultiplied, premultiply on upload.
- *  Default option, used for all loaded images.
- * @property {number} PREMULTIPLIED_ALPHA - Source is already premultiplied
- *  Example: spine atlases with `_pma` suffix.
- * @property {number} NPM - Alias for NO_PREMULTIPLIED_ALPHA.
- * @property {number} UNPACK - Default option, alias for PREMULTIPLY_ON_UPLOAD.
- * @property {number} PMA - Alias for PREMULTIPLIED_ALPHA.
- */
-var ALPHA_MODES;
-(function (ALPHA_MODES) {
-    ALPHA_MODES[ALPHA_MODES["NPM"] = 0] = "NPM";
-    ALPHA_MODES[ALPHA_MODES["UNPACK"] = 1] = "UNPACK";
-    ALPHA_MODES[ALPHA_MODES["PMA"] = 2] = "PMA";
-    ALPHA_MODES[ALPHA_MODES["NO_PREMULTIPLIED_ALPHA"] = 0] = "NO_PREMULTIPLIED_ALPHA";
-    ALPHA_MODES[ALPHA_MODES["PREMULTIPLY_ON_UPLOAD"] = 1] = "PREMULTIPLY_ON_UPLOAD";
-    ALPHA_MODES[ALPHA_MODES["PREMULTIPLY_ALPHA"] = 2] = "PREMULTIPLY_ALPHA";
-})(ALPHA_MODES || (ALPHA_MODES = {}));
-/**
- * How to clear renderTextures in filter
- *
- * @name CLEAR_MODES
- * @memberof PIXI
- * @static
- * @enum {number}
- * @property {number} BLEND - Preserve the information in the texture, blend above
- * @property {number} CLEAR - Must use `gl.clear` operation
- * @property {number} BLIT - Clear or blit it, depends on device and level of paranoia
- * @property {number} NO - Alias for BLEND, same as `false` in earlier versions
- * @property {number} YES - Alias for CLEAR, same as `true` in earlier versions
- * @property {number} AUTO - Alias for BLIT
- */
-var CLEAR_MODES;
-(function (CLEAR_MODES) {
-    CLEAR_MODES[CLEAR_MODES["NO"] = 0] = "NO";
-    CLEAR_MODES[CLEAR_MODES["YES"] = 1] = "YES";
-    CLEAR_MODES[CLEAR_MODES["AUTO"] = 2] = "AUTO";
-    CLEAR_MODES[CLEAR_MODES["BLEND"] = 0] = "BLEND";
-    CLEAR_MODES[CLEAR_MODES["CLEAR"] = 1] = "CLEAR";
-    CLEAR_MODES[CLEAR_MODES["BLIT"] = 2] = "BLIT";
-})(CLEAR_MODES || (CLEAR_MODES = {}));
-/**
- * The gc modes that are supported by pixi.
- *
- * The {@link PIXI.settings.GC_MODE} Garbage Collection mode for PixiJS textures is AUTO
- * If set to GC_MODE, the renderer will occasionally check textures usage. If they are not
- * used for a specified period of time they will be removed from the GPU. They will of course
- * be uploaded again when they are required. This is a silent behind the scenes process that
- * should ensure that the GPU does not  get filled up.
- *
- * Handy for mobile devices!
- * This property only affects WebGL.
- *
- * @name GC_MODES
- * @enum {number}
- * @static
- * @memberof PIXI
- * @property {number} AUTO - Garbage collection will happen periodically automatically
- * @property {number} MANUAL - Garbage collection will need to be called manually
- */
-var GC_MODES;
-(function (GC_MODES) {
-    GC_MODES[GC_MODES["AUTO"] = 0] = "AUTO";
-    GC_MODES[GC_MODES["MANUAL"] = 1] = "MANUAL";
-})(GC_MODES || (GC_MODES = {}));
-/**
- * Constants that specify float precision in shaders.
- *
- * @name PRECISION
- * @memberof PIXI
- * @constant
- * @static
- * @enum {string}
- * @property {string} LOW='lowp'
- * @property {string} MEDIUM='mediump'
- * @property {string} HIGH='highp'
- */
-var PRECISION;
-(function (PRECISION) {
-    PRECISION["LOW"] = "lowp";
-    PRECISION["MEDIUM"] = "mediump";
-    PRECISION["HIGH"] = "highp";
-})(PRECISION || (PRECISION = {}));
-/**
- * Constants for mask implementations.
- * We use `type` suffix because it leads to very different behaviours
- *
- * @name MASK_TYPES
- * @memberof PIXI
- * @static
- * @enum {number}
- * @property {number} NONE - Mask is ignored
- * @property {number} SCISSOR - Scissor mask, rectangle on screen, cheap
- * @property {number} STENCIL - Stencil mask, 1-bit, medium, works only if renderer supports stencil
- * @property {number} SPRITE - Mask that uses SpriteMaskFilter, uses temporary RenderTexture
- */
-var MASK_TYPES;
-(function (MASK_TYPES) {
-    MASK_TYPES[MASK_TYPES["NONE"] = 0] = "NONE";
-    MASK_TYPES[MASK_TYPES["SCISSOR"] = 1] = "SCISSOR";
-    MASK_TYPES[MASK_TYPES["STENCIL"] = 2] = "STENCIL";
-    MASK_TYPES[MASK_TYPES["SPRITE"] = 3] = "SPRITE";
-})(MASK_TYPES || (MASK_TYPES = {}));
-/**
- * Constants for multi-sampling antialiasing.
- *
- * @see PIXI.Framebuffer#multisample
- *
- * @name MSAA_QUALITY
- * @memberof PIXI
- * @static
- * @enum {number}
- * @property {number} NONE - No multisampling for this renderTexture
- * @property {number} LOW - Try 2 samples
- * @property {number} MEDIUM - Try 4 samples
- * @property {number} HIGH - Try 8 samples
- */
-var MSAA_QUALITY;
-(function (MSAA_QUALITY) {
-    MSAA_QUALITY[MSAA_QUALITY["NONE"] = 0] = "NONE";
-    MSAA_QUALITY[MSAA_QUALITY["LOW"] = 2] = "LOW";
-    MSAA_QUALITY[MSAA_QUALITY["MEDIUM"] = 4] = "MEDIUM";
-    MSAA_QUALITY[MSAA_QUALITY["HIGH"] = 8] = "HIGH";
-})(MSAA_QUALITY || (MSAA_QUALITY = {}));
 
 var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
@@ -5258,8 +5017,387 @@ Url.prototype.parseHost = function() {
 };
 
 /*!
- * @pixi/utils - v5.3.1
- * Compiled Fri, 24 Jul 2020 20:56:48 UTC
+ * @pixi/constants - v5.2.1
+ * Compiled Tue, 28 Jan 2020 23:33:11 UTC
+ *
+ * @pixi/constants is licensed under the MIT License.
+ * http://www.opensource.org/licenses/mit-license
+ */
+/**
+ * Different types of environments for WebGL.
+ *
+ * @static
+ * @memberof PIXI
+ * @name ENV
+ * @enum {number}
+ * @property {number} WEBGL_LEGACY - Used for older v1 WebGL devices. PixiJS will aim to ensure compatibility
+ *  with older / less advanced devices. If you experience unexplained flickering prefer this environment.
+ * @property {number} WEBGL - Version 1 of WebGL
+ * @property {number} WEBGL2 - Version 2 of WebGL
+ */
+var ENV;
+(function (ENV) {
+    ENV[ENV["WEBGL_LEGACY"] = 0] = "WEBGL_LEGACY";
+    ENV[ENV["WEBGL"] = 1] = "WEBGL";
+    ENV[ENV["WEBGL2"] = 2] = "WEBGL2";
+})(ENV || (ENV = {}));
+/**
+ * Constant to identify the Renderer Type.
+ *
+ * @static
+ * @memberof PIXI
+ * @name RENDERER_TYPE
+ * @enum {number}
+ * @property {number} UNKNOWN - Unknown render type.
+ * @property {number} WEBGL - WebGL render type.
+ * @property {number} CANVAS - Canvas render type.
+ */
+var RENDERER_TYPE;
+(function (RENDERER_TYPE) {
+    RENDERER_TYPE[RENDERER_TYPE["UNKNOWN"] = 0] = "UNKNOWN";
+    RENDERER_TYPE[RENDERER_TYPE["WEBGL"] = 1] = "WEBGL";
+    RENDERER_TYPE[RENDERER_TYPE["CANVAS"] = 2] = "CANVAS";
+})(RENDERER_TYPE || (RENDERER_TYPE = {}));
+/**
+ * Various blend modes supported by PIXI.
+ *
+ * IMPORTANT - The WebGL renderer only supports the NORMAL, ADD, MULTIPLY and SCREEN blend modes.
+ * Anything else will silently act like NORMAL.
+ *
+ * @memberof PIXI
+ * @name BLEND_MODES
+ * @enum {number}
+ * @property {number} NORMAL
+ * @property {number} ADD
+ * @property {number} MULTIPLY
+ * @property {number} SCREEN
+ * @property {number} OVERLAY
+ * @property {number} DARKEN
+ * @property {number} LIGHTEN
+ * @property {number} COLOR_DODGE
+ * @property {number} COLOR_BURN
+ * @property {number} HARD_LIGHT
+ * @property {number} SOFT_LIGHT
+ * @property {number} DIFFERENCE
+ * @property {number} EXCLUSION
+ * @property {number} HUE
+ * @property {number} SATURATION
+ * @property {number} COLOR
+ * @property {number} LUMINOSITY
+ * @property {number} NORMAL_NPM
+ * @property {number} ADD_NPM
+ * @property {number} SCREEN_NPM
+ * @property {number} NONE
+ * @property {number} SRC_IN
+ * @property {number} SRC_OUT
+ * @property {number} SRC_ATOP
+ * @property {number} DST_OVER
+ * @property {number} DST_IN
+ * @property {number} DST_OUT
+ * @property {number} DST_ATOP
+ * @property {number} SUBTRACT
+ * @property {number} SRC_OVER
+ * @property {number} ERASE
+ * @property {number} XOR
+ */
+var BLEND_MODES;
+(function (BLEND_MODES) {
+    BLEND_MODES[BLEND_MODES["NORMAL"] = 0] = "NORMAL";
+    BLEND_MODES[BLEND_MODES["ADD"] = 1] = "ADD";
+    BLEND_MODES[BLEND_MODES["MULTIPLY"] = 2] = "MULTIPLY";
+    BLEND_MODES[BLEND_MODES["SCREEN"] = 3] = "SCREEN";
+    BLEND_MODES[BLEND_MODES["OVERLAY"] = 4] = "OVERLAY";
+    BLEND_MODES[BLEND_MODES["DARKEN"] = 5] = "DARKEN";
+    BLEND_MODES[BLEND_MODES["LIGHTEN"] = 6] = "LIGHTEN";
+    BLEND_MODES[BLEND_MODES["COLOR_DODGE"] = 7] = "COLOR_DODGE";
+    BLEND_MODES[BLEND_MODES["COLOR_BURN"] = 8] = "COLOR_BURN";
+    BLEND_MODES[BLEND_MODES["HARD_LIGHT"] = 9] = "HARD_LIGHT";
+    BLEND_MODES[BLEND_MODES["SOFT_LIGHT"] = 10] = "SOFT_LIGHT";
+    BLEND_MODES[BLEND_MODES["DIFFERENCE"] = 11] = "DIFFERENCE";
+    BLEND_MODES[BLEND_MODES["EXCLUSION"] = 12] = "EXCLUSION";
+    BLEND_MODES[BLEND_MODES["HUE"] = 13] = "HUE";
+    BLEND_MODES[BLEND_MODES["SATURATION"] = 14] = "SATURATION";
+    BLEND_MODES[BLEND_MODES["COLOR"] = 15] = "COLOR";
+    BLEND_MODES[BLEND_MODES["LUMINOSITY"] = 16] = "LUMINOSITY";
+    BLEND_MODES[BLEND_MODES["NORMAL_NPM"] = 17] = "NORMAL_NPM";
+    BLEND_MODES[BLEND_MODES["ADD_NPM"] = 18] = "ADD_NPM";
+    BLEND_MODES[BLEND_MODES["SCREEN_NPM"] = 19] = "SCREEN_NPM";
+    BLEND_MODES[BLEND_MODES["NONE"] = 20] = "NONE";
+    BLEND_MODES[BLEND_MODES["SRC_OVER"] = 0] = "SRC_OVER";
+    BLEND_MODES[BLEND_MODES["SRC_IN"] = 21] = "SRC_IN";
+    BLEND_MODES[BLEND_MODES["SRC_OUT"] = 22] = "SRC_OUT";
+    BLEND_MODES[BLEND_MODES["SRC_ATOP"] = 23] = "SRC_ATOP";
+    BLEND_MODES[BLEND_MODES["DST_OVER"] = 24] = "DST_OVER";
+    BLEND_MODES[BLEND_MODES["DST_IN"] = 25] = "DST_IN";
+    BLEND_MODES[BLEND_MODES["DST_OUT"] = 26] = "DST_OUT";
+    BLEND_MODES[BLEND_MODES["DST_ATOP"] = 27] = "DST_ATOP";
+    BLEND_MODES[BLEND_MODES["ERASE"] = 26] = "ERASE";
+    BLEND_MODES[BLEND_MODES["SUBTRACT"] = 28] = "SUBTRACT";
+    BLEND_MODES[BLEND_MODES["XOR"] = 29] = "XOR";
+})(BLEND_MODES || (BLEND_MODES = {}));
+/**
+ * Various webgl draw modes. These can be used to specify which GL drawMode to use
+ * under certain situations and renderers.
+ *
+ * @memberof PIXI
+ * @static
+ * @name DRAW_MODES
+ * @enum {number}
+ * @property {number} POINTS
+ * @property {number} LINES
+ * @property {number} LINE_LOOP
+ * @property {number} LINE_STRIP
+ * @property {number} TRIANGLES
+ * @property {number} TRIANGLE_STRIP
+ * @property {number} TRIANGLE_FAN
+ */
+var DRAW_MODES;
+(function (DRAW_MODES) {
+    DRAW_MODES[DRAW_MODES["POINTS"] = 0] = "POINTS";
+    DRAW_MODES[DRAW_MODES["LINES"] = 1] = "LINES";
+    DRAW_MODES[DRAW_MODES["LINE_LOOP"] = 2] = "LINE_LOOP";
+    DRAW_MODES[DRAW_MODES["LINE_STRIP"] = 3] = "LINE_STRIP";
+    DRAW_MODES[DRAW_MODES["TRIANGLES"] = 4] = "TRIANGLES";
+    DRAW_MODES[DRAW_MODES["TRIANGLE_STRIP"] = 5] = "TRIANGLE_STRIP";
+    DRAW_MODES[DRAW_MODES["TRIANGLE_FAN"] = 6] = "TRIANGLE_FAN";
+})(DRAW_MODES || (DRAW_MODES = {}));
+/**
+ * Various GL texture/resources formats.
+ *
+ * @memberof PIXI
+ * @static
+ * @name FORMATS
+ * @enum {number}
+ * @property {number} RGBA=6408
+ * @property {number} RGB=6407
+ * @property {number} ALPHA=6406
+ * @property {number} LUMINANCE=6409
+ * @property {number} LUMINANCE_ALPHA=6410
+ * @property {number} DEPTH_COMPONENT=6402
+ * @property {number} DEPTH_STENCIL=34041
+ */
+var FORMATS;
+(function (FORMATS) {
+    FORMATS[FORMATS["RGBA"] = 6408] = "RGBA";
+    FORMATS[FORMATS["RGB"] = 6407] = "RGB";
+    FORMATS[FORMATS["ALPHA"] = 6406] = "ALPHA";
+    FORMATS[FORMATS["LUMINANCE"] = 6409] = "LUMINANCE";
+    FORMATS[FORMATS["LUMINANCE_ALPHA"] = 6410] = "LUMINANCE_ALPHA";
+    FORMATS[FORMATS["DEPTH_COMPONENT"] = 6402] = "DEPTH_COMPONENT";
+    FORMATS[FORMATS["DEPTH_STENCIL"] = 34041] = "DEPTH_STENCIL";
+})(FORMATS || (FORMATS = {}));
+/**
+ * Various GL target types.
+ *
+ * @memberof PIXI
+ * @static
+ * @name TARGETS
+ * @enum {number}
+ * @property {number} TEXTURE_2D=3553
+ * @property {number} TEXTURE_CUBE_MAP=34067
+ * @property {number} TEXTURE_2D_ARRAY=35866
+ * @property {number} TEXTURE_CUBE_MAP_POSITIVE_X=34069
+ * @property {number} TEXTURE_CUBE_MAP_NEGATIVE_X=34070
+ * @property {number} TEXTURE_CUBE_MAP_POSITIVE_Y=34071
+ * @property {number} TEXTURE_CUBE_MAP_NEGATIVE_Y=34072
+ * @property {number} TEXTURE_CUBE_MAP_POSITIVE_Z=34073
+ * @property {number} TEXTURE_CUBE_MAP_NEGATIVE_Z=34074
+ */
+var TARGETS;
+(function (TARGETS) {
+    TARGETS[TARGETS["TEXTURE_2D"] = 3553] = "TEXTURE_2D";
+    TARGETS[TARGETS["TEXTURE_CUBE_MAP"] = 34067] = "TEXTURE_CUBE_MAP";
+    TARGETS[TARGETS["TEXTURE_2D_ARRAY"] = 35866] = "TEXTURE_2D_ARRAY";
+    TARGETS[TARGETS["TEXTURE_CUBE_MAP_POSITIVE_X"] = 34069] = "TEXTURE_CUBE_MAP_POSITIVE_X";
+    TARGETS[TARGETS["TEXTURE_CUBE_MAP_NEGATIVE_X"] = 34070] = "TEXTURE_CUBE_MAP_NEGATIVE_X";
+    TARGETS[TARGETS["TEXTURE_CUBE_MAP_POSITIVE_Y"] = 34071] = "TEXTURE_CUBE_MAP_POSITIVE_Y";
+    TARGETS[TARGETS["TEXTURE_CUBE_MAP_NEGATIVE_Y"] = 34072] = "TEXTURE_CUBE_MAP_NEGATIVE_Y";
+    TARGETS[TARGETS["TEXTURE_CUBE_MAP_POSITIVE_Z"] = 34073] = "TEXTURE_CUBE_MAP_POSITIVE_Z";
+    TARGETS[TARGETS["TEXTURE_CUBE_MAP_NEGATIVE_Z"] = 34074] = "TEXTURE_CUBE_MAP_NEGATIVE_Z";
+})(TARGETS || (TARGETS = {}));
+/**
+ * Various GL data format types.
+ *
+ * @memberof PIXI
+ * @static
+ * @name TYPES
+ * @enum {number}
+ * @property {number} UNSIGNED_BYTE=5121
+ * @property {number} UNSIGNED_SHORT=5123
+ * @property {number} UNSIGNED_SHORT_5_6_5=33635
+ * @property {number} UNSIGNED_SHORT_4_4_4_4=32819
+ * @property {number} UNSIGNED_SHORT_5_5_5_1=32820
+ * @property {number} FLOAT=5126
+ * @property {number} HALF_FLOAT=36193
+ */
+var TYPES;
+(function (TYPES) {
+    TYPES[TYPES["UNSIGNED_BYTE"] = 5121] = "UNSIGNED_BYTE";
+    TYPES[TYPES["UNSIGNED_SHORT"] = 5123] = "UNSIGNED_SHORT";
+    TYPES[TYPES["UNSIGNED_SHORT_5_6_5"] = 33635] = "UNSIGNED_SHORT_5_6_5";
+    TYPES[TYPES["UNSIGNED_SHORT_4_4_4_4"] = 32819] = "UNSIGNED_SHORT_4_4_4_4";
+    TYPES[TYPES["UNSIGNED_SHORT_5_5_5_1"] = 32820] = "UNSIGNED_SHORT_5_5_5_1";
+    TYPES[TYPES["FLOAT"] = 5126] = "FLOAT";
+    TYPES[TYPES["HALF_FLOAT"] = 36193] = "HALF_FLOAT";
+})(TYPES || (TYPES = {}));
+/**
+ * The scale modes that are supported by pixi.
+ *
+ * The {@link PIXI.settings.SCALE_MODE} scale mode affects the default scaling mode of future operations.
+ * It can be re-assigned to either LINEAR or NEAREST, depending upon suitability.
+ *
+ * @memberof PIXI
+ * @static
+ * @name SCALE_MODES
+ * @enum {number}
+ * @property {number} LINEAR Smooth scaling
+ * @property {number} NEAREST Pixelating scaling
+ */
+var SCALE_MODES;
+(function (SCALE_MODES) {
+    SCALE_MODES[SCALE_MODES["NEAREST"] = 0] = "NEAREST";
+    SCALE_MODES[SCALE_MODES["LINEAR"] = 1] = "LINEAR";
+})(SCALE_MODES || (SCALE_MODES = {}));
+/**
+ * The wrap modes that are supported by pixi.
+ *
+ * The {@link PIXI.settings.WRAP_MODE} wrap mode affects the default wrapping mode of future operations.
+ * It can be re-assigned to either CLAMP or REPEAT, depending upon suitability.
+ * If the texture is non power of two then clamp will be used regardless as WebGL can
+ * only use REPEAT if the texture is po2.
+ *
+ * This property only affects WebGL.
+ *
+ * @name WRAP_MODES
+ * @memberof PIXI
+ * @static
+ * @enum {number}
+ * @property {number} CLAMP - The textures uvs are clamped
+ * @property {number} REPEAT - The texture uvs tile and repeat
+ * @property {number} MIRRORED_REPEAT - The texture uvs tile and repeat with mirroring
+ */
+var WRAP_MODES;
+(function (WRAP_MODES) {
+    WRAP_MODES[WRAP_MODES["CLAMP"] = 33071] = "CLAMP";
+    WRAP_MODES[WRAP_MODES["REPEAT"] = 10497] = "REPEAT";
+    WRAP_MODES[WRAP_MODES["MIRRORED_REPEAT"] = 33648] = "MIRRORED_REPEAT";
+})(WRAP_MODES || (WRAP_MODES = {}));
+/**
+ * Mipmap filtering modes that are supported by pixi.
+ *
+ * The {@link PIXI.settings.MIPMAP_TEXTURES} affects default texture filtering.
+ * Mipmaps are generated for a baseTexture if its `mipmap` field is `ON`,
+ * or its `POW2` and texture dimensions are powers of 2.
+ * Due to platform restriction, `ON` option will work like `POW2` for webgl-1.
+ *
+ * This property only affects WebGL.
+ *
+ * @name MIPMAP_MODES
+ * @memberof PIXI
+ * @static
+ * @enum {number}
+ * @property {number} OFF - No mipmaps
+ * @property {number} POW2 - Generate mipmaps if texture dimensions are pow2
+ * @property {number} ON - Always generate mipmaps
+ */
+var MIPMAP_MODES;
+(function (MIPMAP_MODES) {
+    MIPMAP_MODES[MIPMAP_MODES["OFF"] = 0] = "OFF";
+    MIPMAP_MODES[MIPMAP_MODES["POW2"] = 1] = "POW2";
+    MIPMAP_MODES[MIPMAP_MODES["ON"] = 2] = "ON";
+})(MIPMAP_MODES || (MIPMAP_MODES = {}));
+/**
+ * How to treat textures with premultiplied alpha
+ *
+ * @name ALPHA_MODES
+ * @memberof PIXI
+ * @static
+ * @enum {number}
+ * @property {number} NO_PREMULTIPLIED_ALPHA - Source is not premultiplied, leave it like that.
+ *  Option for compressed and data textures that are created from typed arrays.
+ * @property {number} PREMULTIPLY_ON_UPLOAD - Source is not premultiplied, premultiply on upload.
+ *  Default option, used for all loaded images.
+ * @property {number} PREMULTIPLIED_ALPHA - Source is already premultiplied
+ *  Example: spine atlases with `_pma` suffix.
+ * @property {number} NPM - Alias for NO_PREMULTIPLIED_ALPHA.
+ * @property {number} UNPACK - Default option, alias for PREMULTIPLY_ON_UPLOAD.
+ * @property {number} PMA - Alias for PREMULTIPLIED_ALPHA.
+ */
+var ALPHA_MODES;
+(function (ALPHA_MODES) {
+    ALPHA_MODES[ALPHA_MODES["NPM"] = 0] = "NPM";
+    ALPHA_MODES[ALPHA_MODES["UNPACK"] = 1] = "UNPACK";
+    ALPHA_MODES[ALPHA_MODES["PMA"] = 2] = "PMA";
+    ALPHA_MODES[ALPHA_MODES["NO_PREMULTIPLIED_ALPHA"] = 0] = "NO_PREMULTIPLIED_ALPHA";
+    ALPHA_MODES[ALPHA_MODES["PREMULTIPLY_ON_UPLOAD"] = 1] = "PREMULTIPLY_ON_UPLOAD";
+    ALPHA_MODES[ALPHA_MODES["PREMULTIPLY_ALPHA"] = 2] = "PREMULTIPLY_ALPHA";
+})(ALPHA_MODES || (ALPHA_MODES = {}));
+/**
+ * The gc modes that are supported by pixi.
+ *
+ * The {@link PIXI.settings.GC_MODE} Garbage Collection mode for PixiJS textures is AUTO
+ * If set to GC_MODE, the renderer will occasionally check textures usage. If they are not
+ * used for a specified period of time they will be removed from the GPU. They will of course
+ * be uploaded again when they are required. This is a silent behind the scenes process that
+ * should ensure that the GPU does not  get filled up.
+ *
+ * Handy for mobile devices!
+ * This property only affects WebGL.
+ *
+ * @name GC_MODES
+ * @enum {number}
+ * @static
+ * @memberof PIXI
+ * @property {number} AUTO - Garbage collection will happen periodically automatically
+ * @property {number} MANUAL - Garbage collection will need to be called manually
+ */
+var GC_MODES;
+(function (GC_MODES) {
+    GC_MODES[GC_MODES["AUTO"] = 0] = "AUTO";
+    GC_MODES[GC_MODES["MANUAL"] = 1] = "MANUAL";
+})(GC_MODES || (GC_MODES = {}));
+/**
+ * Constants that specify float precision in shaders.
+ *
+ * @name PRECISION
+ * @memberof PIXI
+ * @constant
+ * @static
+ * @enum {string}
+ * @property {string} LOW='lowp'
+ * @property {string} MEDIUM='mediump'
+ * @property {string} HIGH='highp'
+ */
+var PRECISION;
+(function (PRECISION) {
+    PRECISION["LOW"] = "lowp";
+    PRECISION["MEDIUM"] = "mediump";
+    PRECISION["HIGH"] = "highp";
+})(PRECISION || (PRECISION = {}));
+/**
+ * Constants for mask implementations.
+ * We use `type` suffix because it leads to very different behaviours
+ *
+ * @name MASK_TYPES
+ * @memberof PIXI
+ * @static
+ * @enum {number}
+ * @property {number} NONE - Mask is ignored
+ * @property {number} SCISSOR - Scissor mask, rectangle on screen, cheap
+ * @property {number} STENCIL - Stencil mask, 1-bit, medium, works only if renderer supports stencil
+ * @property {number} SPRITE - Mask that uses SpriteMaskFilter, uses temporary RenderTexture
+ */
+var MASK_TYPES;
+(function (MASK_TYPES) {
+    MASK_TYPES[MASK_TYPES["NONE"] = 0] = "NONE";
+    MASK_TYPES[MASK_TYPES["SCISSOR"] = 1] = "SCISSOR";
+    MASK_TYPES[MASK_TYPES["STENCIL"] = 2] = "STENCIL";
+    MASK_TYPES[MASK_TYPES["SPRITE"] = 3] = "SPRITE";
+})(MASK_TYPES || (MASK_TYPES = {}));
+
+/*!
+ * @pixi/utils - v5.2.1
+ * Compiled Tue, 28 Jan 2020 23:33:11 UTC
  *
  * @pixi/utils is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
@@ -5288,117 +5426,6 @@ settings.RETINA_PREFIX = /@([0-9\.]+)x/;
  * @default true
  */
 settings.FAIL_IF_MAJOR_PERFORMANCE_CAVEAT = true;
-
-var saidHello = false;
-var VERSION = '5.3.1';
-/**
- * Logs out the version and renderer information for this running instance of PIXI.
- * If you don't want to see this message you can run `PIXI.utils.skipHello()` before
- * creating your renderer. Keep in mind that doing that will forever make you a jerk face.
- *
- * @static
- * @function sayHello
- * @memberof PIXI.utils
- * @param {string} type - The string renderer type to log.
- */
-function sayHello(type) {
-    var _a;
-    if (saidHello) {
-        return;
-    }
-    if (navigator.userAgent.toLowerCase().indexOf('chrome') > -1) {
-        var args = [
-            "\n %c %c %c PixiJS " + VERSION + " - \u2730 " + type + " \u2730  %c  %c  http://www.pixijs.com/  %c %c \u2665%c\u2665%c\u2665 \n\n",
-            'background: #ff66a5; padding:5px 0;',
-            'background: #ff66a5; padding:5px 0;',
-            'color: #ff66a5; background: #030307; padding:5px 0;',
-            'background: #ff66a5; padding:5px 0;',
-            'background: #ffc3dc; padding:5px 0;',
-            'background: #ff66a5; padding:5px 0;',
-            'color: #ff2424; background: #fff; padding:5px 0;',
-            'color: #ff2424; background: #fff; padding:5px 0;',
-            'color: #ff2424; background: #fff; padding:5px 0;' ];
-        (_a = window.console).log.apply(_a, args);
-    }
-    else if (window.console) {
-        window.console.log("PixiJS " + VERSION + " - " + type + " - http://www.pixijs.com/");
-    }
-    saidHello = true;
-}
-
-var supported;
-/**
- * Helper for checking for WebGL support.
- *
- * @memberof PIXI.utils
- * @function isWebGLSupported
- * @return {boolean} Is WebGL supported.
- */
-function isWebGLSupported() {
-    if (typeof supported === 'undefined') {
-        supported = (function supported() {
-            var contextOptions = {
-                stencil: true,
-                failIfMajorPerformanceCaveat: settings.FAIL_IF_MAJOR_PERFORMANCE_CAVEAT,
-            };
-            try {
-                if (!window.WebGLRenderingContext) {
-                    return false;
-                }
-                var canvas = document.createElement('canvas');
-                var gl = (canvas.getContext('webgl', contextOptions)
-                    || canvas.getContext('experimental-webgl', contextOptions));
-                var success = !!(gl && gl.getContextAttributes().stencil);
-                if (gl) {
-                    var loseContext = gl.getExtension('WEBGL_lose_context');
-                    if (loseContext) {
-                        loseContext.loseContext();
-                    }
-                }
-                gl = null;
-                return success;
-            }
-            catch (e) {
-                return false;
-            }
-        })();
-    }
-    return supported;
-}
-
-/**
- * Converts a hexadecimal color number to an [R, G, B] array of normalized floats (numbers from 0.0 to 1.0).
- *
- * @example
- * PIXI.utils.hex2rgb(0xffffff); // returns [1, 1, 1]
- * @memberof PIXI.utils
- * @function hex2rgb
- * @param {number} hex - The hexadecimal number to convert
- * @param  {number[]} [out=[]] - If supplied, this array will be used rather than returning a new one
- * @return {number[]} An array representing the [R, G, B] of the color where all values are floats.
- */
-function hex2rgb(hex, out) {
-    if (out === void 0) { out = []; }
-    out[0] = ((hex >> 16) & 0xFF) / 255;
-    out[1] = ((hex >> 8) & 0xFF) / 255;
-    out[2] = (hex & 0xFF) / 255;
-    return out;
-}
-/**
- * Converts a hexadecimal color number to a string.
- *
- * @example
- * PIXI.utils.hex2string(0xffffff); // returns "#ffffff"
- * @memberof PIXI.utils
- * @function hex2string
- * @param {number} hex - Number in hex (e.g., `0xffffff`)
- * @return {string} The string color (e.g., `"#ffffff"`).
- */
-function hex2string(hex) {
-    var hexString = hex.toString(16);
-    hexString = '000000'.substr(0, 6 - hexString.length) + hexString;
-    return "#" + hexString;
-}
 
 /**
  * Corrects PixiJS blend, takes premultiplied alpha into account
@@ -5438,8 +5465,8 @@ var premultiplyBlendMode = mapPremultipliedBlendModes();
  *
  * @memberof PIXI.utils
  * @function premultiplyTint
- * @param {number} tint - integer RGB
- * @param {number} alpha - floating point alpha (0.0-1.0)
+ * @param {number} tint integer RGB
+ * @param {number} alpha floating point alpha (0.0-1.0)
  * @returns {number} tint multiplied by alpha
  */
 function premultiplyTint(tint, alpha) {
@@ -5464,7 +5491,7 @@ function premultiplyTint(tint, alpha) {
  *
  * @function nextPow2
  * @memberof PIXI.utils
- * @param {number} v - input value
+ * @param {number} v input value
  * @return {number}
  */
 function nextPow2(v) {
@@ -5482,7 +5509,7 @@ function nextPow2(v) {
  *
  * @function isPow2
  * @memberof PIXI.utils
- * @param {number} v - input value
+ * @param {number} v input value
  * @return {boolean} `true` if value is power of two
  */
 function isPow2(v) {
@@ -5493,7 +5520,7 @@ function isPow2(v) {
  *
  * @function log2
  * @memberof PIXI.utils
- * @param {number} v - input value
+ * @param {number} v input value
  * @return {number} logarithm base 2
  */
 function log2(v) {
@@ -5511,29 +5538,6 @@ function log2(v) {
     return r | (v >> 1);
 }
 
-/**
- * Remove items from a javascript array without generating garbage
- *
- * @function removeItems
- * @memberof PIXI.utils
- * @param {Array<any>} arr - Array to remove elements from
- * @param {number} startIdx - starting index
- * @param {number} removeCount - how many to remove
- */
-function removeItems(arr, startIdx, removeCount) {
-    var length = arr.length;
-    var i;
-    if (startIdx >= length || removeCount === 0) {
-        return;
-    }
-    removeCount = (startIdx + removeCount > length ? length - startIdx : removeCount);
-    var len = length - removeCount;
-    for (i = startIdx; i < len; ++i) {
-        arr[i] = arr[i + removeCount];
-    }
-    arr.length = len;
-}
-
 var nextUid = 0;
 /**
  * Gets the next unique identifier
@@ -5544,49 +5548,6 @@ var nextUid = 0;
  */
 function uid() {
     return ++nextUid;
-}
-
-// A map of warning messages already fired
-var warnings = {};
-/**
- * Helper for warning developers about deprecated features & settings.
- * A stack track for warnings is given; useful for tracking-down where
- * deprecated methods/properties/classes are being used within the code.
- *
- * @memberof PIXI.utils
- * @function deprecation
- * @param {string} version - The version where the feature became deprecated
- * @param {string} message - Message should include what is deprecated, where, and the new solution
- * @param {number} [ignoreDepth=3] - The number of steps to ignore at the top of the error stack
- *        this is mostly to ignore internal deprecation calls.
- */
-function deprecation(version, message, ignoreDepth) {
-    if (ignoreDepth === void 0) { ignoreDepth = 3; }
-    // Ignore duplicat
-    if (warnings[message]) {
-        return;
-    }
-    /* eslint-disable no-console */
-    var stack = new Error().stack;
-    // Handle IE < 10 and Safari < 6
-    if (typeof stack === 'undefined') {
-        console.warn('PixiJS Deprecation Warning: ', message + "\nDeprecated since v" + version);
-    }
-    else {
-        // chop off the stack trace which includes PixiJS internal calls
-        stack = stack.split('\n').splice(ignoreDepth).join('\n');
-        if (console.groupCollapsed) {
-            console.groupCollapsed('%cPixiJS Deprecation Warning: %c%s', 'color:#614108;background:#fffbe6', 'font-weight:normal;color:#614108;background:#fffbe6', message + "\nDeprecated since v" + version);
-            console.warn(stack);
-            console.groupEnd();
-        }
-        else {
-            console.warn('PixiJS Deprecation Warning: ', message + "\nDeprecated since v" + version);
-            console.warn(stack);
-        }
-    }
-    /* eslint-enable no-console */
-    warnings[message] = true;
 }
 
 /**
@@ -5684,7 +5645,7 @@ var CanvasRenderTarget = /** @class */ (function () {
         set: function (val) {
             this.canvas.width = val;
         },
-        enumerable: false,
+        enumerable: true,
         configurable: true
     });
     Object.defineProperty(CanvasRenderTarget.prototype, "height", {
@@ -5699,7 +5660,7 @@ var CanvasRenderTarget = /** @class */ (function () {
         set: function (val) {
             this.canvas.height = val;
         },
-        enumerable: false,
+        enumerable: true,
         configurable: true
     });
     return CanvasRenderTarget;
@@ -5760,204 +5721,8 @@ function getResolutionOfUrl(url, defaultValue) {
 }
 
 /*!
- * @pixi/runner - v5.3.1
- * Compiled Fri, 24 Jul 2020 20:56:48 UTC
- *
- * @pixi/runner is licensed under the MIT License.
- * http://www.opensource.org/licenses/mit-license
- */
-/**
- * A Runner is a highly performant and simple alternative to signals. Best used in situations
- * where events are dispatched to many objects at high frequency (say every frame!)
- *
- *
- * like a signal..
- * ```
- * import { Runner } from '@pixi/runner';
- *
- * const myObject = {
- *     loaded: new Runner('loaded')
- * }
- *
- * const listener = {
- *     loaded: function(){
- *         // thin
- *     }
- * }
- *
- * myObject.update.add(listener);
- *
- * myObject.loaded.emit();
- * ```
- *
- * Or for handling calling the same function on many items
- * ```
- * import { Runner } from '@pixi/runner';
- *
- * const myGame = {
- *     update: new Runner('update')
- * }
- *
- * const gameObject = {
- *     update: function(time){
- *         // update my gamey state
- *     }
- * }
- *
- * myGame.update.add(gameObject1);
- *
- * myGame.update.emit(time);
- * ```
- * @class
- * @memberof PIXI
- */
-var Runner = /** @class */ (function () {
-    /**
-     *  @param {string} name - the function name that will be executed on the listeners added to this Runner.
-     */
-    function Runner(name) {
-        this.items = [];
-        this._name = name;
-        this._aliasCount = 0;
-    }
-    /**
-     * Dispatch/Broadcast Runner to all listeners added to the queue.
-     * @param {...any} params - optional parameters to pass to each listener
-     * @return {PIXI.Runner}
-     */
-    Runner.prototype.emit = function (a0, a1, a2, a3, a4, a5, a6, a7) {
-        if (arguments.length > 8) {
-            throw new Error('max arguments reached');
-        }
-        var _a = this, name = _a.name, items = _a.items;
-        this._aliasCount++;
-        for (var i = 0, len = items.length; i < len; i++) {
-            items[i][name](a0, a1, a2, a3, a4, a5, a6, a7);
-        }
-        if (items === this.items) {
-            this._aliasCount--;
-        }
-        return this;
-    };
-    Runner.prototype.ensureNonAliasedItems = function () {
-        if (this._aliasCount > 0 && this.items.length > 1) {
-            this._aliasCount = 0;
-            this.items = this.items.slice(0);
-        }
-    };
-    /**
-     * Add a listener to the Runner
-     *
-     * Runners do not need to have scope or functions passed to them.
-     * All that is required is to pass the listening object and ensure that it has contains a function that has the same name
-     * as the name provided to the Runner when it was created.
-     *
-     * Eg A listener passed to this Runner will require a 'complete' function.
-     *
-     * ```
-     * import { Runner } from '@pixi/runner';
-     *
-     * const complete = new Runner('complete');
-     * ```
-     *
-     * The scope used will be the object itself.
-     *
-     * @param {any} item - The object that will be listening.
-     * @return {PIXI.Runner}
-     */
-    Runner.prototype.add = function (item) {
-        if (item[this._name]) {
-            this.ensureNonAliasedItems();
-            this.remove(item);
-            this.items.push(item);
-        }
-        return this;
-    };
-    /**
-     * Remove a single listener from the dispatch queue.
-     * @param {any} item - The listenr that you would like to remove.
-     * @return {PIXI.Runner}
-     */
-    Runner.prototype.remove = function (item) {
-        var index = this.items.indexOf(item);
-        if (index !== -1) {
-            this.ensureNonAliasedItems();
-            this.items.splice(index, 1);
-        }
-        return this;
-    };
-    /**
-     * Check to see if the listener is already in the Runner
-     * @param {any} item - The listener that you would like to check.
-     */
-    Runner.prototype.contains = function (item) {
-        return this.items.indexOf(item) !== -1;
-    };
-    /**
-     * Remove all listeners from the Runner
-     * @return {PIXI.Runner}
-     */
-    Runner.prototype.removeAll = function () {
-        this.ensureNonAliasedItems();
-        this.items.length = 0;
-        return this;
-    };
-    /**
-     * Remove all references, don't use after this.
-     */
-    Runner.prototype.destroy = function () {
-        this.removeAll();
-        this.items = null;
-        this._name = null;
-    };
-    Object.defineProperty(Runner.prototype, "empty", {
-        /**
-         * `true` if there are no this Runner contains no listeners
-         *
-         * @member {boolean}
-         * @readonly
-         */
-        get: function () {
-            return this.items.length === 0;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Runner.prototype, "name", {
-        /**
-         * The name of the runner.
-         *
-         * @member {string}
-         * @readonly
-         */
-        get: function () {
-            return this._name;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    return Runner;
-}());
-Object.defineProperties(Runner.prototype, {
-    /**
-     * Alias for `emit`
-     * @memberof PIXI.Runner#
-     * @method dispatch
-     * @see PIXI.Runner#emit
-     */
-    dispatch: { value: Runner.prototype.emit },
-    /**
-     * Alias for `emit`
-     * @memberof PIXI.Runner#
-     * @method run
-     * @see PIXI.Runner#emit
-     */
-    run: { value: Runner.prototype.emit },
-});
-
-/*!
- * @pixi/ticker - v5.3.1
- * Compiled Fri, 24 Jul 2020 20:56:48 UTC
+ * @pixi/ticker - v5.2.1
+ * Compiled Tue, 28 Jan 2020 23:33:11 UTC
  *
  * @pixi/ticker is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
@@ -5984,11 +5749,11 @@ settings.TARGET_FPMS = 0.06;
  * @name UPDATE_PRIORITY
  * @memberof PIXI
  * @enum {number}
- * @property {number} INTERACTION=50 Highest priority, used for {@link PIXI.InteractionManager}
+ * @property {number} INTERACTION=50 Highest priority, used for {@link PIXI.interaction.InteractionManager}
  * @property {number} HIGH=25 High priority updating, {@link PIXI.VideoBaseTexture} and {@link PIXI.AnimatedSprite}
  * @property {number} NORMAL=0 Default priority for ticker events, see {@link PIXI.Ticker#add}.
  * @property {number} LOW=-25 Low priority used for {@link PIXI.Application} rendering.
- * @property {number} UTILITY=-50 Lowest priority used for {@link PIXI.BasePrepare} utility.
+ * @property {number} UTILITY=-50 Lowest priority used for {@link PIXI.prepare.BasePrepare} utility.
  */
 var UPDATE_PRIORITY;
 (function (UPDATE_PRIORITY) {
@@ -6427,10 +6192,9 @@ var Ticker = /** @class */ (function () {
     };
     Object.defineProperty(Ticker.prototype, "count", {
         /**
-         * The number of listeners on this ticker, calculated by walking through linked list
+         * Counts the number of listeners on this ticker.
          *
-         * @readonly
-         * @member {number}
+         * @returns {number} The number of listeners on this ticker
          */
         get: function () {
             if (!this._head) {
@@ -6443,7 +6207,7 @@ var Ticker = /** @class */ (function () {
             }
             return count;
         },
-        enumerable: false,
+        enumerable: true,
         configurable: true
     });
     /**
@@ -6562,7 +6326,7 @@ var Ticker = /** @class */ (function () {
         get: function () {
             return 1000 / this.elapsedMS;
         },
-        enumerable: false,
+        enumerable: true,
         configurable: true
     });
     Object.defineProperty(Ticker.prototype, "minFPS", {
@@ -6587,7 +6351,7 @@ var Ticker = /** @class */ (function () {
             var minFPMS = Math.min(Math.max(0, minFPS) / 1000, settings.TARGET_FPMS);
             this._maxElapsedMS = 1 / minFPMS;
         },
-        enumerable: false,
+        enumerable: true,
         configurable: true
     });
     Object.defineProperty(Ticker.prototype, "maxFPS", {
@@ -6617,7 +6381,7 @@ var Ticker = /** @class */ (function () {
                 this._minElapsedMS = 1 / (maxFPS / 1000);
             }
         },
-        enumerable: false,
+        enumerable: true,
         configurable: true
     });
     Object.defineProperty(Ticker, "shared", {
@@ -6672,12 +6436,12 @@ var Ticker = /** @class */ (function () {
             }
             return Ticker._shared;
         },
-        enumerable: false,
+        enumerable: true,
         configurable: true
     });
     Object.defineProperty(Ticker, "system", {
         /**
-         * The system ticker instance used by {@link PIXI.InteractionManager} and by
+         * The system ticker instance used by {@link PIXI.interaction.InteractionManager} and by
          * {@link PIXI.BasePrepare} for core timing functionality that shouldn't usually need to be paused,
          * unlike the `shared` ticker which drives visual animations and rendering which may want to be paused.
          *
@@ -6694,316 +6458,33 @@ var Ticker = /** @class */ (function () {
             }
             return Ticker._system;
         },
-        enumerable: false,
+        enumerable: true,
         configurable: true
     });
     return Ticker;
 }());
 
 /*!
- * @pixi/math - v5.3.1
- * Compiled Fri, 24 Jul 2020 20:56:48 UTC
+ * @pixi/math - v5.2.1
+ * Compiled Tue, 28 Jan 2020 23:33:11 UTC
  *
  * @pixi/math is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
  */
 /**
- * Two Pi.
- *
- * @static
- * @constant {number} PI_2
- * @memberof PIXI
- */
-var PI_2 = Math.PI * 2;
-var SHAPES;
-(function (SHAPES) {
-    SHAPES[SHAPES["POLY"] = 0] = "POLY";
-    SHAPES[SHAPES["RECT"] = 1] = "RECT";
-    SHAPES[SHAPES["CIRC"] = 2] = "CIRC";
-    SHAPES[SHAPES["ELIP"] = 3] = "ELIP";
-    SHAPES[SHAPES["RREC"] = 4] = "RREC";
-})(SHAPES || (SHAPES = {}));
-/**
- * Constants that identify shapes, mainly to prevent `instanceof` calls.
- *
- * @static
- * @constant
- * @name SHAPES
- * @memberof PIXI
- * @type {enum}
- * @property {number} POLY Polygon
- * @property {number} RECT Rectangle
- * @property {number} CIRC Circle
- * @property {number} ELIP Ellipse
- * @property {number} RREC Rounded Rectangle
- * @enum {number}
- */
-
-/**
- * Size object, contains width and height
- *
- * @memberof PIXI
- * @typedef {object} ISize
- * @property {number} width - Width component
- * @property {number} height - Height component
- */
-/**
- * Rectangle object is an area defined by its position, as indicated by its top-left corner
- * point (x, y) and by its width and its height.
- *
- * @class
- * @memberof PIXI
- */
-var Rectangle = /** @class */ (function () {
-    /**
-     * @param {number} [x=0] - The X coordinate of the upper-left corner of the rectangle
-     * @param {number} [y=0] - The Y coordinate of the upper-left corner of the rectangle
-     * @param {number} [width=0] - The overall width of this rectangle
-     * @param {number} [height=0] - The overall height of this rectangle
-     */
-    function Rectangle(x, y, width, height) {
-        if (x === void 0) { x = 0; }
-        if (y === void 0) { y = 0; }
-        if (width === void 0) { width = 0; }
-        if (height === void 0) { height = 0; }
-        /**
-         * @member {number}
-         * @default 0
-         */
-        this.x = Number(x);
-        /**
-         * @member {number}
-         * @default 0
-         */
-        this.y = Number(y);
-        /**
-         * @member {number}
-         * @default 0
-         */
-        this.width = Number(width);
-        /**
-         * @member {number}
-         * @default 0
-         */
-        this.height = Number(height);
-        /**
-         * The type of the object, mainly used to avoid `instanceof` checks
-         *
-         * @member {number}
-         * @readOnly
-         * @default PIXI.SHAPES.RECT
-         * @see PIXI.SHAPES
-         */
-        this.type = SHAPES.RECT;
-    }
-    Object.defineProperty(Rectangle.prototype, "left", {
-        /**
-         * returns the left edge of the rectangle
-         *
-         * @member {number}
-         */
-        get: function () {
-            return this.x;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Rectangle.prototype, "right", {
-        /**
-         * returns the right edge of the rectangle
-         *
-         * @member {number}
-         */
-        get: function () {
-            return this.x + this.width;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Rectangle.prototype, "top", {
-        /**
-         * returns the top edge of the rectangle
-         *
-         * @member {number}
-         */
-        get: function () {
-            return this.y;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Rectangle.prototype, "bottom", {
-        /**
-         * returns the bottom edge of the rectangle
-         *
-         * @member {number}
-         */
-        get: function () {
-            return this.y + this.height;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Rectangle, "EMPTY", {
-        /**
-         * A constant empty rectangle.
-         *
-         * @static
-         * @constant
-         * @member {PIXI.Rectangle}
-         * @return {PIXI.Rectangle} An empty rectangle
-         */
-        get: function () {
-            return new Rectangle(0, 0, 0, 0);
-        },
-        enumerable: false,
-        configurable: true
-    });
-    /**
-     * Creates a clone of this Rectangle
-     *
-     * @return {PIXI.Rectangle} a copy of the rectangle
-     */
-    Rectangle.prototype.clone = function () {
-        return new Rectangle(this.x, this.y, this.width, this.height);
-    };
-    /**
-     * Copies another rectangle to this one.
-     *
-     * @param {PIXI.Rectangle} rectangle - The rectangle to copy from.
-     * @return {PIXI.Rectangle} Returns itself.
-     */
-    Rectangle.prototype.copyFrom = function (rectangle) {
-        this.x = rectangle.x;
-        this.y = rectangle.y;
-        this.width = rectangle.width;
-        this.height = rectangle.height;
-        return this;
-    };
-    /**
-     * Copies this rectangle to another one.
-     *
-     * @param {PIXI.Rectangle} rectangle - The rectangle to copy to.
-     * @return {PIXI.Rectangle} Returns given parameter.
-     */
-    Rectangle.prototype.copyTo = function (rectangle) {
-        rectangle.x = this.x;
-        rectangle.y = this.y;
-        rectangle.width = this.width;
-        rectangle.height = this.height;
-        return rectangle;
-    };
-    /**
-     * Checks whether the x and y coordinates given are contained within this Rectangle
-     *
-     * @param {number} x - The X coordinate of the point to test
-     * @param {number} y - The Y coordinate of the point to test
-     * @return {boolean} Whether the x/y coordinates are within this Rectangle
-     */
-    Rectangle.prototype.contains = function (x, y) {
-        if (this.width <= 0 || this.height <= 0) {
-            return false;
-        }
-        if (x >= this.x && x < this.x + this.width) {
-            if (y >= this.y && y < this.y + this.height) {
-                return true;
-            }
-        }
-        return false;
-    };
-    /**
-     * Pads the rectangle making it grow in all directions.
-     * If paddingY is omitted, both paddingX and paddingY will be set to paddingX.
-     *
-     * @param {number} [paddingX=0] - The horizontal padding amount.
-     * @param {number} [paddingY=0] - The vertical padding amount.
-     * @return {PIXI.Rectangle} Returns itself.
-     */
-    Rectangle.prototype.pad = function (paddingX, paddingY) {
-        if (paddingX === void 0) { paddingX = 0; }
-        if (paddingY === void 0) { paddingY = paddingX; }
-        this.x -= paddingX;
-        this.y -= paddingY;
-        this.width += paddingX * 2;
-        this.height += paddingY * 2;
-        return this;
-    };
-    /**
-     * Fits this rectangle around the passed one.
-     *
-     * @param {PIXI.Rectangle} rectangle - The rectangle to fit.
-     * @return {PIXI.Rectangle} Returns itself.
-     */
-    Rectangle.prototype.fit = function (rectangle) {
-        var x1 = Math.max(this.x, rectangle.x);
-        var x2 = Math.min(this.x + this.width, rectangle.x + rectangle.width);
-        var y1 = Math.max(this.y, rectangle.y);
-        var y2 = Math.min(this.y + this.height, rectangle.y + rectangle.height);
-        this.x = x1;
-        this.width = Math.max(x2 - x1, 0);
-        this.y = y1;
-        this.height = Math.max(y2 - y1, 0);
-        return this;
-    };
-    /**
-     * Enlarges rectangle that way its corners lie on grid
-     *
-     * @param {number} [resolution=1] resolution
-     * @param {number} [eps=0.001] precision
-     * @return {PIXI.Rectangle} Returns itself.
-     */
-    Rectangle.prototype.ceil = function (resolution, eps) {
-        if (resolution === void 0) { resolution = 1; }
-        if (eps === void 0) { eps = 0.001; }
-        var x2 = Math.ceil((this.x + this.width - eps) * resolution) / resolution;
-        var y2 = Math.ceil((this.y + this.height - eps) * resolution) / resolution;
-        this.x = Math.floor((this.x + eps) * resolution) / resolution;
-        this.y = Math.floor((this.y + eps) * resolution) / resolution;
-        this.width = x2 - this.x;
-        this.height = y2 - this.y;
-        return this;
-    };
-    /**
-     * Enlarges this rectangle to include the passed rectangle.
-     *
-     * @param {PIXI.Rectangle} rectangle - The rectangle to include.
-     * @return {PIXI.Rectangle} Returns itself.
-     */
-    Rectangle.prototype.enlarge = function (rectangle) {
-        var x1 = Math.min(this.x, rectangle.x);
-        var x2 = Math.max(this.x + this.width, rectangle.x + rectangle.width);
-        var y1 = Math.min(this.y, rectangle.y);
-        var y2 = Math.max(this.y + this.height, rectangle.y + rectangle.height);
-        this.x = x1;
-        this.width = x2 - x1;
-        this.y = y1;
-        this.height = y2 - y1;
-        return this;
-    };
-    return Rectangle;
-}());
-
-/**
  * Common interface for points. Both Point and ObservablePoint implement it
  * @memberof PIXI
- * @interface IPointData
+ * @interface IPoint
  */
 /**
  * X coord
- * @memberof PIXI.IPointData#
+ * @memberof PIXI.IPoint#
  * @member {number} x
  */
 /**
  * Y coord
- * @memberof PIXI.IPointData#
+ * @memberof PIXI.IPoint#
  * @member {number} y
- */
-
-/**
- * Common interface for points. Both Point and ObservablePoint implement it
- * @memberof PIXI
- * @interface IPoint
- * @extends PIXI.IPointData
  */
 /**
  * Sets the point to a new x and y position.
@@ -7018,7 +6499,7 @@ var Rectangle = /** @class */ (function () {
  * Copies x and y from the given point
  * @method copyFrom
  * @memberof PIXI.IPoint#
- * @param {PIXI.IPointData} p - The point to copy from
+ * @param {PIXI.IPoint} p - The point to copy from
  * @returns {this} Returns itself.
  */
 /**
@@ -7033,7 +6514,7 @@ var Rectangle = /** @class */ (function () {
  *
  * @method equals
  * @memberof PIXI.IPoint#
- * @param {PIXI.IPointData} p - The point to check
+ * @param {PIXI.IPoint} p - The point to check
  * @returns {boolean} Whether the given point equal to this point
  */
 
@@ -7075,7 +6556,7 @@ var Point = /** @class */ (function () {
     /**
      * Copies x and y from the given point
      *
-     * @param {PIXI.IPointData} p - The point to copy from
+     * @param {PIXI.IPoint} p - The point to copy from
      * @returns {this} Returns itself.
      */
     Point.prototype.copyFrom = function (p) {
@@ -7095,7 +6576,7 @@ var Point = /** @class */ (function () {
     /**
      * Returns true if the given point is equal to this point
      *
-     * @param {PIXI.IPointData} p - The point to check
+     * @param {PIXI.IPoint} p - The point to check
      * @returns {boolean} Whether the given point equal to this point
      */
     Point.prototype.equals = function (p) {
@@ -7180,7 +6661,7 @@ var ObservablePoint = /** @class */ (function () {
     /**
      * Copies x and y from the given point
      *
-     * @param {PIXI.IPointData} p - The point to copy from.
+     * @param {PIXI.IPoint} p - The point to copy from.
      * @returns {this} Returns itself.
      */
     ObservablePoint.prototype.copyFrom = function (p) {
@@ -7204,7 +6685,7 @@ var ObservablePoint = /** @class */ (function () {
     /**
      * Returns true if the given point is equal to this point
      *
-     * @param {PIXI.IPointData} p - The point to check
+     * @param {PIXI.IPoint} p - The point to check
      * @returns {boolean} Whether the given point equal to this point
      */
     ObservablePoint.prototype.equals = function (p) {
@@ -7225,7 +6706,7 @@ var ObservablePoint = /** @class */ (function () {
                 this.cb.call(this.scope);
             }
         },
-        enumerable: false,
+        enumerable: true,
         configurable: true
     });
     Object.defineProperty(ObservablePoint.prototype, "y", {
@@ -7243,11 +6724,59 @@ var ObservablePoint = /** @class */ (function () {
                 this.cb.call(this.scope);
             }
         },
-        enumerable: false,
+        enumerable: true,
         configurable: true
     });
     return ObservablePoint;
 }());
+
+/**
+ * Two Pi.
+ *
+ * @static
+ * @constant {number} PI_2
+ * @memberof PIXI
+ */
+var PI_2 = Math.PI * 2;
+/**
+ * Conversion factor for converting radians to degrees.
+ *
+ * @static
+ * @constant {number} RAD_TO_DEG
+ * @memberof PIXI
+ */
+var RAD_TO_DEG = 180 / Math.PI;
+/**
+ * Conversion factor for converting degrees to radians.
+ *
+ * @static
+ * @constant {number} DEG_TO_RAD
+ * @memberof PIXI
+ */
+var DEG_TO_RAD = Math.PI / 180;
+var SHAPES;
+(function (SHAPES) {
+    SHAPES[SHAPES["POLY"] = 0] = "POLY";
+    SHAPES[SHAPES["RECT"] = 1] = "RECT";
+    SHAPES[SHAPES["CIRC"] = 2] = "CIRC";
+    SHAPES[SHAPES["ELIP"] = 3] = "ELIP";
+    SHAPES[SHAPES["RREC"] = 4] = "RREC";
+})(SHAPES || (SHAPES = {}));
+/**
+ * Constants that identify shapes, mainly to prevent `instanceof` calls.
+ *
+ * @static
+ * @constant
+ * @name SHAPES
+ * @memberof PIXI
+ * @type {enum}
+ * @property {number} POLY Polygon
+ * @property {number} RECT Rectangle
+ * @property {number} CIRC Circle
+ * @property {number} ELIP Ellipse
+ * @property {number} RREC Rounded Rectangle
+ * @enum {number}
+ */
 
 /**
  * The PixiJS Matrix as a class makes it a lot faster.
@@ -7390,12 +6919,12 @@ var Matrix = /** @class */ (function () {
      * Get a new position with the current transformation applied.
      * Can be used to go from a child's coordinate space to the world coordinate space. (e.g. rendering)
      *
-     * @param {PIXI.IPointData} pos - The origin
+     * @param {PIXI.Point} pos - The origin
      * @param {PIXI.Point} [newPos] - The point that the new position is assigned to (allowed to be same as input)
      * @return {PIXI.Point} The new point, transformed through this matrix
      */
     Matrix.prototype.apply = function (pos, newPos) {
-        newPos = (newPos || new Point());
+        newPos = newPos || new Point();
         var x = pos.x;
         var y = pos.y;
         newPos.x = (this.a * x) + (this.c * y) + this.tx;
@@ -7406,12 +6935,12 @@ var Matrix = /** @class */ (function () {
      * Get a new position with the inverse of the current transformation applied.
      * Can be used to go from the world coordinate space to a child's coordinate space. (e.g. input)
      *
-     * @param {PIXI.IPointData} pos - The origin
+     * @param {PIXI.Point} pos - The origin
      * @param {PIXI.Point} [newPos] - The point that the new position is assigned to (allowed to be same as input)
      * @return {PIXI.Point} The new point, inverse-transformed through this matrix
      */
     Matrix.prototype.applyInverse = function (pos, newPos) {
-        newPos = (newPos || new Point());
+        newPos = newPos || new Point();
         var id = 1 / ((this.a * this.d) + (this.c * -this.b));
         var x = pos.x;
         var y = pos.y;
@@ -7422,8 +6951,8 @@ var Matrix = /** @class */ (function () {
     /**
      * Translates the matrix on the x and y.
      *
-     * @param {number} x - How much to translate x by
-     * @param {number} y - How much to translate y by
+     * @param {number} x How much to translate x by
+     * @param {number} y How much to translate y by
      * @return {PIXI.Matrix} This matrix. Good for chaining method calls.
      */
     Matrix.prototype.translate = function (x, y) {
@@ -7434,8 +6963,8 @@ var Matrix = /** @class */ (function () {
     /**
      * Applies a scale transformation to the matrix.
      *
-     * @param {number} x - The amount to scale horizontally
-     * @param {number} y - The amount to scale vertically
+     * @param {number} x The amount to scale horizontally
+     * @param {number} y The amount to scale vertically
      * @return {PIXI.Matrix} This matrix. Good for chaining method calls.
      */
     Matrix.prototype.scale = function (x, y) {
@@ -7651,7 +7180,7 @@ var Matrix = /** @class */ (function () {
         get: function () {
             return new Matrix();
         },
-        enumerable: false,
+        enumerable: true,
         configurable: true
     });
     Object.defineProperty(Matrix, "TEMP_MATRIX", {
@@ -7665,7 +7194,7 @@ var Matrix = /** @class */ (function () {
         get: function () {
             return new Matrix();
         },
-        enumerable: false,
+        enumerable: true,
         configurable: true
     });
     return Matrix;
@@ -8220,7 +7749,7 @@ var Transform = /** @class */ (function () {
                 this.updateSkew();
             }
         },
-        enumerable: false,
+        enumerable: true,
         configurable: true
     });
     /**
@@ -8234,48 +7763,2111 @@ var Transform = /** @class */ (function () {
     return Transform;
 }());
 
+/**
+ * Size object, contains width and height
+ *
+ * @memberof PIXI
+ * @typedef {object} ISize
+ * @property {number} width - Width component
+ * @property {number} height - Height component
+ */
+/**
+ * Rectangle object is an area defined by its position, as indicated by its top-left corner
+ * point (x, y) and by its width and its height.
+ *
+ * @class
+ * @memberof PIXI
+ */
+var Rectangle = /** @class */ (function () {
+    /**
+     * @param {number} [x=0] - The X coordinate of the upper-left corner of the rectangle
+     * @param {number} [y=0] - The Y coordinate of the upper-left corner of the rectangle
+     * @param {number} [width=0] - The overall width of this rectangle
+     * @param {number} [height=0] - The overall height of this rectangle
+     */
+    function Rectangle(x, y, width, height) {
+        if (x === void 0) { x = 0; }
+        if (y === void 0) { y = 0; }
+        if (width === void 0) { width = 0; }
+        if (height === void 0) { height = 0; }
+        /**
+         * @member {number}
+         * @default 0
+         */
+        this.x = Number(x);
+        /**
+         * @member {number}
+         * @default 0
+         */
+        this.y = Number(y);
+        /**
+         * @member {number}
+         * @default 0
+         */
+        this.width = Number(width);
+        /**
+         * @member {number}
+         * @default 0
+         */
+        this.height = Number(height);
+        /**
+         * The type of the object, mainly used to avoid `instanceof` checks
+         *
+         * @member {number}
+         * @readOnly
+         * @default PIXI.SHAPES.RECT
+         * @see PIXI.SHAPES
+         */
+        this.type = SHAPES.RECT;
+    }
+    Object.defineProperty(Rectangle.prototype, "left", {
+        /**
+         * returns the left edge of the rectangle
+         *
+         * @member {number}
+         */
+        get: function () {
+            return this.x;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Rectangle.prototype, "right", {
+        /**
+         * returns the right edge of the rectangle
+         *
+         * @member {number}
+         */
+        get: function () {
+            return this.x + this.width;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Rectangle.prototype, "top", {
+        /**
+         * returns the top edge of the rectangle
+         *
+         * @member {number}
+         */
+        get: function () {
+            return this.y;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Rectangle.prototype, "bottom", {
+        /**
+         * returns the bottom edge of the rectangle
+         *
+         * @member {number}
+         */
+        get: function () {
+            return this.y + this.height;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Rectangle, "EMPTY", {
+        /**
+         * A constant empty rectangle.
+         *
+         * @static
+         * @constant
+         * @member {PIXI.Rectangle}
+         * @return {PIXI.Rectangle} An empty rectangle
+         */
+        get: function () {
+            return new Rectangle(0, 0, 0, 0);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    /**
+     * Creates a clone of this Rectangle
+     *
+     * @return {PIXI.Rectangle} a copy of the rectangle
+     */
+    Rectangle.prototype.clone = function () {
+        return new Rectangle(this.x, this.y, this.width, this.height);
+    };
+    /**
+     * Copies another rectangle to this one.
+     *
+     * @param {PIXI.Rectangle} rectangle - The rectangle to copy from.
+     * @return {PIXI.Rectangle} Returns itself.
+     */
+    Rectangle.prototype.copyFrom = function (rectangle) {
+        this.x = rectangle.x;
+        this.y = rectangle.y;
+        this.width = rectangle.width;
+        this.height = rectangle.height;
+        return this;
+    };
+    /**
+     * Copies this rectangle to another one.
+     *
+     * @param {PIXI.Rectangle} rectangle - The rectangle to copy to.
+     * @return {PIXI.Rectangle} Returns given parameter.
+     */
+    Rectangle.prototype.copyTo = function (rectangle) {
+        rectangle.x = this.x;
+        rectangle.y = this.y;
+        rectangle.width = this.width;
+        rectangle.height = this.height;
+        return rectangle;
+    };
+    /**
+     * Checks whether the x and y coordinates given are contained within this Rectangle
+     *
+     * @param {number} x - The X coordinate of the point to test
+     * @param {number} y - The Y coordinate of the point to test
+     * @return {boolean} Whether the x/y coordinates are within this Rectangle
+     */
+    Rectangle.prototype.contains = function (x, y) {
+        if (this.width <= 0 || this.height <= 0) {
+            return false;
+        }
+        if (x >= this.x && x < this.x + this.width) {
+            if (y >= this.y && y < this.y + this.height) {
+                return true;
+            }
+        }
+        return false;
+    };
+    /**
+     * Pads the rectangle making it grow in all directions.
+     * If paddingY is omitted, both paddingX and paddingY will be set to paddingX.
+     *
+     * @param {number} [paddingX=0] - The horizontal padding amount.
+     * @param {number} [paddingY=0] - The vertical padding amount.
+     * @return {PIXI.Rectangle} Returns itself.
+     */
+    Rectangle.prototype.pad = function (paddingX, paddingY) {
+        if (paddingX === void 0) { paddingX = 0; }
+        if (paddingY === void 0) { paddingY = paddingX; }
+        this.x -= paddingX;
+        this.y -= paddingY;
+        this.width += paddingX * 2;
+        this.height += paddingY * 2;
+        return this;
+    };
+    /**
+     * Fits this rectangle around the passed one.
+     *
+     * @param {PIXI.Rectangle} rectangle - The rectangle to fit.
+     * @return {PIXI.Rectangle} Returns itself.
+     */
+    Rectangle.prototype.fit = function (rectangle) {
+        var x1 = Math.max(this.x, rectangle.x);
+        var x2 = Math.min(this.x + this.width, rectangle.x + rectangle.width);
+        var y1 = Math.max(this.y, rectangle.y);
+        var y2 = Math.min(this.y + this.height, rectangle.y + rectangle.height);
+        this.x = x1;
+        this.width = Math.max(x2 - x1, 0);
+        this.y = y1;
+        this.height = Math.max(y2 - y1, 0);
+        return this;
+    };
+    /**
+     * Enlarges rectangle that way its corners lie on grid
+     *
+     * @param {number} [resolution=1] resolution
+     * @param {number} [eps=0.001] precision
+     * @return {PIXI.Rectangle} Returns itself.
+     */
+    Rectangle.prototype.ceil = function (resolution, eps) {
+        if (resolution === void 0) { resolution = 1; }
+        if (eps === void 0) { eps = 0.001; }
+        var x2 = Math.ceil((this.x + this.width - eps) * resolution) / resolution;
+        var y2 = Math.ceil((this.y + this.height - eps) * resolution) / resolution;
+        this.x = Math.floor((this.x + eps) * resolution) / resolution;
+        this.y = Math.floor((this.y + eps) * resolution) / resolution;
+        this.width = x2 - this.x;
+        this.height = y2 - this.y;
+        return this;
+    };
+    /**
+     * Enlarges this rectangle to include the passed rectangle.
+     *
+     * @param {PIXI.Rectangle} rectangle - The rectangle to include.
+     * @return {PIXI.Rectangle} Returns itself.
+     */
+    Rectangle.prototype.enlarge = function (rectangle) {
+        var x1 = Math.min(this.x, rectangle.x);
+        var x2 = Math.max(this.x + this.width, rectangle.x + rectangle.width);
+        var y1 = Math.min(this.y, rectangle.y);
+        var y2 = Math.max(this.y + this.height, rectangle.y + rectangle.height);
+        this.x = x1;
+        this.width = x2 - x1;
+        this.y = y1;
+        this.height = y2 - y1;
+        return this;
+    };
+    return Rectangle;
+}());
+
 /*!
- * @pixi/core - v5.3.1
- * Compiled Fri, 24 Jul 2020 20:56:48 UTC
+ * @pixi/display - v5.2.1
+ * Compiled Tue, 28 Jan 2020 23:33:11 UTC
+ *
+ * @pixi/display is licensed under the MIT License.
+ * http://www.opensource.org/licenses/mit-license
+ */
+
+/**
+ * Sets the default value for the container property 'sortableChildren'.
+ * If set to true, the container will sort its children by zIndex value
+ * when updateTransform() is called, or manually if sortChildren() is called.
+ *
+ * This actually changes the order of elements in the array, so should be treated
+ * as a basic solution that is not performant compared to other solutions,
+ * such as @link https://github.com/pixijs/pixi-display
+ *
+ * Also be aware of that this may not work nicely with the addChildAt() function,
+ * as the zIndex sorting may cause the child to automatically sorted to another position.
+ *
+ * @static
+ * @constant
+ * @name SORTABLE_CHILDREN
+ * @memberof PIXI.settings
+ * @type {boolean}
+ * @default false
+ */
+settings.SORTABLE_CHILDREN = false;
+
+/**
+ * 'Builder' pattern for bounds rectangles.
+ *
+ * This could be called an Axis-Aligned Bounding Box.
+ * It is not an actual shape. It is a mutable thing; no 'EMPTY' or those kind of problems.
+ *
+ * @class
+ * @memberof PIXI
+ */
+var Bounds = function Bounds()
+{
+    /**
+     * @member {number}
+     * @default 0
+     */
+    this.minX = Infinity;
+
+    /**
+     * @member {number}
+     * @default 0
+     */
+    this.minY = Infinity;
+
+    /**
+     * @member {number}
+     * @default 0
+     */
+    this.maxX = -Infinity;
+
+    /**
+     * @member {number}
+     * @default 0
+     */
+    this.maxY = -Infinity;
+
+    this.rect = null;
+};
+
+/**
+ * Checks if bounds are empty.
+ *
+ * @return {boolean} True if empty.
+ */
+Bounds.prototype.isEmpty = function isEmpty ()
+{
+    return this.minX > this.maxX || this.minY > this.maxY;
+};
+
+/**
+ * Clears the bounds and resets.
+ *
+ */
+Bounds.prototype.clear = function clear ()
+{
+    this.minX = Infinity;
+    this.minY = Infinity;
+    this.maxX = -Infinity;
+    this.maxY = -Infinity;
+};
+
+/**
+ * Can return Rectangle.EMPTY constant, either construct new rectangle, either use your rectangle
+ * It is not guaranteed that it will return tempRect
+ *
+ * @param {PIXI.Rectangle} rect - temporary object will be used if AABB is not empty
+ * @returns {PIXI.Rectangle} A rectangle of the bounds
+ */
+Bounds.prototype.getRectangle = function getRectangle (rect)
+{
+    if (this.minX > this.maxX || this.minY > this.maxY)
+    {
+        return Rectangle.EMPTY;
+    }
+
+    rect = rect || new Rectangle(0, 0, 1, 1);
+
+    rect.x = this.minX;
+    rect.y = this.minY;
+    rect.width = this.maxX - this.minX;
+    rect.height = this.maxY - this.minY;
+
+    return rect;
+};
+
+/**
+ * This function should be inlined when its possible.
+ *
+ * @param {PIXI.Point} point - The point to add.
+ */
+Bounds.prototype.addPoint = function addPoint (point)
+{
+    this.minX = Math.min(this.minX, point.x);
+    this.maxX = Math.max(this.maxX, point.x);
+    this.minY = Math.min(this.minY, point.y);
+    this.maxY = Math.max(this.maxY, point.y);
+};
+
+/**
+ * Adds a quad, not transformed
+ *
+ * @param {Float32Array} vertices - The verts to add.
+ */
+Bounds.prototype.addQuad = function addQuad (vertices)
+{
+    var minX = this.minX;
+    var minY = this.minY;
+    var maxX = this.maxX;
+    var maxY = this.maxY;
+
+    var x = vertices[0];
+    var y = vertices[1];
+
+    minX = x < minX ? x : minX;
+    minY = y < minY ? y : minY;
+    maxX = x > maxX ? x : maxX;
+    maxY = y > maxY ? y : maxY;
+
+    x = vertices[2];
+    y = vertices[3];
+    minX = x < minX ? x : minX;
+    minY = y < minY ? y : minY;
+    maxX = x > maxX ? x : maxX;
+    maxY = y > maxY ? y : maxY;
+
+    x = vertices[4];
+    y = vertices[5];
+    minX = x < minX ? x : minX;
+    minY = y < minY ? y : minY;
+    maxX = x > maxX ? x : maxX;
+    maxY = y > maxY ? y : maxY;
+
+    x = vertices[6];
+    y = vertices[7];
+    minX = x < minX ? x : minX;
+    minY = y < minY ? y : minY;
+    maxX = x > maxX ? x : maxX;
+    maxY = y > maxY ? y : maxY;
+
+    this.minX = minX;
+    this.minY = minY;
+    this.maxX = maxX;
+    this.maxY = maxY;
+};
+
+/**
+ * Adds sprite frame, transformed.
+ *
+ * @param {PIXI.Transform} transform - transform to apply
+ * @param {number} x0 - left X of frame
+ * @param {number} y0 - top Y of frame
+ * @param {number} x1 - right X of frame
+ * @param {number} y1 - bottom Y of frame
+ */
+Bounds.prototype.addFrame = function addFrame (transform, x0, y0, x1, y1)
+{
+    this.addFrameMatrix(transform.worldTransform, x0, y0, x1, y1);
+};
+
+/**
+ * Adds sprite frame, multiplied by matrix
+ *
+ * @param {PIXI.Matrix} matrix - matrix to apply
+ * @param {number} x0 - left X of frame
+ * @param {number} y0 - top Y of frame
+ * @param {number} x1 - right X of frame
+ * @param {number} y1 - bottom Y of frame
+ */
+Bounds.prototype.addFrameMatrix = function addFrameMatrix (matrix, x0, y0, x1, y1)
+{
+    var a = matrix.a;
+    var b = matrix.b;
+    var c = matrix.c;
+    var d = matrix.d;
+    var tx = matrix.tx;
+    var ty = matrix.ty;
+
+    var minX = this.minX;
+    var minY = this.minY;
+    var maxX = this.maxX;
+    var maxY = this.maxY;
+
+    var x = (a * x0) + (c * y0) + tx;
+    var y = (b * x0) + (d * y0) + ty;
+
+    minX = x < minX ? x : minX;
+    minY = y < minY ? y : minY;
+    maxX = x > maxX ? x : maxX;
+    maxY = y > maxY ? y : maxY;
+
+    x = (a * x1) + (c * y0) + tx;
+    y = (b * x1) + (d * y0) + ty;
+    minX = x < minX ? x : minX;
+    minY = y < minY ? y : minY;
+    maxX = x > maxX ? x : maxX;
+    maxY = y > maxY ? y : maxY;
+
+    x = (a * x0) + (c * y1) + tx;
+    y = (b * x0) + (d * y1) + ty;
+    minX = x < minX ? x : minX;
+    minY = y < minY ? y : minY;
+    maxX = x > maxX ? x : maxX;
+    maxY = y > maxY ? y : maxY;
+
+    x = (a * x1) + (c * y1) + tx;
+    y = (b * x1) + (d * y1) + ty;
+    minX = x < minX ? x : minX;
+    minY = y < minY ? y : minY;
+    maxX = x > maxX ? x : maxX;
+    maxY = y > maxY ? y : maxY;
+
+    this.minX = minX;
+    this.minY = minY;
+    this.maxX = maxX;
+    this.maxY = maxY;
+};
+
+/**
+ * Adds screen vertices from array
+ *
+ * @param {Float32Array} vertexData - calculated vertices
+ * @param {number} beginOffset - begin offset
+ * @param {number} endOffset - end offset, excluded
+ */
+Bounds.prototype.addVertexData = function addVertexData (vertexData, beginOffset, endOffset)
+{
+    var minX = this.minX;
+    var minY = this.minY;
+    var maxX = this.maxX;
+    var maxY = this.maxY;
+
+    for (var i = beginOffset; i < endOffset; i += 2)
+    {
+        var x = vertexData[i];
+        var y = vertexData[i + 1];
+
+        minX = x < minX ? x : minX;
+        minY = y < minY ? y : minY;
+        maxX = x > maxX ? x : maxX;
+        maxY = y > maxY ? y : maxY;
+    }
+
+    this.minX = minX;
+    this.minY = minY;
+    this.maxX = maxX;
+    this.maxY = maxY;
+};
+
+/**
+ * Add an array of mesh vertices
+ *
+ * @param {PIXI.Transform} transform - mesh transform
+ * @param {Float32Array} vertices - mesh coordinates in array
+ * @param {number} beginOffset - begin offset
+ * @param {number} endOffset - end offset, excluded
+ */
+Bounds.prototype.addVertices = function addVertices (transform, vertices, beginOffset, endOffset)
+{
+    this.addVerticesMatrix(transform.worldTransform, vertices, beginOffset, endOffset);
+};
+
+/**
+ * Add an array of mesh vertices
+ *
+ * @param {PIXI.Matrix} matrix - mesh matrix
+ * @param {Float32Array} vertices - mesh coordinates in array
+ * @param {number} beginOffset - begin offset
+ * @param {number} endOffset - end offset, excluded
+ * @param {number} [padX] - x padding
+ * @param {number} [padY] - y padding
+ */
+Bounds.prototype.addVerticesMatrix = function addVerticesMatrix (matrix, vertices, beginOffset, endOffset, padX, padY)
+{
+    var a = matrix.a;
+    var b = matrix.b;
+    var c = matrix.c;
+    var d = matrix.d;
+    var tx = matrix.tx;
+    var ty = matrix.ty;
+
+    padX = padX || 0;
+    padY = padY || 0;
+
+    var minX = this.minX;
+    var minY = this.minY;
+    var maxX = this.maxX;
+    var maxY = this.maxY;
+
+    for (var i = beginOffset; i < endOffset; i += 2)
+    {
+        var rawX = vertices[i];
+        var rawY = vertices[i + 1];
+        var x = (a * rawX) + (c * rawY) + tx;
+        var y = (d * rawY) + (b * rawX) + ty;
+
+        minX = Math.min(minX, x - padX);
+        maxX = Math.max(maxX, x + padX);
+        minY = Math.min(minY, y - padY);
+        maxY = Math.max(maxY, y + padY);
+    }
+
+    this.minX = minX;
+    this.minY = minY;
+    this.maxX = maxX;
+    this.maxY = maxY;
+};
+
+/**
+ * Adds other Bounds
+ *
+ * @param {PIXI.Bounds} bounds - TODO
+ */
+Bounds.prototype.addBounds = function addBounds (bounds)
+{
+    var minX = this.minX;
+    var minY = this.minY;
+    var maxX = this.maxX;
+    var maxY = this.maxY;
+
+    this.minX = bounds.minX < minX ? bounds.minX : minX;
+    this.minY = bounds.minY < minY ? bounds.minY : minY;
+    this.maxX = bounds.maxX > maxX ? bounds.maxX : maxX;
+    this.maxY = bounds.maxY > maxY ? bounds.maxY : maxY;
+};
+
+/**
+ * Adds other Bounds, masked with Bounds
+ *
+ * @param {PIXI.Bounds} bounds - TODO
+ * @param {PIXI.Bounds} mask - TODO
+ */
+Bounds.prototype.addBoundsMask = function addBoundsMask (bounds, mask)
+{
+    var _minX = bounds.minX > mask.minX ? bounds.minX : mask.minX;
+    var _minY = bounds.minY > mask.minY ? bounds.minY : mask.minY;
+    var _maxX = bounds.maxX < mask.maxX ? bounds.maxX : mask.maxX;
+    var _maxY = bounds.maxY < mask.maxY ? bounds.maxY : mask.maxY;
+
+    if (_minX <= _maxX && _minY <= _maxY)
+    {
+        var minX = this.minX;
+        var minY = this.minY;
+        var maxX = this.maxX;
+        var maxY = this.maxY;
+
+        this.minX = _minX < minX ? _minX : minX;
+        this.minY = _minY < minY ? _minY : minY;
+        this.maxX = _maxX > maxX ? _maxX : maxX;
+        this.maxY = _maxY > maxY ? _maxY : maxY;
+    }
+};
+
+/**
+ * Adds other Bounds, multiplied by matrix. Bounds shouldn't be empty
+ *
+ * @param {PIXI.Bounds} bounds other bounds
+ * @param {PIXI.Matrix} matrix multiplicator
+ */
+Bounds.prototype.addBoundsMatrix = function addBoundsMatrix (bounds, matrix)
+{
+    this.addFrameMatrix(matrix, bounds.minX, bounds.minY, bounds.maxX, bounds.maxY);
+};
+
+/**
+ * Adds other Bounds, masked with Rectangle
+ *
+ * @param {PIXI.Bounds} bounds - TODO
+ * @param {PIXI.Rectangle} area - TODO
+ */
+Bounds.prototype.addBoundsArea = function addBoundsArea (bounds, area)
+{
+    var _minX = bounds.minX > area.x ? bounds.minX : area.x;
+    var _minY = bounds.minY > area.y ? bounds.minY : area.y;
+    var _maxX = bounds.maxX < area.x + area.width ? bounds.maxX : (area.x + area.width);
+    var _maxY = bounds.maxY < area.y + area.height ? bounds.maxY : (area.y + area.height);
+
+    if (_minX <= _maxX && _minY <= _maxY)
+    {
+        var minX = this.minX;
+        var minY = this.minY;
+        var maxX = this.maxX;
+        var maxY = this.maxY;
+
+        this.minX = _minX < minX ? _minX : minX;
+        this.minY = _minY < minY ? _minY : minY;
+        this.maxX = _maxX > maxX ? _maxX : maxX;
+        this.maxY = _maxY > maxY ? _maxY : maxY;
+    }
+};
+
+/**
+ * Pads bounds object, making it grow in all directions.
+ * If paddingY is omitted, both paddingX and paddingY will be set to paddingX.
+ *
+ * @param {number} [paddingX=0] - The horizontal padding amount.
+ * @param {number} [paddingY=0] - The vertical padding amount.
+ */
+Bounds.prototype.pad = function pad (paddingX, paddingY)
+{
+    paddingX = paddingX || 0;
+    paddingY = paddingY || ((paddingY !== 0) ? paddingX : 0);
+
+    if (!this.isEmpty())
+    {
+        this.minX -= paddingX;
+        this.maxX += paddingX;
+        this.minY -= paddingY;
+        this.maxY += paddingY;
+    }
+};
+
+/**
+ * Adds padded frame. (x0, y0) should be strictly less than (x1, y1)
+ *
+ * @param {number} x0 - left X of frame
+ * @param {number} y0 - top Y of frame
+ * @param {number} x1 - right X of frame
+ * @param {number} y1 - bottom Y of frame
+ * @param {number} padX - padding X
+ * @param {number} padY - padding Y
+ */
+Bounds.prototype.addFramePad = function addFramePad (x0, y0, x1, y1, padX, padY)
+{
+    x0 -= padX;
+    y0 -= padY;
+    x1 += padX;
+    y1 += padY;
+
+    this.minX = this.minX < x0 ? this.minX : x0;
+    this.maxX = this.maxX > x1 ? this.maxX : x1;
+    this.minY = this.minY < y0 ? this.minY : y0;
+    this.maxY = this.maxY > y1 ? this.maxY : y1;
+};
+
+// _tempDisplayObjectParent = new DisplayObject();
+
+/**
+ * The base class for all objects that are rendered on the screen.
+ *
+ * This is an abstract class and should not be used on its own; rather it should be extended.
+ *
+ * @class
+ * @extends PIXI.utils.EventEmitter
+ * @memberof PIXI
+ */
+var DisplayObject = /*@__PURE__*/(function (EventEmitter) {
+    function DisplayObject()
+    {
+        EventEmitter.call(this);
+
+        this.tempDisplayObjectParent = null;
+
+        // TODO: need to create Transform from factory
+        /**
+         * World transform and local transform of this object.
+         * This will become read-only later, please do not assign anything there unless you know what are you doing.
+         *
+         * @member {PIXI.Transform}
+         */
+        this.transform = new Transform();
+
+        /**
+         * The opacity of the object.
+         *
+         * @member {number}
+         */
+        this.alpha = 1;
+
+        /**
+         * The visibility of the object. If false the object will not be drawn, and
+         * the updateTransform function will not be called.
+         *
+         * Only affects recursive calls from parent. You can ask for bounds or call updateTransform manually.
+         *
+         * @member {boolean}
+         */
+        this.visible = true;
+
+        /**
+         * Can this object be rendered, if false the object will not be drawn but the updateTransform
+         * methods will still be called.
+         *
+         * Only affects recursive calls from parent. You can ask for bounds manually.
+         *
+         * @member {boolean}
+         */
+        this.renderable = true;
+
+        /**
+         * The display object container that contains this display object.
+         *
+         * @member {PIXI.Container}
+         * @readonly
+         */
+        this.parent = null;
+
+        /**
+         * The multiplied alpha of the displayObject.
+         *
+         * @member {number}
+         * @readonly
+         */
+        this.worldAlpha = 1;
+
+        /**
+         * Which index in the children array the display component was before the previous zIndex sort.
+         * Used by containers to help sort objects with the same zIndex, by using previous array index as the decider.
+         *
+         * @member {number}
+         * @protected
+         */
+        this._lastSortedIndex = 0;
+
+        /**
+         * The zIndex of the displayObject.
+         * A higher value will mean it will be rendered on top of other displayObjects within the same container.
+         *
+         * @member {number}
+         * @protected
+         */
+        this._zIndex = 0;
+
+        /**
+         * The area the filter is applied to. This is used as more of an optimization
+         * rather than figuring out the dimensions of the displayObject each frame you can set this rectangle.
+         *
+         * Also works as an interaction mask.
+         *
+         * @member {?PIXI.Rectangle}
+         */
+        this.filterArea = null;
+
+        /**
+         * Sets the filters for the displayObject.
+         * * IMPORTANT: This is a WebGL only feature and will be ignored by the canvas renderer.
+         * To remove filters simply set this property to `'null'`.
+         *
+         * @member {?PIXI.Filter[]}
+         */
+        this.filters = null;
+        this._enabledFilters = null;
+
+        /**
+         * The bounds object, this is used to calculate and store the bounds of the displayObject.
+         *
+         * @member {PIXI.Bounds}
+         * @protected
+         */
+        this._bounds = new Bounds();
+        this._boundsID = 0;
+        this._lastBoundsID = -1;
+        this._boundsRect = null;
+        this._localBoundsRect = null;
+
+        /**
+         * The original, cached mask of the object.
+         *
+         * @member {PIXI.Graphics|PIXI.Sprite|null}
+         * @protected
+         */
+        this._mask = null;
+
+        /**
+         * Fired when this DisplayObject is added to a Container.
+         *
+         * @event PIXI.DisplayObject#added
+         * @param {PIXI.Container} container - The container added to.
+         */
+
+        /**
+         * Fired when this DisplayObject is removed from a Container.
+         *
+         * @event PIXI.DisplayObject#removed
+         * @param {PIXI.Container} container - The container removed from.
+         */
+
+        /**
+         * If the object has been destroyed via destroy(). If true, it should not be used.
+         *
+         * @member {boolean}
+         * @protected
+         */
+        this._destroyed = false;
+
+        /**
+         * used to fast check if a sprite is.. a sprite!
+         * @member {boolean}
+         */
+        this.isSprite = false;
+
+        /**
+         * Does any other displayObject use this object as a mask?
+         * @member {boolean}
+         */
+        this.isMask = false;
+    }
+
+    if ( EventEmitter ) DisplayObject.__proto__ = EventEmitter;
+    DisplayObject.prototype = Object.create( EventEmitter && EventEmitter.prototype );
+    DisplayObject.prototype.constructor = DisplayObject;
+
+    var prototypeAccessors = { _tempDisplayObjectParent: { configurable: true },x: { configurable: true },y: { configurable: true },worldTransform: { configurable: true },localTransform: { configurable: true },position: { configurable: true },scale: { configurable: true },pivot: { configurable: true },skew: { configurable: true },rotation: { configurable: true },angle: { configurable: true },zIndex: { configurable: true },worldVisible: { configurable: true },mask: { configurable: true } };
+
+    /**
+     * @protected
+     * @member {PIXI.DisplayObject}
+     */
+    DisplayObject.mixin = function mixin (source)
+    {
+        // in ES8/ES2017, this would be really easy:
+        // Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
+
+        // get all the enumerable property keys
+        var keys = Object.keys(source);
+
+        // loop through properties
+        for (var i = 0; i < keys.length; ++i)
+        {
+            var propertyName = keys[i];
+
+            // Set the property using the property descriptor - this works for accessors and normal value properties
+            Object.defineProperty(
+                DisplayObject.prototype,
+                propertyName,
+                Object.getOwnPropertyDescriptor(source, propertyName)
+            );
+        }
+    };
+
+    prototypeAccessors._tempDisplayObjectParent.get = function ()
+    {
+        if (this.tempDisplayObjectParent === null)
+        {
+            this.tempDisplayObjectParent = new DisplayObject();
+        }
+
+        return this.tempDisplayObjectParent;
+    };
+
+    /**
+     * Updates the object transform for rendering.
+     *
+     * TODO - Optimization pass!
+     */
+    DisplayObject.prototype.updateTransform = function updateTransform ()
+    {
+        this._boundsID++;
+
+        this.transform.updateTransform(this.parent.transform);
+        // multiply the alphas..
+        this.worldAlpha = this.alpha * this.parent.worldAlpha;
+    };
+
+    /**
+     * Recalculates the bounds of the display object.
+     *
+     * Does nothing by default and can be overwritten in a parent class.
+     */
+    DisplayObject.prototype.calculateBounds = function calculateBounds ()
+    {
+        // OVERWRITE;
+    };
+
+    /**
+     * Recursively updates transform of all objects from the root to this one
+     * internal function for toLocal()
+     */
+    DisplayObject.prototype._recursivePostUpdateTransform = function _recursivePostUpdateTransform ()
+    {
+        if (this.parent)
+        {
+            this.parent._recursivePostUpdateTransform();
+            this.transform.updateTransform(this.parent.transform);
+        }
+        else
+        {
+            this.transform.updateTransform(this._tempDisplayObjectParent.transform);
+        }
+    };
+
+    /**
+     * Retrieves the bounds of the displayObject as a rectangle object.
+     *
+     * @param {boolean} [skipUpdate] - Setting to `true` will stop the transforms of the scene graph from
+     *  being updated. This means the calculation returned MAY be out of date BUT will give you a
+     *  nice performance boost.
+     * @param {PIXI.Rectangle} [rect] - Optional rectangle to store the result of the bounds calculation.
+     * @return {PIXI.Rectangle} The rectangular bounding area.
+     */
+    DisplayObject.prototype.getBounds = function getBounds (skipUpdate, rect)
+    {
+        if (!skipUpdate)
+        {
+            if (!this.parent)
+            {
+                this.parent = this._tempDisplayObjectParent;
+                this.updateTransform();
+                this.parent = null;
+            }
+            else
+            {
+                this._recursivePostUpdateTransform();
+                this.updateTransform();
+            }
+        }
+
+        if (this._boundsID !== this._lastBoundsID)
+        {
+            this.calculateBounds();
+            this._lastBoundsID = this._boundsID;
+        }
+
+        if (!rect)
+        {
+            if (!this._boundsRect)
+            {
+                this._boundsRect = new Rectangle();
+            }
+
+            rect = this._boundsRect;
+        }
+
+        return this._bounds.getRectangle(rect);
+    };
+
+    /**
+     * Retrieves the local bounds of the displayObject as a rectangle object.
+     *
+     * @param {PIXI.Rectangle} [rect] - Optional rectangle to store the result of the bounds calculation.
+     * @return {PIXI.Rectangle} The rectangular bounding area.
+     */
+    DisplayObject.prototype.getLocalBounds = function getLocalBounds (rect)
+    {
+        var transformRef = this.transform;
+        var parentRef = this.parent;
+
+        this.parent = null;
+        this.transform = this._tempDisplayObjectParent.transform;
+
+        if (!rect)
+        {
+            if (!this._localBoundsRect)
+            {
+                this._localBoundsRect = new Rectangle();
+            }
+
+            rect = this._localBoundsRect;
+        }
+
+        var bounds = this.getBounds(false, rect);
+
+        this.parent = parentRef;
+        this.transform = transformRef;
+
+        return bounds;
+    };
+
+    /**
+     * Calculates the global position of the display object.
+     *
+     * @param {PIXI.IPoint} position - The world origin to calculate from.
+     * @param {PIXI.IPoint} [point] - A Point object in which to store the value, optional
+     *  (otherwise will create a new Point).
+     * @param {boolean} [skipUpdate=false] - Should we skip the update transform.
+     * @return {PIXI.IPoint} A point object representing the position of this object.
+     */
+    DisplayObject.prototype.toGlobal = function toGlobal (position, point, skipUpdate)
+    {
+        if ( skipUpdate === void 0 ) skipUpdate = false;
+
+        if (!skipUpdate)
+        {
+            this._recursivePostUpdateTransform();
+
+            // this parent check is for just in case the item is a root object.
+            // If it is we need to give it a temporary parent so that displayObjectUpdateTransform works correctly
+            // this is mainly to avoid a parent check in the main loop. Every little helps for performance :)
+            if (!this.parent)
+            {
+                this.parent = this._tempDisplayObjectParent;
+                this.displayObjectUpdateTransform();
+                this.parent = null;
+            }
+            else
+            {
+                this.displayObjectUpdateTransform();
+            }
+        }
+
+        // don't need to update the lot
+        return this.worldTransform.apply(position, point);
+    };
+
+    /**
+     * Calculates the local position of the display object relative to another point.
+     *
+     * @param {PIXI.IPoint} position - The world origin to calculate from.
+     * @param {PIXI.DisplayObject} [from] - The DisplayObject to calculate the global position from.
+     * @param {PIXI.IPoint} [point] - A Point object in which to store the value, optional
+     *  (otherwise will create a new Point).
+     * @param {boolean} [skipUpdate=false] - Should we skip the update transform
+     * @return {PIXI.IPoint} A point object representing the position of this object
+     */
+    DisplayObject.prototype.toLocal = function toLocal (position, from, point, skipUpdate)
+    {
+        if (from)
+        {
+            position = from.toGlobal(position, point, skipUpdate);
+        }
+
+        if (!skipUpdate)
+        {
+            this._recursivePostUpdateTransform();
+
+            // this parent check is for just in case the item is a root object.
+            // If it is we need to give it a temporary parent so that displayObjectUpdateTransform works correctly
+            // this is mainly to avoid a parent check in the main loop. Every little helps for performance :)
+            if (!this.parent)
+            {
+                this.parent = this._tempDisplayObjectParent;
+                this.displayObjectUpdateTransform();
+                this.parent = null;
+            }
+            else
+            {
+                this.displayObjectUpdateTransform();
+            }
+        }
+
+        // simply apply the matrix..
+        return this.worldTransform.applyInverse(position, point);
+    };
+
+    /**
+     * Renders the object using the WebGL renderer.
+     *
+     * @param {PIXI.Renderer} renderer - The renderer.
+     */
+    DisplayObject.prototype.render = function render (renderer) // eslint-disable-line no-unused-vars
+    {
+        // OVERWRITE;
+    };
+
+    /**
+     * Set the parent Container of this DisplayObject.
+     *
+     * @param {PIXI.Container} container - The Container to add this DisplayObject to.
+     * @return {PIXI.Container} The Container that this DisplayObject was added to.
+     */
+    DisplayObject.prototype.setParent = function setParent (container)
+    {
+        if (!container || !container.addChild)
+        {
+            throw new Error('setParent: Argument must be a Container');
+        }
+
+        container.addChild(this);
+
+        return container;
+    };
+
+    /**
+     * Convenience function to set the position, scale, skew and pivot at once.
+     *
+     * @param {number} [x=0] - The X position
+     * @param {number} [y=0] - The Y position
+     * @param {number} [scaleX=1] - The X scale value
+     * @param {number} [scaleY=1] - The Y scale value
+     * @param {number} [rotation=0] - The rotation
+     * @param {number} [skewX=0] - The X skew value
+     * @param {number} [skewY=0] - The Y skew value
+     * @param {number} [pivotX=0] - The X pivot value
+     * @param {number} [pivotY=0] - The Y pivot value
+     * @return {PIXI.DisplayObject} The DisplayObject instance
+     */
+    DisplayObject.prototype.setTransform = function setTransform (x, y, scaleX, scaleY, rotation, skewX, skewY, pivotX, pivotY)
+    {
+        if ( x === void 0 ) x = 0;
+        if ( y === void 0 ) y = 0;
+        if ( scaleX === void 0 ) scaleX = 1;
+        if ( scaleY === void 0 ) scaleY = 1;
+        if ( rotation === void 0 ) rotation = 0;
+        if ( skewX === void 0 ) skewX = 0;
+        if ( skewY === void 0 ) skewY = 0;
+        if ( pivotX === void 0 ) pivotX = 0;
+        if ( pivotY === void 0 ) pivotY = 0;
+
+        this.position.x = x;
+        this.position.y = y;
+        this.scale.x = !scaleX ? 1 : scaleX;
+        this.scale.y = !scaleY ? 1 : scaleY;
+        this.rotation = rotation;
+        this.skew.x = skewX;
+        this.skew.y = skewY;
+        this.pivot.x = pivotX;
+        this.pivot.y = pivotY;
+
+        return this;
+    };
+
+    /**
+     * Base destroy method for generic display objects. This will automatically
+     * remove the display object from its parent Container as well as remove
+     * all current event listeners and internal references. Do not use a DisplayObject
+     * after calling `destroy()`.
+     *
+     */
+    DisplayObject.prototype.destroy = function destroy ()
+    {
+        if (this.parent)
+        {
+            this.parent.removeChild(this);
+        }
+        this.removeAllListeners();
+        this.transform = null;
+
+        this.parent = null;
+        this._bounds = null;
+        this._currentBounds = null;
+        this._mask = null;
+
+        this.filters = null;
+        this.filterArea = null;
+        this.hitArea = null;
+
+        this.interactive = false;
+        this.interactiveChildren = false;
+
+        this._destroyed = true;
+    };
+
+    /**
+     * The position of the displayObject on the x axis relative to the local coordinates of the parent.
+     * An alias to position.x
+     *
+     * @member {number}
+     */
+    prototypeAccessors.x.get = function ()
+    {
+        return this.position.x;
+    };
+
+    prototypeAccessors.x.set = function (value) // eslint-disable-line require-jsdoc
+    {
+        this.transform.position.x = value;
+    };
+
+    /**
+     * The position of the displayObject on the y axis relative to the local coordinates of the parent.
+     * An alias to position.y
+     *
+     * @member {number}
+     */
+    prototypeAccessors.y.get = function ()
+    {
+        return this.position.y;
+    };
+
+    prototypeAccessors.y.set = function (value) // eslint-disable-line require-jsdoc
+    {
+        this.transform.position.y = value;
+    };
+
+    /**
+     * Current transform of the object based on world (parent) factors.
+     *
+     * @member {PIXI.Matrix}
+     * @readonly
+     */
+    prototypeAccessors.worldTransform.get = function ()
+    {
+        return this.transform.worldTransform;
+    };
+
+    /**
+     * Current transform of the object based on local factors: position, scale, other stuff.
+     *
+     * @member {PIXI.Matrix}
+     * @readonly
+     */
+    prototypeAccessors.localTransform.get = function ()
+    {
+        return this.transform.localTransform;
+    };
+
+    /**
+     * The coordinate of the object relative to the local coordinates of the parent.
+     * Assignment by value since pixi-v4.
+     *
+     * @member {PIXI.IPoint}
+     */
+    prototypeAccessors.position.get = function ()
+    {
+        return this.transform.position;
+    };
+
+    prototypeAccessors.position.set = function (value) // eslint-disable-line require-jsdoc
+    {
+        this.transform.position.copyFrom(value);
+    };
+
+    /**
+     * The scale factor of the object.
+     * Assignment by value since pixi-v4.
+     *
+     * @member {PIXI.IPoint}
+     */
+    prototypeAccessors.scale.get = function ()
+    {
+        return this.transform.scale;
+    };
+
+    prototypeAccessors.scale.set = function (value) // eslint-disable-line require-jsdoc
+    {
+        this.transform.scale.copyFrom(value);
+    };
+
+    /**
+     * The pivot point of the displayObject that it rotates around.
+     * Assignment by value since pixi-v4.
+     *
+     * @member {PIXI.IPoint}
+     */
+    prototypeAccessors.pivot.get = function ()
+    {
+        return this.transform.pivot;
+    };
+
+    prototypeAccessors.pivot.set = function (value) // eslint-disable-line require-jsdoc
+    {
+        this.transform.pivot.copyFrom(value);
+    };
+
+    /**
+     * The skew factor for the object in radians.
+     * Assignment by value since pixi-v4.
+     *
+     * @member {PIXI.ObservablePoint}
+     */
+    prototypeAccessors.skew.get = function ()
+    {
+        return this.transform.skew;
+    };
+
+    prototypeAccessors.skew.set = function (value) // eslint-disable-line require-jsdoc
+    {
+        this.transform.skew.copyFrom(value);
+    };
+
+    /**
+     * The rotation of the object in radians.
+     * 'rotation' and 'angle' have the same effect on a display object; rotation is in radians, angle is in degrees.
+     *
+     * @member {number}
+     */
+    prototypeAccessors.rotation.get = function ()
+    {
+        return this.transform.rotation;
+    };
+
+    prototypeAccessors.rotation.set = function (value) // eslint-disable-line require-jsdoc
+    {
+        this.transform.rotation = value;
+    };
+
+    /**
+     * The angle of the object in degrees.
+     * 'rotation' and 'angle' have the same effect on a display object; rotation is in radians, angle is in degrees.
+     *
+     * @member {number}
+     */
+    prototypeAccessors.angle.get = function ()
+    {
+        return this.transform.rotation * RAD_TO_DEG;
+    };
+
+    prototypeAccessors.angle.set = function (value) // eslint-disable-line require-jsdoc
+    {
+        this.transform.rotation = value * DEG_TO_RAD;
+    };
+
+    /**
+     * The zIndex of the displayObject.
+     * If a container has the sortableChildren property set to true, children will be automatically
+     * sorted by zIndex value; a higher value will mean it will be moved towards the end of the array,
+     * and thus rendered on top of other displayObjects within the same container.
+     *
+     * @member {number}
+     */
+    prototypeAccessors.zIndex.get = function ()
+    {
+        return this._zIndex;
+    };
+
+    prototypeAccessors.zIndex.set = function (value) // eslint-disable-line require-jsdoc
+    {
+        this._zIndex = value;
+        if (this.parent)
+        {
+            this.parent.sortDirty = true;
+        }
+    };
+
+    /**
+     * Indicates if the object is globally visible.
+     *
+     * @member {boolean}
+     * @readonly
+     */
+    prototypeAccessors.worldVisible.get = function ()
+    {
+        var item = this;
+
+        do
+        {
+            if (!item.visible)
+            {
+                return false;
+            }
+
+            item = item.parent;
+        } while (item);
+
+        return true;
+    };
+
+    /**
+     * Sets a mask for the displayObject. A mask is an object that limits the visibility of an
+     * object to the shape of the mask applied to it. In PixiJS a regular mask must be a
+     * {@link PIXI.Graphics} or a {@link PIXI.Sprite} object. This allows for much faster masking in canvas as it
+     * utilities shape clipping. To remove a mask, set this property to `null`.
+     *
+     * For sprite mask both alpha and red channel are used. Black mask is the same as transparent mask.
+     * @example
+     * const graphics = new PIXI.Graphics();
+     * graphics.beginFill(0xFF3300);
+     * graphics.drawRect(50, 250, 100, 100);
+     * graphics.endFill();
+     *
+     * const sprite = new PIXI.Sprite(texture);
+     * sprite.mask = graphics;
+     * @todo At the moment, PIXI.CanvasRenderer doesn't support PIXI.Sprite as mask.
+     *
+     * @member {PIXI.Container|PIXI.MaskData}
+     */
+    prototypeAccessors.mask.get = function ()
+    {
+        return this._mask;
+    };
+
+    prototypeAccessors.mask.set = function (value) // eslint-disable-line require-jsdoc
+    {
+        if (this._mask)
+        {
+            var maskObject = this._mask.maskObject || this._mask;
+
+            maskObject.renderable = true;
+            maskObject.isMask = false;
+        }
+
+        this._mask = value;
+
+        if (this._mask)
+        {
+            var maskObject$1 = this._mask.maskObject || this._mask;
+
+            maskObject$1.renderable = false;
+            maskObject$1.isMask = true;
+        }
+    };
+
+    Object.defineProperties( DisplayObject.prototype, prototypeAccessors );
+
+    return DisplayObject;
+}(eventemitter3));
+
+/**
+ * DisplayObject default updateTransform, does not update children of container.
+ * Will crash if there's no parent element.
+ *
+ * @memberof PIXI.DisplayObject#
+ * @function displayObjectUpdateTransform
+ */
+DisplayObject.prototype.displayObjectUpdateTransform = DisplayObject.prototype.updateTransform;
+
+/*!
+ * @pixi/core - v5.2.1
+ * Compiled Tue, 28 Jan 2020 23:33:11 UTC
  *
  * @pixi/core is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
  */
 
 /**
- * The maximum support for using WebGL. If a device does not
- * support WebGL version, for instance WebGL 2, it will still
- * attempt to fallback support to WebGL 1. If you want to
- * explicitly remove feature support to target a more stable
- * baseline, prefer a lower environment.
+ * Base resource class for textures that manages validation and uploading, depending on its type.
  *
- * Due to {@link https://bugs.chromium.org/p/chromium/issues/detail?id=934823|bug in chromium}
- * we disable webgl2 by default for all non-apple mobile devices.
+ * Uploading of a base texture to the GPU is required.
  *
- * @static
- * @name PREFER_ENV
- * @memberof PIXI.settings
- * @type {number}
- * @default PIXI.ENV.WEBGL2
+ * @class
+ * @memberof PIXI.resources
  */
-settings.PREFER_ENV = isMobile$1.any ? ENV.WEBGL : ENV.WEBGL2;
+var Resource = function Resource(width, height)
+{
+    if ( width === void 0 ) width = 0;
+    if ( height === void 0 ) height = 0;
+
+    /**
+     * Internal width of the resource
+     * @member {number}
+     * @protected
+     */
+    this._width = width;
+
+    /**
+     * Internal height of the resource
+     * @member {number}
+     * @protected
+     */
+    this._height = height;
+
+    /**
+     * If resource has been destroyed
+     * @member {boolean}
+     * @readonly
+     * @default false
+     */
+    this.destroyed = false;
+
+    /**
+     * `true` if resource is created by BaseTexture
+     * useful for doing cleanup with BaseTexture destroy
+     * and not cleaning up resources that were created
+     * externally.
+     * @member {boolean}
+     * @protected
+     */
+    this.internal = false;
+
+    /**
+     * Mini-runner for handling resize events
+     *
+     * @member {Runner}
+     * @private
+     */
+    this.onResize = new Runner('setRealSize', 2);
+
+    /**
+     * Mini-runner for handling update events
+     *
+     * @member {Runner}
+     * @private
+     */
+    this.onUpdate = new Runner('update');
+
+    /**
+     * Handle internal errors, such as loading errors
+     *
+     * @member {Runner}
+     * @private
+     */
+    this.onError = new Runner('onError', 1);
+};
+
+var prototypeAccessors = { valid: { configurable: true },width: { configurable: true },height: { configurable: true } };
+
 /**
- * If set to `true`, *only* Textures and BaseTexture objects stored
- * in the caches ({@link PIXI.utils.TextureCache TextureCache} and
- * {@link PIXI.utils.BaseTextureCache BaseTextureCache}) can be
- * used when calling {@link PIXI.Texture.from Texture.from} or
- * {@link PIXI.BaseTexture.from BaseTexture.from}.
- * Otherwise, these `from` calls throw an exception. Using this property
- * can be useful if you want to enforce preloading all assets with
- * {@link PIXI.Loader Loader}.
+ * Bind to a parent BaseTexture
  *
- * @static
- * @name STRICT_TEXTURE_CACHE
- * @memberof PIXI.settings
- * @type {boolean}
- * @default false
+ * @param {PIXI.BaseTexture} baseTexture - Parent texture
  */
-settings.STRICT_TEXTURE_CACHE = false;
+Resource.prototype.bind = function bind (baseTexture)
+{
+    this.onResize.add(baseTexture);
+    this.onUpdate.add(baseTexture);
+    this.onError.add(baseTexture);
+
+    // Call a resize immediate if we already
+    // have the width and height of the resource
+    if (this._width || this._height)
+    {
+        this.onResize.run(this._width, this._height);
+    }
+};
+
+/**
+ * Unbind to a parent BaseTexture
+ *
+ * @param {PIXI.BaseTexture} baseTexture - Parent texture
+ */
+Resource.prototype.unbind = function unbind (baseTexture)
+{
+    this.onResize.remove(baseTexture);
+    this.onUpdate.remove(baseTexture);
+    this.onError.remove(baseTexture);
+};
+
+/**
+ * Trigger a resize event
+ * @param {number} width X dimension
+ * @param {number} height Y dimension
+ */
+Resource.prototype.resize = function resize (width, height)
+{
+    if (width !== this._width || height !== this._height)
+    {
+        this._width = width;
+        this._height = height;
+        this.onResize.run(width, height);
+    }
+};
+
+/**
+ * Has been validated
+ * @readonly
+ * @member {boolean}
+ */
+prototypeAccessors.valid.get = function ()
+{
+    return !!this._width && !!this._height;
+};
+
+/**
+ * Has been updated trigger event
+ */
+Resource.prototype.update = function update ()
+{
+    if (!this.destroyed)
+    {
+        this.onUpdate.run();
+    }
+};
+
+/**
+ * This can be overridden to start preloading a resource
+ * or do any other prepare step.
+ * @protected
+ * @return {Promise<void>} Handle the validate event
+ */
+Resource.prototype.load = function load ()
+{
+    return Promise.resolve();
+};
+
+/**
+ * The width of the resource.
+ *
+ * @member {number}
+ * @readonly
+ */
+prototypeAccessors.width.get = function ()
+{
+    return this._width;
+};
+
+/**
+ * The height of the resource.
+ *
+ * @member {number}
+ * @readonly
+ */
+prototypeAccessors.height.get = function ()
+{
+    return this._height;
+};
+
+/**
+ * Uploads the texture or returns false if it cant for some reason. Override this.
+ *
+ * @param {PIXI.Renderer} renderer - yeah, renderer!
+ * @param {PIXI.BaseTexture} baseTexture - the texture
+ * @param {PIXI.GLTexture} glTexture - texture instance for this webgl context
+ * @returns {boolean} true is success
+ */
+Resource.prototype.upload = function upload (renderer, baseTexture, glTexture) // eslint-disable-line no-unused-vars
+{
+    return false;
+};
+
+/**
+ * Set the style, optional to override
+ *
+ * @param {PIXI.Renderer} renderer - yeah, renderer!
+ * @param {PIXI.BaseTexture} baseTexture - the texture
+ * @param {PIXI.GLTexture} glTexture - texture instance for this webgl context
+ * @returns {boolean} `true` is success
+ */
+Resource.prototype.style = function style (renderer, baseTexture, glTexture) // eslint-disable-line no-unused-vars
+{
+    return false;
+};
+
+/**
+ * Clean up anything, this happens when destroying is ready.
+ *
+ * @protected
+ */
+Resource.prototype.dispose = function dispose ()
+{
+    // override
+};
+
+/**
+ * Call when destroying resource, unbind any BaseTexture object
+ * before calling this method, as reference counts are maintained
+ * internally.
+ */
+Resource.prototype.destroy = function destroy ()
+{
+    if (!this.destroyed)
+    {
+        this.destroyed = true;
+        this.dispose();
+        this.onError.removeAll();
+        this.onError = null;
+        this.onResize.removeAll();
+        this.onResize = null;
+        this.onUpdate.removeAll();
+        this.onUpdate = null;
+    }
+};
+
+Object.defineProperties( Resource.prototype, prototypeAccessors );
+
+/**
+ * Base for all the image/canvas resources
+ * @class
+ * @extends PIXI.resources.Resource
+ * @memberof PIXI.resources
+ */
+var BaseImageResource = /*@__PURE__*/(function (Resource) {
+    function BaseImageResource(source)
+    {
+        var width = source.naturalWidth || source.videoWidth || source.width;
+        var height = source.naturalHeight || source.videoHeight || source.height;
+
+        Resource.call(this, width, height);
+
+        /**
+         * The source element
+         * @member {HTMLImageElement|HTMLCanvasElement|HTMLVideoElement|SVGElement}
+         * @readonly
+         */
+        this.source = source;
+
+        /**
+         * If set to `true`, will force `texImage2D` over `texSubImage2D` for uploading.
+         * Certain types of media (e.g. video) using `texImage2D` is more performant.
+         * @member {boolean}
+         * @default false
+         * @private
+         */
+        this.noSubImage = false;
+    }
+
+    if ( Resource ) BaseImageResource.__proto__ = Resource;
+    BaseImageResource.prototype = Object.create( Resource && Resource.prototype );
+    BaseImageResource.prototype.constructor = BaseImageResource;
+
+    /**
+     * Set cross origin based detecting the url and the crossorigin
+     * @protected
+     * @param {HTMLElement} element - Element to apply crossOrigin
+     * @param {string} url - URL to check
+     * @param {boolean|string} [crossorigin=true] - Cross origin value to use
+     */
+    BaseImageResource.crossOrigin = function crossOrigin (element, url, crossorigin)
+    {
+        if (crossorigin === undefined && url.indexOf('data:') !== 0)
+        {
+            element.crossOrigin = determineCrossOrigin(url);
+        }
+        else if (crossorigin !== false)
+        {
+            element.crossOrigin = typeof crossorigin === 'string' ? crossorigin : 'anonymous';
+        }
+    };
+
+    /**
+     * Upload the texture to the GPU.
+     * @param {PIXI.Renderer} renderer Upload to the renderer
+     * @param {PIXI.BaseTexture} baseTexture Reference to parent texture
+     * @param {PIXI.GLTexture} glTexture
+     * @param {HTMLImageElement|HTMLCanvasElement|HTMLVideoElement|SVGElement} [source] (optional)
+     * @returns {boolean} true is success
+     */
+    BaseImageResource.prototype.upload = function upload (renderer, baseTexture, glTexture, source)
+    {
+        var gl = renderer.gl;
+        var width = baseTexture.realWidth;
+        var height = baseTexture.realHeight;
+
+        source = source || this.source;
+
+        gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, baseTexture.alphaMode === ALPHA_MODES.UNPACK);
+
+        if (!this.noSubImage
+            && baseTexture.target === gl.TEXTURE_2D
+            && glTexture.width === width
+            && glTexture.height === height)
+        {
+            gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, baseTexture.format, baseTexture.type, source);
+        }
+        else
+        {
+            glTexture.width = width;
+            glTexture.height = height;
+
+            gl.texImage2D(baseTexture.target, 0, baseTexture.format, baseTexture.format, baseTexture.type, source);
+        }
+
+        return true;
+    };
+
+    /**
+     * Checks if source width/height was changed, resize can cause extra baseTexture update.
+     * Triggers one update in any case.
+     */
+    BaseImageResource.prototype.update = function update ()
+    {
+        if (this.destroyed)
+        {
+            return;
+        }
+
+        var width = this.source.naturalWidth || this.source.videoWidth || this.source.width;
+        var height = this.source.naturalHeight || this.source.videoHeight || this.source.height;
+
+        this.resize(width, height);
+
+        Resource.prototype.update.call(this);
+    };
+
+    /**
+     * Destroy this BaseImageResource
+     * @override
+     * @param {PIXI.BaseTexture} [fromTexture] Optional base texture
+     * @return {boolean} Destroy was successful
+     */
+    BaseImageResource.prototype.dispose = function dispose ()
+    {
+        this.source = null;
+    };
+
+    return BaseImageResource;
+}(Resource));
+
+/**
+ * Resource type for HTMLImageElement.
+ * @class
+ * @extends PIXI.resources.BaseImageResource
+ * @memberof PIXI.resources
+ */
+var ImageResource = /*@__PURE__*/(function (BaseImageResource) {
+    function ImageResource(source, options)
+    {
+        options = options || {};
+
+        if (!(source instanceof HTMLImageElement))
+        {
+            var imageElement = new Image();
+
+            BaseImageResource.crossOrigin(imageElement, source, options.crossorigin);
+
+            imageElement.src = source;
+            source = imageElement;
+        }
+
+        BaseImageResource.call(this, source);
+
+        // FireFox 68, and possibly other versions, seems like setting the HTMLImageElement#width and #height
+        // to non-zero values before its loading completes if images are in a cache.
+        // Because of this, need to set the `_width` and the `_height` to zero to avoid uploading incomplete images.
+        // Please refer to the issue #5968 (https://github.com/pixijs/pixi.js/issues/5968).
+        if (!source.complete && !!this._width && !!this._height)
+        {
+            this._width = 0;
+            this._height = 0;
+        }
+
+        /**
+         * URL of the image source
+         * @member {string}
+         */
+        this.url = source.src;
+
+        /**
+         * When process is completed
+         * @member {Promise<void>}
+         * @private
+         */
+        this._process = null;
+
+        /**
+         * If the image should be disposed after upload
+         * @member {boolean}
+         * @default false
+         */
+        this.preserveBitmap = false;
+
+        /**
+         * If capable, convert the image using createImageBitmap API
+         * @member {boolean}
+         * @default PIXI.settings.CREATE_IMAGE_BITMAP
+         */
+        this.createBitmap = (options.createBitmap !== undefined
+            ? options.createBitmap : settings.CREATE_IMAGE_BITMAP) && !!window.createImageBitmap;
+
+        /**
+         * Controls texture alphaMode field
+         * Copies from options
+         * Default is `null`, copies option from baseTexture
+         *
+         * @member {PIXI.ALPHA_MODES|null}
+         * @readonly
+         */
+        this.alphaMode = typeof options.alphaMode === 'number' ? options.alphaMode : null;
+
+        if (options.premultiplyAlpha !== undefined)
+        {
+            // triggers deprecation
+            this.premultiplyAlpha = options.premultiplyAlpha;
+        }
+
+        /**
+         * The ImageBitmap element created for HTMLImageElement
+         * @member {ImageBitmap}
+         * @default null
+         */
+        this.bitmap = null;
+
+        /**
+         * Promise when loading
+         * @member {Promise<void>}
+         * @private
+         * @default null
+         */
+        this._load = null;
+
+        if (options.autoLoad !== false)
+        {
+            this.load();
+        }
+    }
+
+    if ( BaseImageResource ) ImageResource.__proto__ = BaseImageResource;
+    ImageResource.prototype = Object.create( BaseImageResource && BaseImageResource.prototype );
+    ImageResource.prototype.constructor = ImageResource;
+
+    /**
+     * returns a promise when image will be loaded and processed
+     *
+     * @param {boolean} [createBitmap=true] whether process image into bitmap
+     * @returns {Promise<void>}
+     */
+    ImageResource.prototype.load = function load (createBitmap)
+    {
+        var this$1 = this;
+
+        if (createBitmap !== undefined)
+        {
+            this.createBitmap = createBitmap;
+        }
+
+        if (this._load)
+        {
+            return this._load;
+        }
+
+        this._load = new Promise(function (resolve) {
+            this$1.url = this$1.source.src;
+            var ref = this$1;
+            var source = ref.source;
+
+            var completed = function () {
+                if (this$1.destroyed)
+                {
+                    return;
+                }
+                source.onload = null;
+                source.onerror = null;
+
+                this$1.resize(source.width, source.height);
+                this$1._load = null;
+
+                if (this$1.createBitmap)
+                {
+                    resolve(this$1.process());
+                }
+                else
+                {
+                    resolve(this$1);
+                }
+            };
+
+            if (source.complete && source.src)
+            {
+                completed();
+            }
+            else
+            {
+                source.onload = completed;
+                source.onerror = function (event) { return this$1.onError.run(event); };
+            }
+        });
+
+        return this._load;
+    };
+
+    /**
+     * Called when we need to convert image into BitmapImage.
+     * Can be called multiple times, real promise is cached inside.
+     *
+     * @returns {Promise<void>} cached promise to fill that bitmap
+     */
+    ImageResource.prototype.process = function process ()
+    {
+        var this$1 = this;
+
+        if (this._process !== null)
+        {
+            return this._process;
+        }
+        if (this.bitmap !== null || !window.createImageBitmap)
+        {
+            return Promise.resolve(this);
+        }
+
+        this._process = window.createImageBitmap(this.source,
+            0, 0, this.source.width, this.source.height,
+            {
+                premultiplyAlpha: this.premultiplyAlpha === ALPHA_MODES.UNPACK ? 'premultiply' : 'none',
+            })
+            .then(function (bitmap) {
+                if (this$1.destroyed)
+                {
+                    return Promise.reject();
+                }
+                this$1.bitmap = bitmap;
+                this$1.update();
+                this$1._process = null;
+
+                return Promise.resolve(this$1);
+            });
+
+        return this._process;
+    };
+
+    /**
+     * Upload the image resource to GPU.
+     *
+     * @param {PIXI.Renderer} renderer - Renderer to upload to
+     * @param {PIXI.BaseTexture} baseTexture - BaseTexture for this resource
+     * @param {PIXI.GLTexture} glTexture - GLTexture to use
+     * @returns {boolean} true is success
+     */
+    ImageResource.prototype.upload = function upload (renderer, baseTexture, glTexture)
+    {
+        if (typeof this.alphaMode === 'number')
+        {
+            // bitmap stores unpack premultiply flag, we dont have to notify texImage2D about it
+
+            baseTexture.alphaMode = this.alphaMode;
+        }
+
+        if (!this.createBitmap)
+        {
+            return BaseImageResource.prototype.upload.call(this, renderer, baseTexture, glTexture);
+        }
+        if (!this.bitmap)
+        {
+            // yeah, ignore the output
+            this.process();
+            if (!this.bitmap)
+            {
+                return false;
+            }
+        }
+
+        BaseImageResource.prototype.upload.call(this, renderer, baseTexture, glTexture, this.bitmap);
+
+        if (!this.preserveBitmap)
+        {
+            // checks if there are other renderers that possibly need this bitmap
+
+            var flag = true;
+
+            for (var key in baseTexture._glTextures)
+            {
+                var otherTex = baseTexture._glTextures[key];
+
+                if (otherTex !== glTexture && otherTex.dirtyId !== baseTexture.dirtyId)
+                {
+                    flag = false;
+                    break;
+                }
+            }
+
+            if (flag)
+            {
+                if (this.bitmap.close)
+                {
+                    this.bitmap.close();
+                }
+
+                this.bitmap = null;
+            }
+        }
+
+        return true;
+    };
+
+    /**
+     * Destroys this texture
+     * @override
+     */
+    ImageResource.prototype.dispose = function dispose ()
+    {
+        this.source.onload = null;
+        this.source.onerror = null;
+
+        BaseImageResource.prototype.dispose.call(this);
+
+        if (this.bitmap)
+        {
+            this.bitmap.close();
+            this.bitmap = null;
+        }
+        this._process = null;
+        this._load = null;
+    };
+
+    return ImageResource;
+}(BaseImageResource));
 
 /**
  * Collection of installed resource types, class must extend {@link PIXI.resources.Resource}.
@@ -8304,6 +9896,7 @@ settings.STRICT_TEXTURE_CACHE = false;
  * @readonly
  */
 var INSTALLED = [];
+
 /**
  * Create a resource element from a single source element. This
  * auto-detects which type of resource to create. All resources that
@@ -8333,325 +9926,135 @@ var INSTALLED = [];
  *        texture should be updated from the video. Leave at 0 to update at every render
  * @return {PIXI.resources.Resource} The created resource.
  */
-function autoDetectResource(source, options) {
-    if (!source) {
+function autoDetectResource(source, options)
+{
+    if (!source)
+    {
         return null;
     }
+
     var extension = '';
-    if (typeof source === 'string') {
+
+    if (typeof source === 'string')
+    {
         // search for file extension: period, 3-4 chars, then ?, # or EOL
         var result = (/\.(\w{3,4})(?:$|\?|#)/i).exec(source);
-        if (result) {
+
+        if (result)
+        {
             extension = result[1].toLowerCase();
         }
     }
-    for (var i = INSTALLED.length - 1; i >= 0; --i) {
+
+    for (var i = INSTALLED.length - 1; i >= 0; --i)
+    {
         var ResourcePlugin = INSTALLED[i];
-        if (ResourcePlugin.test && ResourcePlugin.test(source, extension)) {
+
+        if (ResourcePlugin.test && ResourcePlugin.test(source, extension))
+        {
             return new ResourcePlugin(source, options);
         }
     }
-    throw new Error('Unrecognized source type to auto-detect Resource');
+
+    // When in doubt: probably an image
+    // might be appropriate to throw an error or return null
+    return new ImageResource(source, options);
 }
-
-/*! *****************************************************************************
-Copyright (c) Microsoft Corporation. All rights reserved.
-Licensed under the Apache License, Version 2.0 (the "License"); you may not use
-this file except in compliance with the License. You may obtain a copy of the
-License at http://www.apache.org/licenses/LICENSE-2.0
-
-THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
-WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
-MERCHANTABLITY OR NON-INFRINGEMENT.
-
-See the Apache Version 2.0 License for specific language governing permissions
-and limitations under the License.
-***************************************************************************** */
-/* global Reflect, Promise */
-
-var extendStatics = function(d, b) {
-    extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) { if (b.hasOwnProperty(p)) { d[p] = b[p]; } } };
-    return extendStatics(d, b);
-};
-
-function __extends(d, b) {
-    extendStatics(d, b);
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-}
-
-/**
- * Base resource class for textures that manages validation and uploading, depending on its type.
- *
- * Uploading of a base texture to the GPU is required.
- *
- * @class
- * @memberof PIXI.resources
- */
-var Resource = /** @class */ (function () {
-    /**
-     * @param {number} [width=0] - Width of the resource
-     * @param {number} [height=0] - Height of the resource
-     */
-    function Resource(width, height) {
-        if (width === void 0) { width = 0; }
-        if (height === void 0) { height = 0; }
-        /**
-         * Internal width of the resource
-         * @member {number}
-         * @protected
-         */
-        this._width = width;
-        /**
-         * Internal height of the resource
-         * @member {number}
-         * @protected
-         */
-        this._height = height;
-        /**
-         * If resource has been destroyed
-         * @member {boolean}
-         * @readonly
-         * @default false
-         */
-        this.destroyed = false;
-        /**
-         * `true` if resource is created by BaseTexture
-         * useful for doing cleanup with BaseTexture destroy
-         * and not cleaning up resources that were created
-         * externally.
-         * @member {boolean}
-         * @protected
-         */
-        this.internal = false;
-        /**
-         * Mini-runner for handling resize events
-         * accepts 2 parameters: width, height
-         *
-         * @member {Runner}
-         * @private
-         */
-        this.onResize = new Runner('setRealSize');
-        /**
-         * Mini-runner for handling update events
-         *
-         * @member {Runner}
-         * @private
-         */
-        this.onUpdate = new Runner('update');
-        /**
-         * Handle internal errors, such as loading errors
-         * accepts 1 param: error
-         *
-         * @member {Runner}
-         * @private
-         */
-        this.onError = new Runner('onError');
-    }
-    /**
-     * Bind to a parent BaseTexture
-     *
-     * @param {PIXI.BaseTexture} baseTexture - Parent texture
-     */
-    Resource.prototype.bind = function (baseTexture) {
-        this.onResize.add(baseTexture);
-        this.onUpdate.add(baseTexture);
-        this.onError.add(baseTexture);
-        // Call a resize immediate if we already
-        // have the width and height of the resource
-        if (this._width || this._height) {
-            this.onResize.emit(this._width, this._height);
-        }
-    };
-    /**
-     * Unbind to a parent BaseTexture
-     *
-     * @param {PIXI.BaseTexture} baseTexture - Parent texture
-     */
-    Resource.prototype.unbind = function (baseTexture) {
-        this.onResize.remove(baseTexture);
-        this.onUpdate.remove(baseTexture);
-        this.onError.remove(baseTexture);
-    };
-    /**
-     * Trigger a resize event
-     * @param {number} width - X dimension
-     * @param {number} height - Y dimension
-     */
-    Resource.prototype.resize = function (width, height) {
-        if (width !== this._width || height !== this._height) {
-            this._width = width;
-            this._height = height;
-            this.onResize.emit(width, height);
-        }
-    };
-    Object.defineProperty(Resource.prototype, "valid", {
-        /**
-         * Has been validated
-         * @readonly
-         * @member {boolean}
-         */
-        get: function () {
-            return !!this._width && !!this._height;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    /**
-     * Has been updated trigger event
-     */
-    Resource.prototype.update = function () {
-        if (!this.destroyed) {
-            this.onUpdate.emit();
-        }
-    };
-    /**
-     * This can be overridden to start preloading a resource
-     * or do any other prepare step.
-     * @protected
-     * @return {Promise<void>} Handle the validate event
-     */
-    Resource.prototype.load = function () {
-        return Promise.resolve(this);
-    };
-    Object.defineProperty(Resource.prototype, "width", {
-        /**
-         * The width of the resource.
-         *
-         * @member {number}
-         * @readonly
-         */
-        get: function () {
-            return this._width;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Resource.prototype, "height", {
-        /**
-         * The height of the resource.
-         *
-         * @member {number}
-         * @readonly
-         */
-        get: function () {
-            return this._height;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    /**
-     * Set the style, optional to override
-     *
-     * @param {PIXI.Renderer} renderer - yeah, renderer!
-     * @param {PIXI.BaseTexture} baseTexture - the texture
-     * @param {PIXI.GLTexture} glTexture - texture instance for this webgl context
-     * @returns {boolean} `true` is success
-     */
-    Resource.prototype.style = function (_renderer, _baseTexture, _glTexture) {
-        return false;
-    };
-    /**
-     * Clean up anything, this happens when destroying is ready.
-     *
-     * @protected
-     */
-    Resource.prototype.dispose = function () {
-        // override
-    };
-    /**
-     * Call when destroying resource, unbind any BaseTexture object
-     * before calling this method, as reference counts are maintained
-     * internally.
-     */
-    Resource.prototype.destroy = function () {
-        if (!this.destroyed) {
-            this.destroyed = true;
-            this.dispose();
-            this.onError.removeAll();
-            this.onError = null;
-            this.onResize.removeAll();
-            this.onResize = null;
-            this.onUpdate.removeAll();
-            this.onUpdate = null;
-        }
-    };
-    /**
-     * Abstract, used to auto-detect resource type
-     *
-     * @static
-     * @param {*} source - The source object
-     * @param {string} extension - The extension of source, if set
-     */
-    Resource.test = function (_source, _extension) {
-        return false;
-    };
-    return Resource;
-}());
 
 /**
  * @interface SharedArrayBuffer
  */
+
 /**
  * Buffer resource with data of typed array.
  * @class
  * @extends PIXI.resources.Resource
  * @memberof PIXI.resources
  */
-var BufferResource = /** @class */ (function (_super) {
-    __extends(BufferResource, _super);
-    /**
-     * @param {Float32Array|Uint8Array|Uint32Array} source - Source buffer
-     * @param {object} options - Options
-     * @param {number} options.width - Width of the texture
-     * @param {number} options.height - Height of the texture
-     */
-    function BufferResource(source, options) {
-        var _this = this;
-        var _a = options || {}, width = _a.width, height = _a.height;
-        if (!width || !height) {
+var BufferResource = /*@__PURE__*/(function (Resource) {
+    function BufferResource(source, options)
+    {
+        var ref = options || {};
+        var width = ref.width;
+        var height = ref.height;
+
+        if (!width || !height)
+        {
             throw new Error('BufferResource width or height invalid');
         }
-        _this = _super.call(this, width, height) || this;
+
+        Resource.call(this, width, height);
+
         /**
          * Source array
          * Cannot be ClampedUint8Array because it cant be uploaded to WebGL
          *
          * @member {Float32Array|Uint8Array|Uint32Array}
          */
-        _this.data = source;
-        return _this;
+        this.data = source;
     }
+
+    if ( Resource ) BufferResource.__proto__ = Resource;
+    BufferResource.prototype = Object.create( Resource && Resource.prototype );
+    BufferResource.prototype.constructor = BufferResource;
+
     /**
      * Upload the texture to the GPU.
-     * @param {PIXI.Renderer} renderer - Upload to the renderer
-     * @param {PIXI.BaseTexture} baseTexture - Reference to parent texture
-     * @param {PIXI.GLTexture} glTexture - glTexture
+     * @param {PIXI.Renderer} renderer Upload to the renderer
+     * @param {PIXI.BaseTexture} baseTexture Reference to parent texture
+     * @param {PIXI.GLTexture} glTexture glTexture
      * @returns {boolean} true is success
      */
-    BufferResource.prototype.upload = function (renderer, baseTexture, glTexture) {
+    BufferResource.prototype.upload = function upload (renderer, baseTexture, glTexture)
+    {
         var gl = renderer.gl;
+
         gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, baseTexture.alphaMode === ALPHA_MODES.UNPACK);
-        if (glTexture.width === baseTexture.width && glTexture.height === baseTexture.height) {
-            gl.texSubImage2D(baseTexture.target, 0, 0, 0, baseTexture.width, baseTexture.height, baseTexture.format, baseTexture.type, this.data);
+
+        if (glTexture.width === baseTexture.width && glTexture.height === baseTexture.height)
+        {
+            gl.texSubImage2D(
+                baseTexture.target,
+                0,
+                0,
+                0,
+                baseTexture.width,
+                baseTexture.height,
+                baseTexture.format,
+                baseTexture.type,
+                this.data
+            );
         }
-        else {
+        else
+        {
             glTexture.width = baseTexture.width;
             glTexture.height = baseTexture.height;
-            gl.texImage2D(baseTexture.target, 0, glTexture.internalFormat, baseTexture.width, baseTexture.height, 0, baseTexture.format, glTexture.type, this.data);
+
+            gl.texImage2D(
+                baseTexture.target,
+                0,
+                glTexture.internalFormat,
+                baseTexture.width,
+                baseTexture.height,
+                0,
+                baseTexture.format,
+                glTexture.type,
+                this.data
+            );
         }
+
         return true;
     };
+
     /**
      * Destroy and don't use after this
      * @override
      */
-    BufferResource.prototype.dispose = function () {
+    BufferResource.prototype.dispose = function dispose ()
+    {
         this.data = null;
     };
+
     /**
      * Used to auto-detect the type of resource.
      *
@@ -8659,11 +10062,13 @@ var BufferResource = /** @class */ (function (_super) {
      * @param {*} source - The source object
      * @return {boolean} `true` if <canvas>
      */
-    BufferResource.test = function (source) {
+    BufferResource.test = function test (source)
+    {
         return source instanceof Float32Array
             || source instanceof Uint8Array
             || source instanceof Uint32Array;
     };
+
     return BufferResource;
 }(Resource));
 
@@ -8672,6 +10077,7 @@ var defaultBufferOptions = {
     format: FORMATS.RGBA,
     alphaMode: ALPHA_MODES.NPM,
 };
+
 /**
  * A Texture stores the information that represents an image.
  * All textures have a base texture, which contains information about the source.
@@ -8698,112 +10104,144 @@ var defaultBufferOptions = {
  * @param {object} [options.resourceOptions] - Optional resource options,
  *        see {@link PIXI.resources.autoDetectResource autoDetectResource}
  */
-var BaseTexture = /** @class */ (function (_super) {
-    __extends(BaseTexture, _super);
-    function BaseTexture(resource, options) {
-        if (resource === void 0) { resource = null; }
-        if (options === void 0) { options = null; }
-        var _this = _super.call(this) || this;
+var BaseTexture = /*@__PURE__*/(function (EventEmitter) {
+    function BaseTexture(resource, options)
+    {
+        if ( resource === void 0 ) resource = null;
+        if ( options === void 0 ) options = null;
+
+        EventEmitter.call(this);
+
         options = options || {};
-        var alphaMode = options.alphaMode, mipmap = options.mipmap, anisotropicLevel = options.anisotropicLevel, scaleMode = options.scaleMode, width = options.width, height = options.height, wrapMode = options.wrapMode, format = options.format, type = options.type, target = options.target, resolution = options.resolution, resourceOptions = options.resourceOptions;
+
+        var alphaMode = options.alphaMode;
+        var mipmap = options.mipmap;
+        var anisotropicLevel = options.anisotropicLevel;
+        var scaleMode = options.scaleMode;
+        var width = options.width;
+        var height = options.height;
+        var wrapMode = options.wrapMode;
+        var format = options.format;
+        var type = options.type;
+        var target = options.target;
+        var resolution = options.resolution;
+        var resourceOptions = options.resourceOptions;
+
         // Convert the resource to a Resource object
-        if (resource && !(resource instanceof Resource)) {
+        if (resource && !(resource instanceof Resource))
+        {
             resource = autoDetectResource(resource, resourceOptions);
             resource.internal = true;
         }
+
         /**
          * The width of the base texture set when the image has loaded
          *
          * @readonly
          * @member {number}
          */
-        _this.width = width || 0;
+        this.width = width || 0;
+
         /**
          * The height of the base texture set when the image has loaded
          *
          * @readonly
          * @member {number}
          */
-        _this.height = height || 0;
+        this.height = height || 0;
+
         /**
          * The resolution / device pixel ratio of the texture
          *
          * @member {number}
          * @default PIXI.settings.RESOLUTION
          */
-        _this.resolution = resolution || settings.RESOLUTION;
+        this.resolution = resolution || settings.RESOLUTION;
+
         /**
          * Mipmap mode of the texture, affects downscaled images
          *
          * @member {PIXI.MIPMAP_MODES}
          * @default PIXI.settings.MIPMAP_TEXTURES
          */
-        _this.mipmap = mipmap !== undefined ? mipmap : settings.MIPMAP_TEXTURES;
+        this.mipmap = mipmap !== undefined ? mipmap : settings.MIPMAP_TEXTURES;
+
         /**
          * Anisotropic filtering level of texture
          *
          * @member {number}
          * @default PIXI.settings.ANISOTROPIC_LEVEL
          */
-        _this.anisotropicLevel = anisotropicLevel !== undefined ? anisotropicLevel : settings.ANISOTROPIC_LEVEL;
+        this.anisotropicLevel = anisotropicLevel !== undefined ? anisotropicLevel : settings.ANISOTROPIC_LEVEL;
+
         /**
          * How the texture wraps
          * @member {number}
          */
-        _this.wrapMode = wrapMode || settings.WRAP_MODE;
+        this.wrapMode = wrapMode || settings.WRAP_MODE;
+
         /**
          * The scale mode to apply when scaling this texture
          *
          * @member {PIXI.SCALE_MODES}
          * @default PIXI.settings.SCALE_MODE
          */
-        _this.scaleMode = scaleMode !== undefined ? scaleMode : settings.SCALE_MODE;
+        this.scaleMode = scaleMode !== undefined ? scaleMode : settings.SCALE_MODE;
+
         /**
          * The pixel format of the texture
          *
          * @member {PIXI.FORMATS}
          * @default PIXI.FORMATS.RGBA
          */
-        _this.format = format || FORMATS.RGBA;
+        this.format = format || FORMATS.RGBA;
+
         /**
          * The type of resource data
          *
          * @member {PIXI.TYPES}
          * @default PIXI.TYPES.UNSIGNED_BYTE
          */
-        _this.type = type || TYPES.UNSIGNED_BYTE;
+        this.type = type || TYPES.UNSIGNED_BYTE;
+
         /**
          * The target type
          *
          * @member {PIXI.TARGETS}
          * @default PIXI.TARGETS.TEXTURE_2D
          */
-        _this.target = target || TARGETS.TEXTURE_2D;
+        this.target = target || TARGETS.TEXTURE_2D;
+
         /**
          * How to treat premultiplied alpha, see {@link PIXI.ALPHA_MODES}.
          *
          * @member {PIXI.ALPHA_MODES}
          * @default PIXI.ALPHA_MODES.UNPACK
          */
-        _this.alphaMode = alphaMode !== undefined ? alphaMode : ALPHA_MODES.UNPACK;
-        if (options.premultiplyAlpha !== undefined) {
+        this.alphaMode = alphaMode !== undefined ? alphaMode : ALPHA_MODES.UNPACK;
+
+        if (options.premultiplyAlpha !== undefined)
+        {
             // triggers deprecation
-            _this.premultiplyAlpha = options.premultiplyAlpha;
+            this.premultiplyAlpha = options.premultiplyAlpha;
         }
+
         /**
          * Global unique identifier for this BaseTexture
          *
-         * @member {number}
+         * @member {string}
          * @protected
          */
-        _this.uid = uid();
+        this.uid = uid();
+
         /**
          * Used by automatic texture Garbage Collection, stores last GC tick when it was bound
          *
          * @member {number}
          * @protected
          */
-        _this.touched = 0;
+        this.touched = 0;
+
         /**
          * Whether or not the texture is a power of two, try to use power of two textures as much
          * as you can
@@ -8812,15 +10250,17 @@ var BaseTexture = /** @class */ (function (_super) {
          * @member {boolean}
          * @default false
          */
-        _this.isPowerOfTwo = false;
-        _this._refreshPOT();
+        this.isPowerOfTwo = false;
+        this._refreshPOT();
+
         /**
          * The map of render context textures where this is bound
          *
          * @member {Object}
          * @private
          */
-        _this._glTextures = {};
+        this._glTextures = {};
+
         /**
          * Used by TextureSystem to only update texture to the GPU when needed.
          * Please call `update()` to increment it.
@@ -8828,26 +10268,30 @@ var BaseTexture = /** @class */ (function (_super) {
          * @readonly
          * @member {number}
          */
-        _this.dirtyId = 0;
+        this.dirtyId = 0;
+
         /**
          * Used by TextureSystem to only update texture style when needed.
          *
          * @protected
          * @member {number}
          */
-        _this.dirtyStyleId = 0;
+        this.dirtyStyleId = 0;
+
         /**
          * Currently default cache ID.
          *
          * @member {string}
          */
-        _this.cacheId = null;
+        this.cacheId = null;
+
         /**
          * Generally speaking means when resource is loaded.
          * @readonly
          * @member {boolean}
          */
-        _this.valid = width > 0 && height > 0;
+        this.valid = width > 0 && height > 0;
+
         /**
          * The collection of alternative cache ids, since some BaseTextures
          * can have more than one ID, short name and longer full URL
@@ -8855,14 +10299,16 @@ var BaseTexture = /** @class */ (function (_super) {
          * @member {Array<string>}
          * @readonly
          */
-        _this.textureCacheIds = [];
+        this.textureCacheIds = [];
+
         /**
          * Flag if BaseTexture has been destroyed.
          *
          * @member {boolean}
          * @readonly
          */
-        _this.destroyed = false;
+        this.destroyed = false;
+
         /**
          * The resource used by this BaseTexture, there can only
          * be one resource per BaseTexture, but textures can share
@@ -8871,25 +10317,22 @@ var BaseTexture = /** @class */ (function (_super) {
          * @member {PIXI.resources.Resource}
          * @readonly
          */
-        _this.resource = null;
+        this.resource = null;
+
         /**
          * Number of the texture batch, used by multi-texture renderers
          *
          * @member {number}
          */
-        _this._batchEnabled = 0;
+        this._batchEnabled = 0;
+
         /**
          * Location inside texture batch, used by multi-texture renderers
          *
          * @member {number}
          */
-        _this._batchLocation = 0;
-        /**
-         * Whether its a part of another texture, handled by ArrayResource or CubeResource
-         *
-         * @member {PIXI.BaseTexture}
-         */
-        _this.parentTextureArray = null;
+        this._batchLocation = 0;
+
         /**
          * Fired when a not-immediately-available source finishes loading.
          *
@@ -8897,6 +10340,7 @@ var BaseTexture = /** @class */ (function (_super) {
          * @event PIXI.BaseTexture#loaded
          * @param {PIXI.BaseTexture} baseTexture - Resource loaded.
          */
+
         /**
          * Fired when a not-immediately-available source fails to load.
          *
@@ -8905,6 +10349,7 @@ var BaseTexture = /** @class */ (function (_super) {
          * @param {PIXI.BaseTexture} baseTexture - Resource errored.
          * @param {ErrorEvent} event - Load error event.
          */
+
         /**
          * Fired when BaseTexture is updated.
          *
@@ -8912,6 +10357,7 @@ var BaseTexture = /** @class */ (function (_super) {
          * @event PIXI.BaseTexture#loaded
          * @param {PIXI.BaseTexture} baseTexture - Resource loaded.
          */
+
         /**
          * Fired when BaseTexture is updated.
          *
@@ -8919,6 +10365,7 @@ var BaseTexture = /** @class */ (function (_super) {
          * @event PIXI.BaseTexture#update
          * @param {PIXI.BaseTexture} baseTexture - Instance of texture being updated.
          */
+
         /**
          * Fired when BaseTexture is destroyed.
          *
@@ -8926,36 +10373,39 @@ var BaseTexture = /** @class */ (function (_super) {
          * @event PIXI.BaseTexture#dispose
          * @param {PIXI.BaseTexture} baseTexture - Instance of texture being destroyed.
          */
+
         // Set the resource
-        _this.setResource(resource);
-        return _this;
+        this.setResource(resource);
     }
-    Object.defineProperty(BaseTexture.prototype, "realWidth", {
-        /**
-         * Pixel width of the source of this texture
-         *
-         * @readonly
-         * @member {number}
-         */
-        get: function () {
-            return Math.ceil((this.width * this.resolution) - 1e-4);
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(BaseTexture.prototype, "realHeight", {
-        /**
-         * Pixel height of the source of this texture
-         *
-         * @readonly
-         * @member {number}
-         */
-        get: function () {
-            return Math.ceil((this.height * this.resolution) - 1e-4);
-        },
-        enumerable: false,
-        configurable: true
-    });
+
+    if ( EventEmitter ) BaseTexture.__proto__ = EventEmitter;
+    BaseTexture.prototype = Object.create( EventEmitter && EventEmitter.prototype );
+    BaseTexture.prototype.constructor = BaseTexture;
+
+    var prototypeAccessors = { realWidth: { configurable: true },realHeight: { configurable: true } };
+
+    /**
+     * Pixel width of the source of this texture
+     *
+     * @readonly
+     * @member {number}
+     */
+    prototypeAccessors.realWidth.get = function ()
+    {
+        return Math.ceil((this.width * this.resolution) - 1e-4);
+    };
+
+    /**
+     * Pixel height of the source of this texture
+     *
+     * @readonly
+     * @member {number}
+     */
+    prototypeAccessors.realHeight.get = function ()
+    {
+        return Math.ceil((this.height * this.resolution) - 1e-4);
+    };
+
     /**
      * Changes style options of BaseTexture
      *
@@ -8963,149 +10413,200 @@ var BaseTexture = /** @class */ (function (_super) {
      * @param {PIXI.MIPMAP_MODES} [mipmap] - enable mipmaps
      * @returns {PIXI.BaseTexture} this
      */
-    BaseTexture.prototype.setStyle = function (scaleMode, mipmap) {
+    BaseTexture.prototype.setStyle = function setStyle (scaleMode, mipmap)
+    {
         var dirty;
-        if (scaleMode !== undefined && scaleMode !== this.scaleMode) {
+
+        if (scaleMode !== undefined && scaleMode !== this.scaleMode)
+        {
             this.scaleMode = scaleMode;
             dirty = true;
         }
-        if (mipmap !== undefined && mipmap !== this.mipmap) {
+
+        if (mipmap !== undefined && mipmap !== this.mipmap)
+        {
             this.mipmap = mipmap;
             dirty = true;
         }
-        if (dirty) {
+
+        if (dirty)
+        {
             this.dirtyStyleId++;
         }
+
         return this;
     };
+
     /**
      * Changes w/h/resolution. Texture becomes valid if width and height are greater than zero.
      *
-     * @param {number} width - Visual width
-     * @param {number} height - Visual height
-     * @param {number} [resolution] - Optionally set resolution
+     * @param {number} width Visual width
+     * @param {number} height Visual height
+     * @param {number} [resolution] Optionally set resolution
      * @returns {PIXI.BaseTexture} this
      */
-    BaseTexture.prototype.setSize = function (width, height, resolution) {
+    BaseTexture.prototype.setSize = function setSize (width, height, resolution)
+    {
         this.resolution = resolution || this.resolution;
         this.width = width;
         this.height = height;
         this._refreshPOT();
         this.update();
+
         return this;
     };
+
     /**
      * Sets real size of baseTexture, preserves current resolution.
      *
-     * @param {number} realWidth - Full rendered width
-     * @param {number} realHeight - Full rendered height
-     * @param {number} [resolution] - Optionally set resolution
+     * @param {number} realWidth Full rendered width
+     * @param {number} realHeight Full rendered height
+     * @param {number} [resolution] Optionally set resolution
      * @returns {PIXI.BaseTexture} this
      */
-    BaseTexture.prototype.setRealSize = function (realWidth, realHeight, resolution) {
+    BaseTexture.prototype.setRealSize = function setRealSize (realWidth, realHeight, resolution)
+    {
         this.resolution = resolution || this.resolution;
         this.width = realWidth / this.resolution;
         this.height = realHeight / this.resolution;
         this._refreshPOT();
         this.update();
+
         return this;
     };
+
     /**
      * Refresh check for isPowerOfTwo texture based on size
      *
      * @private
      */
-    BaseTexture.prototype._refreshPOT = function () {
+    BaseTexture.prototype._refreshPOT = function _refreshPOT ()
+    {
         this.isPowerOfTwo = isPow2(this.realWidth) && isPow2(this.realHeight);
     };
+
     /**
      * Changes resolution
      *
-     * @param {number} resolution - res
+     * @param {number} [resolution] res
      * @returns {PIXI.BaseTexture} this
      */
-    BaseTexture.prototype.setResolution = function (resolution) {
+    BaseTexture.prototype.setResolution = function setResolution (resolution)
+    {
         var oldResolution = this.resolution;
-        if (oldResolution === resolution) {
+
+        if (oldResolution === resolution)
+        {
             return this;
         }
+
         this.resolution = resolution;
-        if (this.valid) {
+
+        if (this.valid)
+        {
             this.width = this.width * oldResolution / resolution;
             this.height = this.height * oldResolution / resolution;
             this.emit('update', this);
         }
+
         this._refreshPOT();
+
         return this;
     };
+
     /**
      * Sets the resource if it wasn't set. Throws error if resource already present
      *
      * @param {PIXI.resources.Resource} resource - that is managing this BaseTexture
      * @returns {PIXI.BaseTexture} this
      */
-    BaseTexture.prototype.setResource = function (resource) {
-        if (this.resource === resource) {
+    BaseTexture.prototype.setResource = function setResource (resource)
+    {
+        if (this.resource === resource)
+        {
             return this;
         }
-        if (this.resource) {
+
+        if (this.resource)
+        {
             throw new Error('Resource can be set only once');
         }
+
         resource.bind(this);
+
         this.resource = resource;
+
         return this;
     };
+
     /**
      * Invalidates the object. Texture becomes valid if width and height are greater than zero.
      */
-    BaseTexture.prototype.update = function () {
-        if (!this.valid) {
-            if (this.width > 0 && this.height > 0) {
+    BaseTexture.prototype.update = function update ()
+    {
+        if (!this.valid)
+        {
+            if (this.width > 0 && this.height > 0)
+            {
                 this.valid = true;
                 this.emit('loaded', this);
                 this.emit('update', this);
             }
         }
-        else {
+        else
+        {
             this.dirtyId++;
             this.dirtyStyleId++;
             this.emit('update', this);
         }
     };
+
     /**
      * Handle errors with resources.
      * @private
      * @param {ErrorEvent} event - Error event emitted.
      */
-    BaseTexture.prototype.onError = function (event) {
+    BaseTexture.prototype.onError = function onError (event)
+    {
         this.emit('error', this, event);
     };
+
     /**
      * Destroys this base texture.
      * The method stops if resource doesn't want this texture to be destroyed.
      * Removes texture from all caches.
      */
-    BaseTexture.prototype.destroy = function () {
+    BaseTexture.prototype.destroy = function destroy ()
+    {
         // remove and destroy the resource
-        if (this.resource) {
+        if (this.resource)
+        {
             this.resource.unbind(this);
             // only destroy resourced created internally
-            if (this.resource.internal) {
+            if (this.resource.internal)
+            {
                 this.resource.destroy();
             }
             this.resource = null;
         }
-        if (this.cacheId) {
+
+        if (this.cacheId)
+        {
             delete BaseTextureCache[this.cacheId];
             delete TextureCache[this.cacheId];
+
             this.cacheId = null;
         }
+
         // finally let the WebGL renderer know..
         this.dispose();
+
         BaseTexture.removeFromCache(this);
         this.textureCacheIds = null;
+
         this.destroyed = true;
     };
+
     /**
      * Frees the texture from WebGL memory without destroying this texture object.
      * This means you can still use the texture later which will upload it to GPU
@@ -9113,15 +10614,11 @@ var BaseTexture = /** @class */ (function (_super) {
      *
      * @fires PIXI.BaseTexture#dispose
      */
-    BaseTexture.prototype.dispose = function () {
+    BaseTexture.prototype.dispose = function dispose ()
+    {
         this.emit('dispose', this);
     };
-    /**
-     * Utility function for BaseTexture|Texture cast
-     */
-    BaseTexture.prototype.castToBaseTexture = function () {
-        return this;
-    };
+
     /**
      * Helper function that creates a base texture based on the source you provide.
      * The source can be - image url, image element, canvas element. If the
@@ -9132,51 +10629,69 @@ var BaseTexture = /** @class */ (function (_super) {
      * @param {string|HTMLImageElement|HTMLCanvasElement|SVGElement|HTMLVideoElement} source - The
      *        source to create base texture from.
      * @param {object} [options] See {@link PIXI.BaseTexture}'s constructor for options.
-     * @param {boolean} [strict] - Enforce strict-mode, see {@link PIXI.settings.STRICT_TEXTURE_CACHE}.
+     * @param {boolean} [strict] Enforce strict-mode, see {@link PIXI.settings.STRICT_TEXTURE_CACHE}.
      * @returns {PIXI.BaseTexture} The new base texture.
      */
-    BaseTexture.from = function (source, options, strict) {
-        if (strict === void 0) { strict = settings.STRICT_TEXTURE_CACHE; }
+    BaseTexture.from = function from (source, options, strict)
+    {
+        if ( strict === void 0 ) strict = settings.STRICT_TEXTURE_CACHE;
+
         var isFrame = typeof source === 'string';
         var cacheId = null;
-        if (isFrame) {
+
+        if (isFrame)
+        {
             cacheId = source;
         }
-        else {
-            if (!source._pixiId) {
-                source._pixiId = "pixiid_" + uid();
+        else
+        {
+            if (!source._pixiId)
+            {
+                source._pixiId = "pixiid_" + (uid());
             }
+
             cacheId = source._pixiId;
         }
+
         var baseTexture = BaseTextureCache[cacheId];
+
         // Strict-mode rejects invalid cacheIds
-        if (isFrame && strict && !baseTexture) {
-            throw new Error("The cacheId \"" + cacheId + "\" does not exist in BaseTextureCache.");
+        if (isFrame && strict && !baseTexture)
+        {
+            throw new Error(("The cacheId \"" + cacheId + "\" does not exist in BaseTextureCache."));
         }
-        if (!baseTexture) {
+
+        if (!baseTexture)
+        {
             baseTexture = new BaseTexture(source, options);
             baseTexture.cacheId = cacheId;
             BaseTexture.addToCache(baseTexture, cacheId);
         }
+
         return baseTexture;
     };
+
     /**
      * Create a new BaseTexture with a BufferResource from a Float32Array.
      * RGBA values are floats from 0 to 1.
      * @static
-     * @param {Float32Array|Uint8Array} buffer - The optional array to use, if no data
+     * @param {Float32Array|Uint8Array} buffer The optional array to use, if no data
      *        is provided, a new Float32Array is created.
      * @param {number} width - Width of the resource
      * @param {number} height - Height of the resource
      * @param {object} [options] See {@link PIXI.BaseTexture}'s constructor for options.
      * @return {PIXI.BaseTexture} The resulting new BaseTexture
      */
-    BaseTexture.fromBuffer = function (buffer, width, height, options) {
+    BaseTexture.fromBuffer = function fromBuffer (buffer, width, height, options)
+    {
         buffer = buffer || new Float32Array(width * height * 4);
+
         var resource = new BufferResource(buffer, { width: width, height: height });
         var type = buffer instanceof Float32Array ? TYPES.FLOAT : TYPES.UNSIGNED_BYTE;
+
         return new BaseTexture(resource, Object.assign(defaultBufferOptions, options || { width: width, height: height, type: type }));
     };
+
     /**
      * Adds a BaseTexture to the global BaseTextureCache. This cache is shared across the whole PIXI object.
      *
@@ -9184,18 +10699,25 @@ var BaseTexture = /** @class */ (function (_super) {
      * @param {PIXI.BaseTexture} baseTexture - The BaseTexture to add to the cache.
      * @param {string} id - The id that the BaseTexture will be stored against.
      */
-    BaseTexture.addToCache = function (baseTexture, id) {
-        if (id) {
-            if (baseTexture.textureCacheIds.indexOf(id) === -1) {
+    BaseTexture.addToCache = function addToCache (baseTexture, id)
+    {
+        if (id)
+        {
+            if (baseTexture.textureCacheIds.indexOf(id) === -1)
+            {
                 baseTexture.textureCacheIds.push(id);
             }
-            if (BaseTextureCache[id]) {
+
+            if (BaseTextureCache[id])
+            {
                 // eslint-disable-next-line no-console
-                console.warn("BaseTexture added to the cache with an id [" + id + "] that already had an entry");
+                console.warn(("BaseTexture added to the cache with an id [" + id + "] that already had an entry"));
             }
+
             BaseTextureCache[id] = baseTexture;
         }
     };
+
     /**
      * Remove a BaseTexture from the global BaseTextureCache.
      *
@@ -9203,199 +10725,53 @@ var BaseTexture = /** @class */ (function (_super) {
      * @param {string|PIXI.BaseTexture} baseTexture - id of a BaseTexture to be removed, or a BaseTexture instance itself.
      * @return {PIXI.BaseTexture|null} The BaseTexture that was removed.
      */
-    BaseTexture.removeFromCache = function (baseTexture) {
-        if (typeof baseTexture === 'string') {
+    BaseTexture.removeFromCache = function removeFromCache (baseTexture)
+    {
+        if (typeof baseTexture === 'string')
+        {
             var baseTextureFromCache = BaseTextureCache[baseTexture];
-            if (baseTextureFromCache) {
+
+            if (baseTextureFromCache)
+            {
                 var index = baseTextureFromCache.textureCacheIds.indexOf(baseTexture);
-                if (index > -1) {
+
+                if (index > -1)
+                {
                     baseTextureFromCache.textureCacheIds.splice(index, 1);
                 }
+
                 delete BaseTextureCache[baseTexture];
+
                 return baseTextureFromCache;
             }
         }
-        else if (baseTexture && baseTexture.textureCacheIds) {
-            for (var i = 0; i < baseTexture.textureCacheIds.length; ++i) {
+        else if (baseTexture && baseTexture.textureCacheIds)
+        {
+            for (var i = 0; i < baseTexture.textureCacheIds.length; ++i)
+            {
                 delete BaseTextureCache[baseTexture.textureCacheIds[i]];
             }
+
             baseTexture.textureCacheIds.length = 0;
+
             return baseTexture;
         }
+
         return null;
     };
-    /**
-     * Global number of the texture batch, used by multi-texture renderers
-     *
-     * @static
-     * @member {number}
-     */
-    BaseTexture._globalBatch = 0;
+
+    Object.defineProperties( BaseTexture.prototype, prototypeAccessors );
+
     return BaseTexture;
 }(eventemitter3));
 
 /**
- * Resource that can manage several resource (items) inside.
- * All resources need to have the same pixel size.
- * Parent class for CubeResource and ArrayResource
+ * Global number of the texture batch, used by multi-texture renderers
  *
- * @class
- * @extends PIXI.resources.Resource
- * @memberof PIXI.resources
- * @param {object} [options] Options to for Resource constructor
- * @param {number} [options.width] - Width of the resource
- * @param {number} [options.height] - Height of the resource
+ * @static
+ * @member {number}
  */
-var AbstractMultiResource = /** @class */ (function (_super) {
-    __extends(AbstractMultiResource, _super);
-    function AbstractMultiResource(length, options) {
-        var _this = this;
-        var _a = options || {}, width = _a.width, height = _a.height;
-        _this = _super.call(this, width, height) || this;
-        /**
-         * Collection of partial baseTextures that correspond to resources
-         * @member {Array<PIXI.BaseTexture>}
-         * @readonly
-         */
-        _this.items = [];
-        /**
-         * Dirty IDs for each part
-         * @member {Array<number>}
-         * @readonly
-         */
-        _this.itemDirtyIds = [];
-        for (var i = 0; i < length; i++) {
-            var partTexture = new BaseTexture();
-            _this.items.push(partTexture);
-            // -2 - first run of texture array upload
-            // -1 - texture item was allocated
-            // >=0 - texture item uploaded , in sync with items[i].dirtyId
-            _this.itemDirtyIds.push(-2);
-        }
-        /**
-         * Number of elements in array
-         *
-         * @member {number}
-         * @readonly
-         */
-        _this.length = length;
-        /**
-         * Promise when loading
-         * @member {Promise}
-         * @private
-         * @default null
-         */
-        _this._load = null;
-        /**
-         * Bound baseTexture, there can only be one
-         * @member {PIXI.BaseTexture}
-         */
-        _this.baseTexture = null;
-        return _this;
-    }
-    /**
-     * used from ArrayResource and CubeResource constructors
-     * @param {Array<*>} resources - Can be resources, image elements, canvas, etc. ,
-     *  length should be same as constructor length
-     * @param {object} [options] - detect options for resources
-     * @protected
-     */
-    AbstractMultiResource.prototype.initFromArray = function (resources, options) {
-        for (var i = 0; i < this.length; i++) {
-            if (!resources[i]) {
-                continue;
-            }
-            if (resources[i].castToBaseTexture) {
-                this.addBaseTextureAt(resources[i].castToBaseTexture(), i);
-            }
-            else if (resources[i] instanceof Resource) {
-                this.addResourceAt(resources[i], i);
-            }
-            else {
-                this.addResourceAt(autoDetectResource(resources[i], options), i);
-            }
-        }
-    };
-    /**
-     * Destroy this BaseImageResource
-     * @override
-     */
-    AbstractMultiResource.prototype.dispose = function () {
-        for (var i = 0, len = this.length; i < len; i++) {
-            this.items[i].destroy();
-        }
-        this.items = null;
-        this.itemDirtyIds = null;
-        this._load = null;
-    };
-    /**
-     * Set a resource by ID
-     *
-     * @param {PIXI.resources.Resource} resource
-     * @param {number} index - Zero-based index of resource to set
-     * @return {PIXI.resources.ArrayResource} Instance for chaining
-     */
-    AbstractMultiResource.prototype.addResourceAt = function (resource, index) {
-        if (!this.items[index]) {
-            throw new Error("Index " + index + " is out of bounds");
-        }
-        // Inherit the first resource dimensions
-        if (resource.valid && !this.valid) {
-            this.resize(resource.width, resource.height);
-        }
-        this.items[index].setResource(resource);
-        return this;
-    };
-    /**
-     * Set the parent base texture
-     * @member {PIXI.BaseTexture}
-     * @override
-     */
-    AbstractMultiResource.prototype.bind = function (baseTexture) {
-        if (this.baseTexture !== null) {
-            throw new Error('Only one base texture per TextureArray is allowed');
-        }
-        _super.prototype.bind.call(this, baseTexture);
-        for (var i = 0; i < this.length; i++) {
-            this.items[i].parentTextureArray = baseTexture;
-            this.items[i].on('update', baseTexture.update, baseTexture);
-        }
-    };
-    /**
-     * Unset the parent base texture
-     * @member {PIXI.BaseTexture}
-     * @override
-     */
-    AbstractMultiResource.prototype.unbind = function (baseTexture) {
-        _super.prototype.unbind.call(this, baseTexture);
-        for (var i = 0; i < this.length; i++) {
-            this.items[i].parentTextureArray = null;
-            this.items[i].off('update', baseTexture.update, baseTexture);
-        }
-    };
-    /**
-     * Load all the resources simultaneously
-     * @override
-     * @return {Promise<void>} When load is resolved
-     */
-    AbstractMultiResource.prototype.load = function () {
-        var _this = this;
-        if (this._load) {
-            return this._load;
-        }
-        var resources = this.items.map(function (item) { return item.resource; }).filter(function (item) { return item; });
-        // TODO: also implement load part-by-part strategy
-        var promises = resources.map(function (item) { return item.load(); });
-        this._load = Promise.all(promises)
-            .then(function () {
-            var _a = _this.items[0], realWidth = _a.realWidth, realHeight = _a.realHeight;
-            _this.resize(realWidth, realHeight);
-            return Promise.resolve(_this);
-        });
-        return this._load;
-    };
-    return AbstractMultiResource;
-}(Resource));
+BaseTexture._globalBatch = 0;
 
 /**
  * A resource that contains a number of sources.
@@ -9405,56 +10781,185 @@ var AbstractMultiResource = /** @class */ (function (_super) {
  * @memberof PIXI.resources
  * @param {number|Array<*>} source - Number of items in array or the collection
  *        of image URLs to use. Can also be resources, image elements, canvas, etc.
- * @param {object} [options] - Options to apply to {@link PIXI.resources.autoDetectResource}
+ * @param {object} [options] Options to apply to {@link PIXI.resources.autoDetectResource}
  * @param {number} [options.width] - Width of the resource
  * @param {number} [options.height] - Height of the resource
  */
-var ArrayResource = /** @class */ (function (_super) {
-    __extends(ArrayResource, _super);
-    function ArrayResource(source, options) {
-        var _this = this;
-        var _a = options || {}, width = _a.width, height = _a.height;
+var ArrayResource = /*@__PURE__*/(function (Resource) {
+    function ArrayResource(source, options)
+    {
+        options = options || {};
+
         var urls;
-        var length;
-        if (Array.isArray(source)) {
+        var length = source;
+
+        if (Array.isArray(source))
+        {
             urls = source;
             length = source.length;
         }
-        else {
-            length = source;
+
+        Resource.call(this, options.width, options.height);
+
+        /**
+         * Collection of resources.
+         * @member {Array<PIXI.BaseTexture>}
+         * @readonly
+         */
+        this.items = [];
+
+        /**
+         * Dirty IDs for each part
+         * @member {Array<number>}
+         * @readonly
+         */
+        this.itemDirtyIds = [];
+
+        for (var i = 0; i < length; i++)
+        {
+            var partTexture = new BaseTexture();
+
+            this.items.push(partTexture);
+            this.itemDirtyIds.push(-1);
         }
-        _this = _super.call(this, length, { width: width, height: height }) || this;
-        if (urls) {
-            _this.initFromArray(urls, options);
+
+        /**
+         * Number of elements in array
+         *
+         * @member {number}
+         * @readonly
+         */
+        this.length = length;
+
+        /**
+         * Promise when loading
+         * @member {Promise}
+         * @private
+         * @default null
+         */
+        this._load = null;
+
+        if (urls)
+        {
+            for (var i$1 = 0; i$1 < length; i$1++)
+            {
+                this.addResourceAt(autoDetectResource(urls[i$1], options), i$1);
+            }
         }
-        return _this;
     }
+
+    if ( Resource ) ArrayResource.__proto__ = Resource;
+    ArrayResource.prototype = Object.create( Resource && Resource.prototype );
+    ArrayResource.prototype.constructor = ArrayResource;
+
     /**
-     * Set a baseTexture by ID,
-     * ArrayResource just takes resource from it, nothing more
+     * Destroy this BaseImageResource
+     * @override
+     */
+    ArrayResource.prototype.dispose = function dispose ()
+    {
+        for (var i = 0, len = this.length; i < len; i++)
+        {
+            this.items[i].destroy();
+        }
+        this.items = null;
+        this.itemDirtyIds = null;
+        this._load = null;
+    };
+
+    /**
+     * Set a resource by ID
      *
-     * @param {PIXI.BaseTexture} baseTexture
+     * @param {PIXI.resources.Resource} resource
      * @param {number} index - Zero-based index of resource to set
      * @return {PIXI.resources.ArrayResource} Instance for chaining
      */
-    ArrayResource.prototype.addBaseTextureAt = function (baseTexture, index) {
-        if (baseTexture.resource) {
-            this.addResourceAt(baseTexture.resource, index);
+    ArrayResource.prototype.addResourceAt = function addResourceAt (resource, index)
+    {
+        var baseTexture = this.items[index];
+
+        if (!baseTexture)
+        {
+            throw new Error(("Index " + index + " is out of bounds"));
         }
-        else {
-            throw new Error('ArrayResource does not support RenderTexture');
+
+        // Inherit the first resource dimensions
+        if (resource.valid && !this.valid)
+        {
+            this.resize(resource.width, resource.height);
         }
+
+        this.items[index].setResource(resource);
+
         return this;
     };
+
     /**
-     * Add binding
+     * Set the parent base texture
      * @member {PIXI.BaseTexture}
      * @override
      */
-    ArrayResource.prototype.bind = function (baseTexture) {
-        _super.prototype.bind.call(this, baseTexture);
+    ArrayResource.prototype.bind = function bind (baseTexture)
+    {
+        Resource.prototype.bind.call(this, baseTexture);
+
         baseTexture.target = TARGETS.TEXTURE_2D_ARRAY;
+
+        for (var i = 0; i < this.length; i++)
+        {
+            this.items[i].on('update', baseTexture.update, baseTexture);
+        }
     };
+
+    /**
+     * Unset the parent base texture
+     * @member {PIXI.BaseTexture}
+     * @override
+     */
+    ArrayResource.prototype.unbind = function unbind (baseTexture)
+    {
+        Resource.prototype.unbind.call(this, baseTexture);
+
+        for (var i = 0; i < this.length; i++)
+        {
+            this.items[i].off('update', baseTexture.update, baseTexture);
+        }
+    };
+
+    /**
+     * Load all the resources simultaneously
+     * @override
+     * @return {Promise<void>} When load is resolved
+     */
+    ArrayResource.prototype.load = function load ()
+    {
+        var this$1 = this;
+
+        if (this._load)
+        {
+            return this._load;
+        }
+
+        var resources = this.items.map(function (item) { return item.resource; });
+
+        // TODO: also implement load part-by-part strategy
+        var promises = resources.map(function (item) { return item.load(); });
+
+        this._load = Promise.all(promises)
+            .then(function () {
+                var ref = resources[0];
+                var width = ref.width;
+                var height = ref.height;
+
+                this$1.resize(width, height);
+
+                return Promise.resolve(this$1);
+            }
+            );
+
+        return this._load;
+    };
+
     /**
      * Upload the resources to the GPU.
      * @param {PIXI.Renderer} renderer
@@ -9462,131 +10967,66 @@ var ArrayResource = /** @class */ (function (_super) {
      * @param {PIXI.GLTexture} glTexture
      * @returns {boolean} whether texture was uploaded
      */
-    ArrayResource.prototype.upload = function (renderer, texture, glTexture) {
-        var _a = this, length = _a.length, itemDirtyIds = _a.itemDirtyIds, items = _a.items;
+    ArrayResource.prototype.upload = function upload (renderer, texture, glTexture)
+    {
+        var ref = this;
+        var length = ref.length;
+        var itemDirtyIds = ref.itemDirtyIds;
+        var items = ref.items;
         var gl = renderer.gl;
-        if (glTexture.dirtyId < 0) {
-            gl.texImage3D(gl.TEXTURE_2D_ARRAY, 0, texture.format, this._width, this._height, length, 0, texture.format, texture.type, null);
+
+        if (glTexture.dirtyId < 0)
+        {
+            gl.texImage3D(
+                gl.TEXTURE_2D_ARRAY,
+                0,
+                texture.format,
+                this._width,
+                this._height,
+                length,
+                0,
+                texture.format,
+                texture.type,
+                null
+            );
         }
-        for (var i = 0; i < length; i++) {
+
+        for (var i = 0; i < length; i++)
+        {
             var item = items[i];
-            if (itemDirtyIds[i] < item.dirtyId) {
+
+            if (itemDirtyIds[i] < item.dirtyId)
+            {
                 itemDirtyIds[i] = item.dirtyId;
-                if (item.valid) {
-                    gl.texSubImage3D(gl.TEXTURE_2D_ARRAY, 0, 0, // xoffset
-                    0, // yoffset
-                    i, // zoffset
-                    item.resource.width, item.resource.height, 1, texture.format, texture.type, item.resource.source);
+                if (item.valid)
+                {
+                    gl.texSubImage3D(
+                        gl.TEXTURE_2D_ARRAY,
+                        0,
+                        0, // xoffset
+                        0, // yoffset
+                        i, // zoffset
+                        item.resource.width,
+                        item.resource.height,
+                        1,
+                        texture.format,
+                        texture.type,
+                        item.resource.source
+                    );
                 }
             }
         }
-        return true;
-    };
-    return ArrayResource;
-}(AbstractMultiResource));
 
-/**
- * Base for all the image/canvas resources
- * @class
- * @extends PIXI.resources.Resource
- * @memberof PIXI.resources
- */
-var BaseImageResource = /** @class */ (function (_super) {
-    __extends(BaseImageResource, _super);
-    /**
-     * @param {HTMLImageElement|HTMLCanvasElement|HTMLVideoElement|SVGElement} source
-     */
-    function BaseImageResource(source) {
-        var _this = this;
-        var sourceAny = source;
-        var width = sourceAny.naturalWidth || sourceAny.videoWidth || sourceAny.width;
-        var height = sourceAny.naturalHeight || sourceAny.videoHeight || sourceAny.height;
-        _this = _super.call(this, width, height) || this;
-        /**
-         * The source element
-         * @member {HTMLImageElement|HTMLCanvasElement|HTMLVideoElement|SVGElement}
-         * @readonly
-         */
-        _this.source = source;
-        /**
-         * If set to `true`, will force `texImage2D` over `texSubImage2D` for uploading.
-         * Certain types of media (e.g. video) using `texImage2D` is more performant.
-         * @member {boolean}
-         * @default false
-         * @private
-         */
-        _this.noSubImage = false;
-        return _this;
-    }
-    /**
-     * Set cross origin based detecting the url and the crossorigin
-     * @protected
-     * @param {HTMLElement} element - Element to apply crossOrigin
-     * @param {string} url - URL to check
-     * @param {boolean|string} [crossorigin=true] - Cross origin value to use
-     */
-    BaseImageResource.crossOrigin = function (element, url, crossorigin) {
-        if (crossorigin === undefined && url.indexOf('data:') !== 0) {
-            element.crossOrigin = determineCrossOrigin(url);
-        }
-        else if (crossorigin !== false) {
-            element.crossOrigin = typeof crossorigin === 'string' ? crossorigin : 'anonymous';
-        }
-    };
-    /**
-     * Upload the texture to the GPU.
-     * @param {PIXI.Renderer} renderer - Upload to the renderer
-     * @param {PIXI.BaseTexture} baseTexture - Reference to parent texture
-     * @param {PIXI.GLTexture} glTexture
-     * @param {HTMLImageElement|HTMLCanvasElement|HTMLVideoElement|SVGElement} [source] (optional)
-     * @returns {boolean} true is success
-     */
-    BaseImageResource.prototype.upload = function (renderer, baseTexture, glTexture, source) {
-        var gl = renderer.gl;
-        var width = baseTexture.realWidth;
-        var height = baseTexture.realHeight;
-        source = source || this.source;
-        gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, baseTexture.alphaMode === ALPHA_MODES.UNPACK);
-        if (!this.noSubImage
-            && baseTexture.target === gl.TEXTURE_2D
-            && glTexture.width === width
-            && glTexture.height === height) {
-            gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, baseTexture.format, baseTexture.type, source);
-        }
-        else {
-            glTexture.width = width;
-            glTexture.height = height;
-            gl.texImage2D(baseTexture.target, 0, baseTexture.format, baseTexture.format, baseTexture.type, source);
-        }
         return true;
     };
-    /**
-     * Checks if source width/height was changed, resize can cause extra baseTexture update.
-     * Triggers one update in any case.
-     */
-    BaseImageResource.prototype.update = function () {
-        if (this.destroyed) {
-            return;
-        }
-        var source = this.source;
-        var width = source.naturalWidth || source.videoWidth || source.width;
-        var height = source.naturalHeight || source.videoHeight || source.height;
-        this.resize(width, height);
-        _super.prototype.update.call(this);
-    };
-    /**
-     * Destroy this BaseImageResource
-     * @override
-     */
-    BaseImageResource.prototype.dispose = function () {
-        this.source = null;
-    };
-    return BaseImageResource;
+
+    return ArrayResource;
 }(Resource));
 
 /**
  * @interface OffscreenCanvas
  */
+
 /**
  * Resource type for HTMLCanvasElement.
  * @class
@@ -9594,26 +11034,28 @@ var BaseImageResource = /** @class */ (function (_super) {
  * @memberof PIXI.resources
  * @param {HTMLCanvasElement} source - Canvas element to use
  */
-var CanvasResource = /** @class */ (function (_super) {
-    __extends(CanvasResource, _super);
-    function CanvasResource() {
-        return _super !== null && _super.apply(this, arguments) || this;
+var CanvasResource = /*@__PURE__*/(function (BaseImageResource) {
+    function CanvasResource () {
+        BaseImageResource.apply(this, arguments);
     }
-    /**
-     * Used to auto-detect the type of resource.
-     *
-     * @static
-     * @param {HTMLCanvasElement|OffscreenCanvas} source - The source object
-     * @return {boolean} `true` if source is HTMLCanvasElement or OffscreenCanvas
-     */
-    CanvasResource.test = function (source) {
+
+    if ( BaseImageResource ) CanvasResource.__proto__ = BaseImageResource;
+    CanvasResource.prototype = Object.create( BaseImageResource && BaseImageResource.prototype );
+    CanvasResource.prototype.constructor = CanvasResource;
+
+    CanvasResource.test = function test (source)
+    {
         var OffscreenCanvas = window.OffscreenCanvas;
+
         // Check for browsers that don't yet support OffscreenCanvas
-        if (OffscreenCanvas && source instanceof OffscreenCanvas) {
+        if (OffscreenCanvas && source instanceof OffscreenCanvas)
+        {
             return true;
         }
+
         return source instanceof HTMLCanvasElement;
     };
+
     return CanvasResource;
 }(BaseImageResource));
 
@@ -9623,363 +11065,90 @@ var CanvasResource = /** @class */ (function (_super) {
  * @class
  * @extends PIXI.resources.ArrayResource
  * @memberof PIXI.resources
- * @param {Array<string|PIXI.resources.Resource>} [source] - Collection of URLs or resources
+ * @param {Array<string|PIXI.resources.Resource>} [source] Collection of URLs or resources
  *        to use as the sides of the cube.
  * @param {object} [options] - ImageResource options
  * @param {number} [options.width] - Width of resource
  * @param {number} [options.height] - Height of resource
- * @param {number} [options.autoLoad=true] - Whether to auto-load resources
- * @param {number} [options.linkBaseTexture=true] - In case BaseTextures are supplied,
- *   whether to copy them or use
  */
-var CubeResource = /** @class */ (function (_super) {
-    __extends(CubeResource, _super);
-    function CubeResource(source, options) {
-        var _this = this;
-        var _a = options || {}, width = _a.width, height = _a.height, autoLoad = _a.autoLoad, linkBaseTexture = _a.linkBaseTexture;
-        if (source && source.length !== CubeResource.SIDES) {
-            throw new Error("Invalid length. Got " + source.length + ", expected 6");
+var CubeResource = /*@__PURE__*/(function (ArrayResource) {
+    function CubeResource(source, options)
+    {
+        options = options || {};
+
+        ArrayResource.call(this, source, options);
+
+        if (this.length !== CubeResource.SIDES)
+        {
+            throw new Error(("Invalid length. Got " + (this.length) + ", expected 6"));
         }
-        _this = _super.call(this, 6, { width: width, height: height }) || this;
-        for (var i = 0; i < CubeResource.SIDES; i++) {
-            _this.items[i].target = TARGETS.TEXTURE_CUBE_MAP_POSITIVE_X + i;
+
+        for (var i = 0; i < CubeResource.SIDES; i++)
+        {
+            this.items[i].target = TARGETS.TEXTURE_CUBE_MAP_POSITIVE_X + i;
         }
-        /**
-         * In case BaseTextures are supplied, whether to use same resource or bind baseTexture itself
-         * @member {boolean}
-         * @protected
-         */
-        _this.linkBaseTexture = linkBaseTexture !== false;
-        if (source) {
-            _this.initFromArray(source, options);
+
+        if (options.autoLoad !== false)
+        {
+            this.load();
         }
-        if (autoLoad !== false) {
-            _this.load();
-        }
-        return _this;
     }
+
+    if ( ArrayResource ) CubeResource.__proto__ = ArrayResource;
+    CubeResource.prototype = Object.create( ArrayResource && ArrayResource.prototype );
+    CubeResource.prototype.constructor = CubeResource;
+
     /**
      * Add binding
      *
      * @override
      * @param {PIXI.BaseTexture} baseTexture - parent base texture
      */
-    CubeResource.prototype.bind = function (baseTexture) {
-        _super.prototype.bind.call(this, baseTexture);
+    CubeResource.prototype.bind = function bind (baseTexture)
+    {
+        ArrayResource.prototype.bind.call(this, baseTexture);
+
         baseTexture.target = TARGETS.TEXTURE_CUBE_MAP;
     };
-    CubeResource.prototype.addBaseTextureAt = function (baseTexture, index, linkBaseTexture) {
-        if (linkBaseTexture === undefined) {
-            linkBaseTexture = this.linkBaseTexture;
-        }
-        if (!this.items[index]) {
-            throw new Error("Index " + index + " is out of bounds");
-        }
-        if (!this.linkBaseTexture
-            || baseTexture.parentTextureArray
-            || Object.keys(baseTexture._glTextures).length > 0) {
-            // copy mode
-            if (baseTexture.resource) {
-                this.addResourceAt(baseTexture.resource, index);
-            }
-            else {
-                throw new Error("CubeResource does not support copying of renderTexture.");
-            }
-        }
-        else {
-            // link mode, the difficult one!
-            baseTexture.target = TARGETS.TEXTURE_CUBE_MAP_POSITIVE_X + index;
-            baseTexture.parentTextureArray = this.baseTexture;
-            this.items[index] = baseTexture;
-        }
-        if (baseTexture.valid && !this.valid) {
-            this.resize(baseTexture.realWidth, baseTexture.realHeight);
-        }
-        this.items[index] = baseTexture;
-        return this;
-    };
+
     /**
      * Upload the resource
      *
      * @returns {boolean} true is success
      */
-    CubeResource.prototype.upload = function (renderer, _baseTexture, glTexture) {
+    CubeResource.prototype.upload = function upload (renderer, baseTexture, glTexture)
+    {
         var dirty = this.itemDirtyIds;
-        for (var i = 0; i < CubeResource.SIDES; i++) {
+
+        for (var i = 0; i < CubeResource.SIDES; i++)
+        {
             var side = this.items[i];
-            if (dirty[i] < side.dirtyId) {
-                if (side.valid && side.resource) {
+
+            if (dirty[i] < side.dirtyId)
+            {
+                dirty[i] = side.dirtyId;
+                if (side.valid)
+                {
                     side.resource.upload(renderer, side, glTexture);
-                    dirty[i] = side.dirtyId;
-                }
-                else if (dirty[i] < -1) {
-                    // either item is not valid yet, either its a renderTexture
-                    // allocate the memory
-                    renderer.gl.texImage2D(side.target, 0, glTexture.internalFormat, _baseTexture.realWidth, _baseTexture.realHeight, 0, _baseTexture.format, glTexture.type, null);
-                    dirty[i] = -1;
                 }
             }
         }
+
         return true;
     };
-    /**
-     * Used to auto-detect the type of resource.
-     *
-     * @static
-     * @param {object} source - The source object
-     * @return {boolean} `true` if source is an array of 6 elements
-     */
-    CubeResource.test = function (source) {
-        return Array.isArray(source) && source.length === CubeResource.SIDES;
-    };
-    /**
-     * Number of texture sides to store for CubeResources
-     *
-     * @name PIXI.resources.CubeResource.SIDES
-     * @static
-     * @member {number}
-     * @default 6
-     */
-    CubeResource.SIDES = 6;
+
     return CubeResource;
-}(AbstractMultiResource));
+}(ArrayResource));
 
 /**
- * Resource type for HTMLImageElement.
- * @class
- * @extends PIXI.resources.BaseImageResource
- * @memberof PIXI.resources
+ * Number of texture sides to store for CubeResources
+ *
+ * @name PIXI.resources.CubeResource.SIDES
+ * @static
+ * @member {number}
+ * @default 6
  */
-var ImageResource = /** @class */ (function (_super) {
-    __extends(ImageResource, _super);
-    /**
-     * @param {HTMLImageElement|string} source - image source or URL
-     * @param {object} [options]
-     * @param {boolean} [options.autoLoad=true] - start loading process
-     * @param {boolean} [options.createBitmap=PIXI.settings.CREATE_IMAGE_BITMAP] - whether its required to create
-     *        a bitmap before upload
-     * @param {boolean} [options.crossorigin=true] - Load image using cross origin
-     * @param {PIXI.ALPHA_MODES} [options.alphaMode=PIXI.ALPHA_MODES.UNPACK] - Premultiply image alpha in bitmap
-     */
-    function ImageResource(source, options) {
-        var _this = this;
-        options = options || {};
-        if (!(source instanceof HTMLImageElement)) {
-            var imageElement = new Image();
-            BaseImageResource.crossOrigin(imageElement, source, options.crossorigin);
-            imageElement.src = source;
-            source = imageElement;
-        }
-        _this = _super.call(this, source) || this;
-        // FireFox 68, and possibly other versions, seems like setting the HTMLImageElement#width and #height
-        // to non-zero values before its loading completes if images are in a cache.
-        // Because of this, need to set the `_width` and the `_height` to zero to avoid uploading incomplete images.
-        // Please refer to the issue #5968 (https://github.com/pixijs/pixi.js/issues/5968).
-        if (!source.complete && !!_this._width && !!_this._height) {
-            _this._width = 0;
-            _this._height = 0;
-        }
-        /**
-         * URL of the image source
-         * @member {string}
-         */
-        _this.url = source.src;
-        /**
-         * When process is completed
-         * @member {Promise<void>}
-         * @private
-         */
-        _this._process = null;
-        /**
-         * If the image should be disposed after upload
-         * @member {boolean}
-         * @default false
-         */
-        _this.preserveBitmap = false;
-        /**
-         * If capable, convert the image using createImageBitmap API
-         * @member {boolean}
-         * @default PIXI.settings.CREATE_IMAGE_BITMAP
-         */
-        _this.createBitmap = (options.createBitmap !== undefined
-            ? options.createBitmap : settings.CREATE_IMAGE_BITMAP) && !!window.createImageBitmap;
-        /**
-         * Controls texture alphaMode field
-         * Copies from options
-         * Default is `null`, copies option from baseTexture
-         *
-         * @member {PIXI.ALPHA_MODES|null}
-         * @readonly
-         */
-        _this.alphaMode = typeof options.alphaMode === 'number' ? options.alphaMode : null;
-        if (options.premultiplyAlpha !== undefined) {
-            // triggers deprecation
-            _this.premultiplyAlpha = options.premultiplyAlpha;
-        }
-        /**
-         * The ImageBitmap element created for HTMLImageElement
-         * @member {ImageBitmap}
-         * @default null
-         */
-        _this.bitmap = null;
-        /**
-         * Promise when loading
-         * @member {Promise<void>}
-         * @private
-         * @default null
-         */
-        _this._load = null;
-        if (options.autoLoad !== false) {
-            _this.load();
-        }
-        return _this;
-    }
-    /**
-     * returns a promise when image will be loaded and processed
-     *
-     * @param {boolean} [createBitmap] - whether process image into bitmap
-     * @returns {Promise<void>}
-     */
-    ImageResource.prototype.load = function (createBitmap) {
-        var _this = this;
-        if (this._load) {
-            return this._load;
-        }
-        if (createBitmap !== undefined) {
-            this.createBitmap = createBitmap;
-        }
-        this._load = new Promise(function (resolve, reject) {
-            var source = _this.source;
-            _this.url = source.src;
-            var completed = function () {
-                if (_this.destroyed) {
-                    return;
-                }
-                source.onload = null;
-                source.onerror = null;
-                _this.resize(source.width, source.height);
-                _this._load = null;
-                if (_this.createBitmap) {
-                    resolve(_this.process());
-                }
-                else {
-                    resolve(_this);
-                }
-            };
-            if (source.complete && source.src) {
-                completed();
-            }
-            else {
-                source.onload = completed;
-                source.onerror = function (event) {
-                    // Avoids Promise freezing when resource broken
-                    reject(event);
-                    _this.onError.emit(event);
-                };
-            }
-        });
-        return this._load;
-    };
-    /**
-     * Called when we need to convert image into BitmapImage.
-     * Can be called multiple times, real promise is cached inside.
-     *
-     * @returns {Promise<void>} cached promise to fill that bitmap
-     */
-    ImageResource.prototype.process = function () {
-        var _this = this;
-        var source = this.source;
-        if (this._process !== null) {
-            return this._process;
-        }
-        if (this.bitmap !== null || !window.createImageBitmap) {
-            return Promise.resolve(this);
-        }
-        this._process = window.createImageBitmap(source, 0, 0, source.width, source.height, {
-            premultiplyAlpha: this.alphaMode === ALPHA_MODES.UNPACK ? 'premultiply' : 'none',
-        })
-            .then(function (bitmap) {
-            if (_this.destroyed) {
-                return Promise.reject();
-            }
-            _this.bitmap = bitmap;
-            _this.update();
-            _this._process = null;
-            return Promise.resolve(_this);
-        });
-        return this._process;
-    };
-    /**
-     * Upload the image resource to GPU.
-     *
-     * @param {PIXI.Renderer} renderer - Renderer to upload to
-     * @param {PIXI.BaseTexture} baseTexture - BaseTexture for this resource
-     * @param {PIXI.GLTexture} glTexture - GLTexture to use
-     * @returns {boolean} true is success
-     */
-    ImageResource.prototype.upload = function (renderer, baseTexture, glTexture) {
-        if (typeof this.alphaMode === 'number') {
-            // bitmap stores unpack premultiply flag, we dont have to notify texImage2D about it
-            baseTexture.alphaMode = this.alphaMode;
-        }
-        if (!this.createBitmap) {
-            return _super.prototype.upload.call(this, renderer, baseTexture, glTexture);
-        }
-        if (!this.bitmap) {
-            // yeah, ignore the output
-            this.process();
-            if (!this.bitmap) {
-                return false;
-            }
-        }
-        _super.prototype.upload.call(this, renderer, baseTexture, glTexture, this.bitmap);
-        if (!this.preserveBitmap) {
-            // checks if there are other renderers that possibly need this bitmap
-            var flag = true;
-            var glTextures = baseTexture._glTextures;
-            for (var key in glTextures) {
-                var otherTex = glTextures[key];
-                if (otherTex !== glTexture && otherTex.dirtyId !== baseTexture.dirtyId) {
-                    flag = false;
-                    break;
-                }
-            }
-            if (flag) {
-                if (this.bitmap.close) {
-                    this.bitmap.close();
-                }
-                this.bitmap = null;
-            }
-        }
-        return true;
-    };
-    /**
-     * Destroys this texture
-     * @override
-     */
-    ImageResource.prototype.dispose = function () {
-        this.source.onload = null;
-        this.source.onerror = null;
-        _super.prototype.dispose.call(this);
-        if (this.bitmap) {
-            this.bitmap.close();
-            this.bitmap = null;
-        }
-        this._process = null;
-        this._load = null;
-    };
-    /**
-     * Used to auto-detect the type of resource.
-     *
-     * @static
-     * @param {string|HTMLImageElement} source - The source object
-     * @return {boolean} `true` if source is string or HTMLImageElement
-     */
-    ImageResource.test = function (source) {
-        return typeof source === 'string' || source instanceof HTMLImageElement;
-    };
-    return ImageResource;
-}(BaseImageResource));
+CubeResource.SIDES = 6;
 
 /**
  * Resource type for SVG elements and graphics.
@@ -9988,137 +11157,169 @@ var ImageResource = /** @class */ (function (_super) {
  * @memberof PIXI.resources
  * @param {string} source - Base64 encoded SVG element or URL for SVG file.
  * @param {object} [options] - Options to use
- * @param {number} [options.scale=1] - Scale to apply to SVG. Overridden by...
- * @param {number} [options.width] - Rasterize SVG this wide. Aspect ratio preserved if height not specified.
- * @param {number} [options.height] - Rasterize SVG this high. Aspect ratio preserved if width not specified.
- * @param {boolean} [options.autoLoad=true] - Start loading right away.
+ * @param {number} [options.scale=1] Scale to apply to SVG. Overridden by...
+ * @param {number} [options.width] Rasterize SVG this wide. Aspect ratio preserved if height not specified.
+ * @param {number} [options.height] Rasterize SVG this high. Aspect ratio preserved if width not specified.
+ * @param {boolean} [options.autoLoad=true] Start loading right away.
  */
-var SVGResource = /** @class */ (function (_super) {
-    __extends(SVGResource, _super);
-    function SVGResource(sourceBase64, options) {
-        var _this = this;
+var SVGResource = /*@__PURE__*/(function (BaseImageResource) {
+    function SVGResource(source, options)
+    {
         options = options || {};
-        _this = _super.call(this, document.createElement('canvas')) || this;
-        _this._width = 0;
-        _this._height = 0;
+
+        BaseImageResource.call(this, document.createElement('canvas'));
+        this._width = 0;
+        this._height = 0;
+
         /**
          * Base64 encoded SVG element or URL for SVG file
          * @readonly
          * @member {string}
          */
-        _this.svg = sourceBase64;
+        this.svg = source;
+
         /**
          * The source scale to apply when rasterizing on load
          * @readonly
          * @member {number}
          */
-        _this.scale = options.scale || 1;
+        this.scale = options.scale || 1;
+
         /**
          * A width override for rasterization on load
          * @readonly
          * @member {number}
          */
-        _this._overrideWidth = options.width;
+        this._overrideWidth = options.width;
+
         /**
          * A height override for rasterization on load
          * @readonly
          * @member {number}
          */
-        _this._overrideHeight = options.height;
+        this._overrideHeight = options.height;
+
         /**
          * Call when completely loaded
          * @private
          * @member {function}
          */
-        _this._resolve = null;
+        this._resolve = null;
+
         /**
          * Cross origin value to use
          * @private
          * @member {boolean|string}
          */
-        _this._crossorigin = options.crossorigin;
+        this._crossorigin = options.crossorigin;
+
         /**
          * Promise when loading
          * @member {Promise<void>}
          * @private
          * @default null
          */
-        _this._load = null;
-        if (options.autoLoad !== false) {
-            _this.load();
+        this._load = null;
+
+        if (options.autoLoad !== false)
+        {
+            this.load();
         }
-        return _this;
     }
-    SVGResource.prototype.load = function () {
-        var _this = this;
-        if (this._load) {
+
+    if ( BaseImageResource ) SVGResource.__proto__ = BaseImageResource;
+    SVGResource.prototype = Object.create( BaseImageResource && BaseImageResource.prototype );
+    SVGResource.prototype.constructor = SVGResource;
+
+    SVGResource.prototype.load = function load ()
+    {
+        var this$1 = this;
+
+        if (this._load)
+        {
             return this._load;
         }
+
         this._load = new Promise(function (resolve) {
             // Save this until after load is finished
-            _this._resolve = function () {
-                _this.resize(_this.source.width, _this.source.height);
-                resolve(_this);
+            this$1._resolve = function () {
+                this$1.resize(this$1.source.width, this$1.source.height);
+                resolve(this$1);
             };
+
             // Convert SVG inline string to data-uri
-            if ((/^\<svg/).test(_this.svg.trim())) {
-                if (!btoa) {
+            if ((/^\<svg/).test(this$1.svg.trim()))
+            {
+                if (!btoa)
+                {
                     throw new Error('Your browser doesn\'t support base64 conversions.');
                 }
-                _this.svg = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(_this.svg)));
+                this$1.svg = "data:image/svg+xml;base64," + (btoa(unescape(encodeURIComponent(this$1.svg))));
             }
-            _this._loadSvg();
+
+            this$1._loadSvg();
         });
+
         return this._load;
     };
+
     /**
      * Loads an SVG image from `imageUrl` or `data URL`.
      *
      * @private
      */
-    SVGResource.prototype._loadSvg = function () {
-        var _this = this;
+    SVGResource.prototype._loadSvg = function _loadSvg ()
+    {
+        var this$1 = this;
+
         var tempImage = new Image();
+
         BaseImageResource.crossOrigin(tempImage, this.svg, this._crossorigin);
         tempImage.src = this.svg;
+
         tempImage.onerror = function (event) {
-            if (!_this._resolve) {
-                return;
-            }
             tempImage.onerror = null;
-            _this.onError.emit(event);
+            this$1.onError.run(event);
         };
+
         tempImage.onload = function () {
-            if (!_this._resolve) {
-                return;
-            }
             var svgWidth = tempImage.width;
             var svgHeight = tempImage.height;
-            if (!svgWidth || !svgHeight) {
+
+            if (!svgWidth || !svgHeight)
+            {
                 throw new Error('The SVG image must have width and height defined (in pixels), canvas API needs them.');
             }
+
             // Set render size
-            var width = svgWidth * _this.scale;
-            var height = svgHeight * _this.scale;
-            if (_this._overrideWidth || _this._overrideHeight) {
-                width = _this._overrideWidth || _this._overrideHeight / svgHeight * svgWidth;
-                height = _this._overrideHeight || _this._overrideWidth / svgWidth * svgHeight;
+            var width = svgWidth * this$1.scale;
+            var height = svgHeight * this$1.scale;
+
+            if (this$1._overrideWidth || this$1._overrideHeight)
+            {
+                width = this$1._overrideWidth || this$1._overrideHeight / svgHeight * svgWidth;
+                height = this$1._overrideHeight || this$1._overrideWidth / svgWidth * svgHeight;
             }
             width = Math.round(width);
             height = Math.round(height);
+
             // Create a canvas element
-            var canvas = _this.source;
+            var canvas = this$1.source;
+
             canvas.width = width;
             canvas.height = height;
-            canvas._pixiId = "canvas_" + uid();
+            canvas._pixiId = "canvas_" + (uid());
+
             // Draw the Svg to the canvas
             canvas
                 .getContext('2d')
                 .drawImage(tempImage, 0, 0, svgWidth, svgHeight, 0, 0, width, height);
-            _this._resolve();
-            _this._resolve = null;
+
+            this$1._resolve();
+            this$1._resolve = null;
         };
     };
+
     /**
      * Get size from an svg string using regexp.
      *
@@ -10126,24 +11327,31 @@ var SVGResource = /** @class */ (function (_super) {
      * @param {string} svgString - a serialized svg element
      * @return {PIXI.ISize} image extension
      */
-    SVGResource.getSize = function (svgString) {
+    SVGResource.getSize = function getSize (svgString)
+    {
         var sizeMatch = SVGResource.SVG_SIZE.exec(svgString);
         var size = {};
-        if (sizeMatch) {
+
+        if (sizeMatch)
+        {
             size[sizeMatch[1]] = Math.round(parseFloat(sizeMatch[3]));
             size[sizeMatch[5]] = Math.round(parseFloat(sizeMatch[7]));
         }
+
         return size;
     };
+
     /**
      * Destroys this texture
      * @override
      */
-    SVGResource.prototype.dispose = function () {
-        _super.prototype.dispose.call(this);
+    SVGResource.prototype.dispose = function dispose ()
+    {
+        BaseImageResource.prototype.dispose.call(this);
         this._resolve = null;
         this._crossorigin = null;
     };
+
     /**
      * Used to auto-detect the type of resource.
      *
@@ -10151,7 +11359,8 @@ var SVGResource = /** @class */ (function (_super) {
      * @param {*} source - The source object
      * @param {string} extension - The extension of source, if set
      */
-    SVGResource.test = function (source, extension) {
+    SVGResource.test = function test (source, extension)
+    {
         // url file extension is SVG
         return extension === 'svg'
             // source is SVG data-uri
@@ -10159,17 +11368,19 @@ var SVGResource = /** @class */ (function (_super) {
             // source is SVG inline
             || (typeof source === 'string' && source.indexOf('<svg') === 0);
     };
-    /**
-     * RegExp for SVG size.
-     *
-     * @static
-     * @constant {RegExp|string} SVG_SIZE
-     * @memberof PIXI.resources.SVGResource
-     * @example &lt;svg width="100" height="100"&gt;&lt;/svg&gt;
-     */
-    SVGResource.SVG_SIZE = /<svg[^>]*(?:\s(width|height)=('|")(\d*(?:\.\d+)?)(?:px)?('|"))[^>]*(?:\s(width|height)=('|")(\d*(?:\.\d+)?)(?:px)?('|"))[^>]*>/i; // eslint-disable-line max-len
+
     return SVGResource;
 }(BaseImageResource));
+
+/**
+ * RegExp for SVG size.
+ *
+ * @static
+ * @constant {RegExp|string} SVG_SIZE
+ * @memberof PIXI.resources.SVGResource
+ * @example &lt;svg width="100" height="100"&gt;&lt;/svg&gt;
+ */
+SVGResource.SVG_SIZE = /<svg[^>]*(?:\s(width|height)=('|")(\d*(?:\.\d+)?)(?:px)?('|"))[^>]*(?:\s(width|height)=('|")(\d*(?:\.\d+)?)(?:px)?('|"))[^>]*>/i; // eslint-disable-line max-len
 
 /**
  * Resource type for HTMLVideoElement.
@@ -10184,57 +11395,61 @@ var SVGResource = /** @class */ (function (_super) {
  * Leave at 0 to update at every render.
  * @param {boolean} [options.crossorigin=true] - Load image using cross origin
  */
-var VideoResource = /** @class */ (function (_super) {
-    __extends(VideoResource, _super);
-    function VideoResource(source, options) {
-        var _this = this;
+var VideoResource = /*@__PURE__*/(function (BaseImageResource) {
+    function VideoResource(source, options)
+    {
         options = options || {};
-        if (!(source instanceof HTMLVideoElement)) {
+
+        if (!(source instanceof HTMLVideoElement))
+        {
             var videoElement = document.createElement('video');
+
             // workaround for https://github.com/pixijs/pixi.js/issues/5996
             videoElement.setAttribute('preload', 'auto');
             videoElement.setAttribute('webkit-playsinline', '');
             videoElement.setAttribute('playsinline', '');
-            if (typeof source === 'string') {
+
+            if (typeof source === 'string')
+            {
                 source = [source];
             }
-            var firstSrc = source[0].src || source[0];
-            BaseImageResource.crossOrigin(videoElement, firstSrc, options.crossorigin);
+
+            BaseImageResource.crossOrigin(videoElement, (source[0].src || source[0]), options.crossorigin);
+
             // array of objects or strings
-            for (var i = 0; i < source.length; ++i) {
+            for (var i = 0; i < source.length; ++i)
+            {
                 var sourceElement = document.createElement('source');
-                var _a = source[i], src = _a.src, mime = _a.mime;
+
+                var ref = source[i];
+                var src = ref.src;
+                var mime = ref.mime;
+
                 src = src || source[i];
+
                 var baseSrc = src.split('?').shift().toLowerCase();
                 var ext = baseSrc.substr(baseSrc.lastIndexOf('.') + 1);
-                mime = mime || VideoResource.MIME_TYPES[ext] || "video/" + ext;
+
+                mime = mime || ("video/" + ext);
+
                 sourceElement.src = src;
                 sourceElement.type = mime;
+
                 videoElement.appendChild(sourceElement);
             }
+
             // Override the source
             source = videoElement;
         }
-        _this = _super.call(this, source) || this;
-        _this.noSubImage = true;
-        /**
-         * `true` to use PIXI.Ticker.shared to auto update the base texture.
-         *
-         * @type {boolean}
-         * @default true
-         * @private
-         */
-        _this._autoUpdate = true;
-        /**
-         * `true` if the instance is currently connected to PIXI.Ticker.shared to auto update the base texture.
-         *
-         * @type {boolean}
-         * @default false
-         * @private
-         */
-        _this._isConnectedToTicker = false;
-        _this._updateFPS = options.updateFPS || 0;
-        _this._msToNextUpdate = 0;
+
+        BaseImageResource.call(this, source);
+
+        this.noSubImage = true;
+        this._autoUpdate = true;
+        this._isAutoUpdating = false;
+        this._updateFPS = options.updateFPS || 0;
+        this._msToNextUpdate = 0;
+
         /**
          * When set to true will automatically play videos used by this texture once
          * they are loaded. If false, it will not modify the playing state.
@@ -10242,219 +11457,287 @@ var VideoResource = /** @class */ (function (_super) {
          * @member {boolean}
          * @default true
          */
-        _this.autoPlay = options.autoPlay !== false;
+        this.autoPlay = options.autoPlay !== false;
+
         /**
          * Promise when loading
          * @member {Promise<void>}
          * @private
          * @default null
          */
-        _this._load = null;
+        this._load = null;
+
         /**
          * Callback when completed with load.
          * @member {function}
          * @private
          */
-        _this._resolve = null;
+        this._resolve = null;
+
         // Bind for listeners
-        _this._onCanPlay = _this._onCanPlay.bind(_this);
-        _this._onError = _this._onError.bind(_this);
-        if (options.autoLoad !== false) {
-            _this.load();
+        this._onCanPlay = this._onCanPlay.bind(this);
+        this._onError = this._onError.bind(this);
+
+        if (options.autoLoad !== false)
+        {
+            this.load();
         }
-        return _this;
     }
+
+    if ( BaseImageResource ) VideoResource.__proto__ = BaseImageResource;
+    VideoResource.prototype = Object.create( BaseImageResource && BaseImageResource.prototype );
+    VideoResource.prototype.constructor = VideoResource;
+
+    var prototypeAccessors = { autoUpdate: { configurable: true },updateFPS: { configurable: true } };
+
     /**
      * Trigger updating of the texture
      *
      * @param {number} [deltaTime=0] - time delta since last tick
      */
-    VideoResource.prototype.update = function (_deltaTime) {
-        if (!this.destroyed) {
+    VideoResource.prototype.update = function update (deltaTime)
+    {
+        if ( deltaTime === void 0 ) deltaTime = 0;
+
+        if (!this.destroyed)
+        {
             // account for if video has had its playbackRate changed
             var elapsedMS = Ticker.shared.elapsedMS * this.source.playbackRate;
+
             this._msToNextUpdate = Math.floor(this._msToNextUpdate - elapsedMS);
-            if (!this._updateFPS || this._msToNextUpdate <= 0) {
-                _super.prototype.update.call(this);
+            if (!this._updateFPS || this._msToNextUpdate <= 0)
+            {
+                BaseImageResource.prototype.update.call(this, deltaTime);
                 this._msToNextUpdate = this._updateFPS ? Math.floor(1000 / this._updateFPS) : 0;
             }
         }
     };
+
     /**
      * Start preloading the video resource.
      *
      * @protected
      * @return {Promise<void>} Handle the validate event
      */
-    VideoResource.prototype.load = function () {
-        var _this = this;
-        if (this._load) {
+    VideoResource.prototype.load = function load ()
+    {
+        var this$1 = this;
+
+        if (this._load)
+        {
             return this._load;
         }
+
         var source = this.source;
+
         if ((source.readyState === source.HAVE_ENOUGH_DATA || source.readyState === source.HAVE_FUTURE_DATA)
-            && source.width && source.height) {
+            && source.width && source.height)
+        {
             source.complete = true;
         }
+
         source.addEventListener('play', this._onPlayStart.bind(this));
         source.addEventListener('pause', this._onPlayStop.bind(this));
-        if (!this._isSourceReady()) {
+
+        if (!this._isSourceReady())
+        {
             source.addEventListener('canplay', this._onCanPlay);
             source.addEventListener('canplaythrough', this._onCanPlay);
             source.addEventListener('error', this._onError, true);
         }
-        else {
+        else
+        {
             this._onCanPlay();
         }
+
         this._load = new Promise(function (resolve) {
-            if (_this.valid) {
-                resolve(_this);
+            if (this$1.valid)
+            {
+                resolve(this$1);
             }
-            else {
-                _this._resolve = resolve;
+            else
+            {
+                this$1._resolve = resolve;
+
                 source.load();
             }
         });
+
         return this._load;
     };
+
     /**
      * Handle video error events.
      *
      * @private
      */
-    VideoResource.prototype._onError = function (event) {
+    VideoResource.prototype._onError = function _onError ()
+    {
         this.source.removeEventListener('error', this._onError, true);
-        this.onError.emit(event);
+        this.onError.run(event);
     };
+
     /**
      * Returns true if the underlying source is playing.
      *
      * @private
      * @return {boolean} True if playing.
      */
-    VideoResource.prototype._isSourcePlaying = function () {
+    VideoResource.prototype._isSourcePlaying = function _isSourcePlaying ()
+    {
         var source = this.source;
+
         return (source.currentTime > 0 && source.paused === false && source.ended === false && source.readyState > 2);
     };
+
     /**
      * Returns true if the underlying source is ready for playing.
      *
      * @private
      * @return {boolean} True if ready.
      */
-    VideoResource.prototype._isSourceReady = function () {
-        var source = this.source;
-        return source.readyState === 3 || source.readyState === 4;
+    VideoResource.prototype._isSourceReady = function _isSourceReady ()
+    {
+        return this.source.readyState === 3 || this.source.readyState === 4;
     };
+
     /**
      * Runs the update loop when the video is ready to play
      *
      * @private
      */
-    VideoResource.prototype._onPlayStart = function () {
+    VideoResource.prototype._onPlayStart = function _onPlayStart ()
+    {
         // Just in case the video has not received its can play even yet..
-        if (!this.valid) {
+        if (!this.valid)
+        {
             this._onCanPlay();
         }
-        if (this.autoUpdate && !this._isConnectedToTicker) {
+
+        if (!this._isAutoUpdating && this.autoUpdate)
+        {
             Ticker.shared.add(this.update, this);
-            this._isConnectedToTicker = true;
+            this._isAutoUpdating = true;
         }
     };
+
     /**
      * Fired when a pause event is triggered, stops the update loop
      *
      * @private
      */
-    VideoResource.prototype._onPlayStop = function () {
-        if (this._isConnectedToTicker) {
+    VideoResource.prototype._onPlayStop = function _onPlayStop ()
+    {
+        if (this._isAutoUpdating)
+        {
             Ticker.shared.remove(this.update, this);
-            this._isConnectedToTicker = false;
+            this._isAutoUpdating = false;
         }
     };
+
     /**
      * Fired when the video is loaded and ready to play
      *
      * @private
      */
-    VideoResource.prototype._onCanPlay = function () {
-        var source = this.source;
+    VideoResource.prototype._onCanPlay = function _onCanPlay ()
+    {
+        var ref = this;
+        var source = ref.source;
+
         source.removeEventListener('canplay', this._onCanPlay);
         source.removeEventListener('canplaythrough', this._onCanPlay);
+
         var valid = this.valid;
+
         this.resize(source.videoWidth, source.videoHeight);
+
         // prevent multiple loaded dispatches..
-        if (!valid && this._resolve) {
+        if (!valid && this._resolve)
+        {
             this._resolve(this);
             this._resolve = null;
         }
-        if (this._isSourcePlaying()) {
+
+        if (this._isSourcePlaying())
+        {
             this._onPlayStart();
         }
-        else if (this.autoPlay) {
+        else if (this.autoPlay)
+        {
             source.play();
         }
     };
+
     /**
      * Destroys this texture
      * @override
      */
-    VideoResource.prototype.dispose = function () {
-        if (this._isConnectedToTicker) {
+    VideoResource.prototype.dispose = function dispose ()
+    {
+        if (this._isAutoUpdating)
+        {
             Ticker.shared.remove(this.update, this);
         }
-        var source = this.source;
-        if (source) {
-            source.removeEventListener('error', this._onError, true);
-            source.pause();
-            source.src = '';
-            source.load();
+
+        if (this.source)
+        {
+            this.source.removeEventListener('error', this._onError, true);
+            this.source.pause();
+            this.source.src = '';
+            this.source.load();
         }
-        _super.prototype.dispose.call(this);
+        BaseImageResource.prototype.dispose.call(this);
     };
-    Object.defineProperty(VideoResource.prototype, "autoUpdate", {
-        /**
-         * Should the base texture automatically update itself, set to true by default
-         *
-         * @member {boolean}
-         */
-        get: function () {
-            return this._autoUpdate;
-        },
-        set: function (value) {
-            if (value !== this._autoUpdate) {
-                this._autoUpdate = value;
-                if (!this._autoUpdate && this._isConnectedToTicker) {
-                    Ticker.shared.remove(this.update, this);
-                    this._isConnectedToTicker = false;
-                }
-                else if (this._autoUpdate && !this._isConnectedToTicker && this._isSourcePlaying()) {
-                    Ticker.shared.add(this.update, this);
-                    this._isConnectedToTicker = true;
-                }
+
+    /**
+     * Should the base texture automatically update itself, set to true by default
+     *
+     * @member {boolean}
+     */
+    prototypeAccessors.autoUpdate.get = function ()
+    {
+        return this._autoUpdate;
+    };
+
+    prototypeAccessors.autoUpdate.set = function (value) // eslint-disable-line require-jsdoc
+    {
+        if (value !== this._autoUpdate)
+        {
+            this._autoUpdate = value;
+
+            if (!this._autoUpdate && this._isAutoUpdating)
+            {
+                Ticker.shared.remove(this.update, this);
+                this._isAutoUpdating = false;
             }
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(VideoResource.prototype, "updateFPS", {
-        /**
-         * How many times a second to update the texture from the video. Leave at 0 to update at every render.
-         * A lower fps can help performance, as updating the texture at 60fps on a 30ps video may not be efficient.
-         *
-         * @member {number}
-         */
-        get: function () {
-            return this._updateFPS;
-        },
-        set: function (value) {
-            if (value !== this._updateFPS) {
-                this._updateFPS = value;
+            else if (this._autoUpdate && !this._isAutoUpdating)
+            {
+                Ticker.shared.add(this.update, this);
+                this._isAutoUpdating = true;
             }
-        },
-        enumerable: false,
-        configurable: true
-    });
+        }
+    };
+
+    /**
+     * How many times a second to update the texture from the video. Leave at 0 to update at every render.
+     * A lower fps can help performance, as updating the texture at 60fps on a 30ps video may not be efficient.
+     *
+     * @member {number}
+     */
+    prototypeAccessors.updateFPS.get = function ()
+    {
+        return this._updateFPS;
+    };
+
+    prototypeAccessors.updateFPS.set = function (value) // eslint-disable-line require-jsdoc
+    {
+        if (value !== this._updateFPS)
+        {
+            this._updateFPS = value;
+        }
+    };
+
     /**
      * Used to auto-detect the type of resource.
      *
@@ -10463,32 +11746,25 @@ var VideoResource = /** @class */ (function (_super) {
      * @param {string} extension - The extension of source, if set
      * @return {boolean} `true` if video source
      */
-    VideoResource.test = function (source, extension) {
+    VideoResource.test = function test (source, extension)
+    {
         return (source instanceof HTMLVideoElement)
             || VideoResource.TYPES.indexOf(extension) > -1;
     };
-    /**
-     * List of common video file extensions supported by VideoResource.
-     * @constant
-     * @member {Array<string>}
-     * @static
-     * @readonly
-     */
-    VideoResource.TYPES = ['mp4', 'm4v', 'webm', 'ogg', 'ogv', 'h264', 'avi', 'mov'];
-    /**
-     * Map of video MIME types that can't be directly derived from file extensions.
-     * @constant
-     * @member {object}
-     * @static
-     * @readonly
-     */
-    VideoResource.MIME_TYPES = {
-        ogv: 'video/ogg',
-        mov: 'video/quicktime',
-        m4v: 'video/mp4',
-    };
+
+    Object.defineProperties( VideoResource.prototype, prototypeAccessors );
+
     return VideoResource;
 }(BaseImageResource));
+
+/**
+ * List of common video file extensions supported by VideoResource.
+ * @constant
+ * @member {Array<string>}
+ * @static
+ * @readonly
+ */
+VideoResource.TYPES = ['mp4', 'm4v', 'webm', 'ogg', 'ogv', 'h264', 'avi', 'mov'];
 
 /**
  * Resource type for ImageBitmap.
@@ -10497,25 +11773,33 @@ var VideoResource = /** @class */ (function (_super) {
  * @memberof PIXI.resources
  * @param {ImageBitmap} source - Image element to use
  */
-var ImageBitmapResource = /** @class */ (function (_super) {
-    __extends(ImageBitmapResource, _super);
-    function ImageBitmapResource() {
-        return _super !== null && _super.apply(this, arguments) || this;
+var ImageBitmapResource = /*@__PURE__*/(function (BaseImageResource) {
+    function ImageBitmapResource () {
+        BaseImageResource.apply(this, arguments);
     }
-    /**
-     * Used to auto-detect the type of resource.
-     *
-     * @static
-     * @param {ImageBitmap} source - The source object
-     * @return {boolean} `true` if source is an ImageBitmap
-     */
-    ImageBitmapResource.test = function (source) {
+
+    if ( BaseImageResource ) ImageBitmapResource.__proto__ = BaseImageResource;
+    ImageBitmapResource.prototype = Object.create( BaseImageResource && BaseImageResource.prototype );
+    ImageBitmapResource.prototype.constructor = ImageBitmapResource;
+
+    ImageBitmapResource.test = function test (source)
+    {
         return !!window.createImageBitmap && source instanceof ImageBitmap;
     };
+
     return ImageBitmapResource;
 }(BaseImageResource));
 
-INSTALLED.push(ImageResource, ImageBitmapResource, CanvasResource, VideoResource, SVGResource, BufferResource, CubeResource, ArrayResource);
+INSTALLED.push(
+    ImageResource,
+    ImageBitmapResource,
+    CanvasResource,
+    VideoResource,
+    SVGResource,
+    BufferResource,
+    CubeResource,
+    ArrayResource
+);
 
 /**
  * System is a base class used for extending systems used by the {@link PIXI.Renderer}
@@ -10524,26 +11808,23 @@ INSTALLED.push(ImageResource, ImageBitmapResource, CanvasResource, VideoResource
  * @class
  * @memberof PIXI
  */
-var System = /** @class */ (function () {
+var System = function System(renderer)
+{
     /**
-     * @param {PIXI.Renderer} renderer - The renderer this manager works for.
+     * The renderer this manager works for.
+     *
+     * @member {PIXI.Renderer}
      */
-    function System(renderer) {
-        /**
-         * The renderer this manager works for.
-         *
-         * @member {PIXI.Renderer}
-         */
-        this.renderer = renderer;
-    }
-    /**
-     * Generic destroy methods to be overridden by the subclass
-     */
-    System.prototype.destroy = function () {
-        this.renderer = null;
-    };
-    return System;
-}());
+    this.renderer = renderer;
+};
+
+/**
+ * Generic destroy methods to be overridden by the subclass
+ */
+System.prototype.destroy = function destroy ()
+{
+    this.renderer = null;
+};
 
 /**
  * Resource type for DepthTexture.
@@ -10551,33 +11832,56 @@ var System = /** @class */ (function () {
  * @extends PIXI.resources.BufferResource
  * @memberof PIXI.resources
  */
-var DepthResource = /** @class */ (function (_super) {
-    __extends(DepthResource, _super);
-    function DepthResource() {
-        return _super !== null && _super.apply(this, arguments) || this;
+var DepthResource = /*@__PURE__*/(function (BufferResource) {
+    function DepthResource () {
+        BufferResource.apply(this, arguments);
     }
-    /**
-     * Upload the texture to the GPU.
-     * @param {PIXI.Renderer} renderer - Upload to the renderer
-     * @param {PIXI.BaseTexture} baseTexture - Reference to parent texture
-     * @param {PIXI.GLTexture} glTexture - glTexture
-     * @returns {boolean} true is success
-     */
-    DepthResource.prototype.upload = function (renderer, baseTexture, glTexture) {
+
+    if ( BufferResource ) DepthResource.__proto__ = BufferResource;
+    DepthResource.prototype = Object.create( BufferResource && BufferResource.prototype );
+    DepthResource.prototype.constructor = DepthResource;
+
+    DepthResource.prototype.upload = function upload (renderer, baseTexture, glTexture)
+    {
         var gl = renderer.gl;
+
         gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, baseTexture.alphaMode === ALPHA_MODES.UNPACK);
-        if (glTexture.width === baseTexture.width && glTexture.height === baseTexture.height) {
-            gl.texSubImage2D(baseTexture.target, 0, 0, 0, baseTexture.width, baseTexture.height, baseTexture.format, baseTexture.type, this.data);
+
+        if (glTexture.width === baseTexture.width && glTexture.height === baseTexture.height)
+        {
+            gl.texSubImage2D(
+                baseTexture.target,
+                0,
+                0,
+                0,
+                baseTexture.width,
+                baseTexture.height,
+                baseTexture.format,
+                baseTexture.type,
+                this.data
+            );
         }
-        else {
+        else
+        {
             glTexture.width = baseTexture.width;
             glTexture.height = baseTexture.height;
-            gl.texImage2D(baseTexture.target, 0, 
-            //  gl.DEPTH_COMPONENT16 Needed for depth to render properly in webgl2.0
-            renderer.context.webGLVersion === 1 ? gl.DEPTH_COMPONENT : gl.DEPTH_COMPONENT16, baseTexture.width, baseTexture.height, 0, baseTexture.format, baseTexture.type, this.data);
+
+            gl.texImage2D(
+                baseTexture.target,
+                0,
+                gl.DEPTH_COMPONENT16, // Needed for depth to render properly in webgl2.0
+                baseTexture.width,
+                baseTexture.height,
+                0,
+                baseTexture.format,
+                baseTexture.type,
+                this.data
+            );
         }
+
         return true;
     };
+
     return DepthResource;
 }(BufferResource));
 
@@ -10587,285 +11891,155 @@ var DepthResource = /** @class */ (function (_super) {
  * @class
  * @memberof PIXI
  */
-var Framebuffer = /** @class */ (function () {
-    /**
-     * @param {number} width - Width of the frame buffer
-     * @param {number} height - Height of the frame buffer
-     */
-    function Framebuffer(width, height) {
-        /**
-         * Width of framebuffer in pixels
-         * @member {number}
-         */
-        this.width = Math.ceil(width || 100);
-        /**
-         * Height of framebuffer in pixels
-         * @member {number}
-         */
-        this.height = Math.ceil(height || 100);
-        this.stencil = false;
-        this.depth = false;
-        this.dirtyId = 0;
-        this.dirtyFormat = 0;
-        this.dirtySize = 0;
-        this.depthTexture = null;
-        this.colorTextures = [];
-        this.glFramebuffers = {};
-        this.disposeRunner = new Runner('disposeFramebuffer');
-        /**
-         * Desired number of samples for antialiasing. 0 means AA should not be used.
-         *
-         * Experimental WebGL2 feature, allows to use antialiasing in individual renderTextures.
-         * Antialiasing is the same as for main buffer with renderer `antialias:true` options.
-         * Seriously affects GPU memory consumption and GPU performance.
-         *
-         *```js
-         * renderTexture.framebuffer.multisample = PIXI.MSAA_QUALITY.HIGH;
-         * //...
-         * renderer.render(renderTexture, myContainer);
-         * renderer.framebuffer.blit(); // copies data from MSAA framebuffer to texture
-         *  ```
-         *
-         * @member {PIXI.MSAA_QUALITY}
-         * @default PIXI.MSAA_QUALITY.NONE
-         */
-        this.multisample = MSAA_QUALITY.NONE;
-    }
-    Object.defineProperty(Framebuffer.prototype, "colorTexture", {
-        /**
-         * Reference to the colorTexture.
-         *
-         * @member {PIXI.BaseTexture[]}
-         * @readonly
-         */
-        get: function () {
-            return this.colorTextures[0];
-        },
-        enumerable: false,
-        configurable: true
-    });
-    /**
-     * Add texture to the colorTexture array
-     *
-     * @param {number} [index=0] - Index of the array to add the texture to
-     * @param {PIXI.BaseTexture} [texture] - Texture to add to the array
-     */
-    Framebuffer.prototype.addColorTexture = function (index, texture) {
-        if (index === void 0) { index = 0; }
-        // TODO add some validation to the texture - same width / height etc?
-        this.colorTextures[index] = texture || new BaseTexture(null, {
-            scaleMode: SCALE_MODES.NEAREST,
-            resolution: 1,
-            mipmap: MIPMAP_MODES.OFF,
-            width: this.width,
-            height: this.height,
-        });
-        this.dirtyId++;
-        this.dirtyFormat++;
-        return this;
-    };
-    /**
-     * Add a depth texture to the frame buffer
-     *
-     * @param {PIXI.BaseTexture} [texture] - Texture to add
-     */
-    Framebuffer.prototype.addDepthTexture = function (texture) {
-        /* eslint-disable max-len */
-        this.depthTexture = texture || new BaseTexture(new DepthResource(null, { width: this.width, height: this.height }), {
-            scaleMode: SCALE_MODES.NEAREST,
-            resolution: 1,
-            width: this.width,
-            height: this.height,
-            mipmap: MIPMAP_MODES.OFF,
-            format: FORMATS.DEPTH_COMPONENT,
-            type: TYPES.UNSIGNED_SHORT,
-        });
-        this.dirtyId++;
-        this.dirtyFormat++;
-        return this;
-    };
-    /**
-     * Enable depth on the frame buffer
-     */
-    Framebuffer.prototype.enableDepth = function () {
-        this.depth = true;
-        this.dirtyId++;
-        this.dirtyFormat++;
-        return this;
-    };
-    /**
-     * Enable stencil on the frame buffer
-     */
-    Framebuffer.prototype.enableStencil = function () {
-        this.stencil = true;
-        this.dirtyId++;
-        this.dirtyFormat++;
-        return this;
-    };
-    /**
-     * Resize the frame buffer
-     *
-     * @param {number} width - Width of the frame buffer to resize to
-     * @param {number} height - Height of the frame buffer to resize to
-     */
-    Framebuffer.prototype.resize = function (width, height) {
-        width = Math.ceil(width);
-        height = Math.ceil(height);
-        if (width === this.width && height === this.height)
-            { return; }
-        this.width = width;
-        this.height = height;
-        this.dirtyId++;
-        this.dirtySize++;
-        for (var i = 0; i < this.colorTextures.length; i++) {
-            var texture = this.colorTextures[i];
-            var resolution = texture.resolution;
-            // take into acount the fact the texture may have a different resolution..
-            texture.setSize(width / resolution, height / resolution);
-        }
-        if (this.depthTexture) {
-            var resolution = this.depthTexture.resolution;
-            this.depthTexture.setSize(width / resolution, height / resolution);
-        }
-    };
-    /**
-     * Disposes WebGL resources that are connected to this geometry
-     */
-    Framebuffer.prototype.dispose = function () {
-        this.disposeRunner.emit(this, false);
-    };
-    /**
-     * Destroys and removes the depth texture added to this framebuffer.
-     */
-    Framebuffer.prototype.destroyDepthTexture = function () {
-        if (this.depthTexture) {
-            this.depthTexture.destroy();
-            this.depthTexture = null;
-            ++this.dirtyId;
-            ++this.dirtyFormat;
-        }
-    };
-    return Framebuffer;
-}());
+var Framebuffer = function Framebuffer(width, height)
+{
+    this.width = Math.ceil(width || 100);
+    this.height = Math.ceil(height || 100);
+
+    this.stencil = false;
+    this.depth = false;
+
+    this.dirtyId = 0;
+    this.dirtyFormat = 0;
+    this.dirtySize = 0;
+
+    this.depthTexture = null;
+    this.colorTextures = [];
+
+    this.glFramebuffers = {};
+
+    this.disposeRunner = new Runner('disposeFramebuffer', 2);
+};
+
+var prototypeAccessors$1 = { colorTexture: { configurable: true } };
 
 /**
- * A BaseRenderTexture is a special texture that allows any PixiJS display object to be rendered to it.
+ * Reference to the colorTexture.
  *
- * __Hint__: All DisplayObjects (i.e. Sprites) that render to a BaseRenderTexture should be preloaded
- * otherwise black rectangles will be drawn instead.
- *
- * A BaseRenderTexture takes a snapshot of any Display Object given to its render method. The position
- * and rotation of the given Display Objects is ignored. For example:
- *
- * ```js
- * let renderer = PIXI.autoDetectRenderer();
- * let baseRenderTexture = new PIXI.BaseRenderTexture({ width: 800, height: 600 });
- * let renderTexture = new PIXI.RenderTexture(baseRenderTexture);
- * let sprite = PIXI.Sprite.from("spinObj_01.png");
- *
- * sprite.position.x = 800/2;
- * sprite.position.y = 600/2;
- * sprite.anchor.x = 0.5;
- * sprite.anchor.y = 0.5;
- *
- * renderer.render(sprite, renderTexture);
- * ```
- *
- * The Sprite in this case will be rendered using its local transform. To render this sprite at 0,0
- * you can clear the transform
- *
- * ```js
- *
- * sprite.setTransform()
- *
- * let baseRenderTexture = new PIXI.BaseRenderTexture({ width: 100, height: 100 });
- * let renderTexture = new PIXI.RenderTexture(baseRenderTexture);
- *
- * renderer.render(sprite, renderTexture);  // Renders to center of RenderTexture
- * ```
- *
- * @class
- * @extends PIXI.BaseTexture
- * @memberof PIXI
+ * @member {PIXI.Texture[]}
+ * @readonly
  */
-var BaseRenderTexture = /** @class */ (function (_super) {
-    __extends(BaseRenderTexture, _super);
-    /**
-     * @param {object} [options]
-     * @param {number} [options.width=100] - The width of the base render texture.
-     * @param {number} [options.height=100] - The height of the base render texture.
-     * @param {PIXI.SCALE_MODES} [options.scaleMode] - See {@link PIXI.SCALE_MODES} for possible values.
-     * @param {number} [options.resolution=1] - The resolution / device pixel ratio of the texture being generated.
-     */
-    function BaseRenderTexture(options) {
-        var _this = this;
-        if (typeof options === 'number') {
-            /* eslint-disable prefer-rest-params */
-            // Backward compatibility of signature
-            var width_1 = arguments[0];
-            var height_1 = arguments[1];
-            var scaleMode = arguments[2];
-            var resolution = arguments[3];
-            options = { width: width_1, height: height_1, scaleMode: scaleMode, resolution: resolution };
-            /* eslint-enable prefer-rest-params */
-        }
-        _this = _super.call(this, null, options) || this;
-        var _a = options || {}, width = _a.width, height = _a.height;
-        // Set defaults
-        _this.mipmap = 0;
-        _this.width = Math.ceil(width) || 100;
-        _this.height = Math.ceil(height) || 100;
-        _this.valid = true;
-        _this.clearColor = [0, 0, 0, 0];
-        _this.framebuffer = new Framebuffer(_this.width * _this.resolution, _this.height * _this.resolution)
-            .addColorTexture(0, _this);
-        // TODO - could this be added the systems?
-        /**
-         * The data structure for the stencil masks.
-         *
-         * @member {PIXI.MaskData[]}
-         */
-        _this.maskStack = [];
-        /**
-         * The data structure for the filters.
-         *
-         * @member {Object[]}
-         */
-        _this.filterStack = [{}];
-        return _this;
+prototypeAccessors$1.colorTexture.get = function ()
+{
+    return this.colorTextures[0];
+};
+
+/**
+ * Add texture to the colorTexture array
+ *
+ * @param {number} [index=0] - Index of the array to add the texture to
+ * @param {PIXI.Texture} [texture] - Texture to add to the array
+ */
+Framebuffer.prototype.addColorTexture = function addColorTexture (index, texture)
+{
+        if ( index === void 0 ) index = 0;
+
+    // TODO add some validation to the texture - same width / height etc?
+    this.colorTextures[index] = texture || new BaseTexture(null, { scaleMode: 0,
+        resolution: 1,
+        mipmap: false,
+        width: this.width,
+        height: this.height });
+
+    this.dirtyId++;
+    this.dirtyFormat++;
+
+    return this;
+};
+
+/**
+ * Add a depth texture to the frame buffer
+ *
+ * @param {PIXI.Texture} [texture] - Texture to add
+ */
+Framebuffer.prototype.addDepthTexture = function addDepthTexture (texture)
+{
+    /* eslint-disable max-len */
+    this.depthTexture = texture || new BaseTexture(new DepthResource(null, { width: this.width, height: this.height }), { scaleMode: 0,
+        resolution: 1,
+        width: this.width,
+        height: this.height,
+        mipmap: false,
+        format: FORMATS.DEPTH_COMPONENT,
+        type: TYPES.UNSIGNED_SHORT });
+    /* eslint-disable max-len */
+    this.dirtyId++;
+    this.dirtyFormat++;
+
+    return this;
+};
+
+/**
+ * Enable depth on the frame buffer
+ */
+Framebuffer.prototype.enableDepth = function enableDepth ()
+{
+    this.depth = true;
+
+    this.dirtyId++;
+    this.dirtyFormat++;
+
+    return this;
+};
+
+/**
+ * Enable stencil on the frame buffer
+ */
+Framebuffer.prototype.enableStencil = function enableStencil ()
+{
+    this.stencil = true;
+
+    this.dirtyId++;
+    this.dirtyFormat++;
+
+    return this;
+};
+
+/**
+ * Resize the frame buffer
+ *
+ * @param {number} width - Width of the frame buffer to resize to
+ * @param {number} height - Height of the frame buffer to resize to
+ */
+Framebuffer.prototype.resize = function resize (width, height)
+{
+    width = Math.ceil(width);
+    height = Math.ceil(height);
+
+    if (width === this.width && height === this.height) { return; }
+
+    this.width = width;
+    this.height = height;
+
+    this.dirtyId++;
+    this.dirtySize++;
+
+    for (var i = 0; i < this.colorTextures.length; i++)
+    {
+        var texture = this.colorTextures[i];
+        var resolution = texture.resolution;
+
+        // take into acount the fact the texture may have a different resolution..
+        texture.setSize(width / resolution, height / resolution);
     }
-    /**
-     * Resizes the BaseRenderTexture.
-     *
-     * @param {number} width - The width to resize to.
-     * @param {number} height - The height to resize to.
-     */
-    BaseRenderTexture.prototype.resize = function (width, height) {
-        width = Math.ceil(width);
-        height = Math.ceil(height);
-        this.framebuffer.resize(width * this.resolution, height * this.resolution);
-    };
-    /**
-     * Frees the texture and framebuffer from WebGL memory without destroying this texture object.
-     * This means you can still use the texture later which will upload it to GPU
-     * memory again.
-     *
-     * @fires PIXI.BaseTexture#dispose
-     */
-    BaseRenderTexture.prototype.dispose = function () {
-        this.framebuffer.dispose();
-        _super.prototype.dispose.call(this);
-    };
-    /**
-     * Destroys this texture.
-     */
-    BaseRenderTexture.prototype.destroy = function () {
-        _super.prototype.destroy.call(this);
-        this.framebuffer.destroyDepthTexture();
-        this.framebuffer = null;
-    };
-    return BaseRenderTexture;
-}(BaseTexture));
+
+    if (this.depthTexture)
+    {
+        var resolution$1 = this.depthTexture.resolution;
+
+        this.depthTexture.setSize(width / resolution$1, height / resolution$1);
+    }
+};
+
+/**
+ * disposes WebGL resources that are connected to this geometry
+ */
+Framebuffer.prototype.dispose = function dispose ()
+{
+    this.disposeRunner.run(this, false);
+};
+
+Object.defineProperties( Framebuffer.prototype, prototypeAccessors$1 );
 
 /**
  * Stores a texture's frame in UV coordinates, in
@@ -10883,112 +12057,133 @@ var BaseRenderTexture = /** @class */ (function (_super) {
  * @protected
  * @memberof PIXI
  */
-var TextureUvs = /** @class */ (function () {
-    function TextureUvs() {
-        /**
-         * X-component of top-left corner `(x0,y0)`.
-         *
-         * @member {number}
-         */
-        this.x0 = 0;
-        /**
-         * Y-component of top-left corner `(x0,y0)`.
-         *
-         * @member {number}
-         */
-        this.y0 = 0;
-        /**
-         * X-component of top-right corner `(x1,y1)`.
-         *
-         * @member {number}
-         */
-        this.x1 = 1;
-        /**
-         * Y-component of top-right corner `(x1,y1)`.
-         *
-         * @member {number}
-         */
-        this.y1 = 0;
-        /**
-         * X-component of bottom-right corner `(x2,y2)`.
-         *
-         * @member {number}
-         */
-        this.x2 = 1;
-        /**
-         * Y-component of bottom-right corner `(x2,y2)`.
-         *
-         * @member {number}
-         */
-        this.y2 = 1;
-        /**
-         * X-component of bottom-left corner `(x3,y3)`.
-         *
-         * @member {number}
-         */
-        this.x3 = 0;
-        /**
-         * Y-component of bottom-right corner `(x3,y3)`.
-         *
-         * @member {number}
-         */
-        this.y3 = 1;
-        this.uvsFloat32 = new Float32Array(8);
-    }
+var TextureUvs = function TextureUvs()
+{
     /**
-     * Sets the texture Uvs based on the given frame information.
+     * X-component of top-left corner `(x0,y0)`.
      *
-     * @protected
-     * @param {PIXI.Rectangle} frame - The frame of the texture
-     * @param {PIXI.Rectangle} baseFrame - The base frame of the texture
-     * @param {number} rotate - Rotation of frame, see {@link PIXI.groupD8}
+     * @member {number}
      */
-    TextureUvs.prototype.set = function (frame, baseFrame, rotate) {
-        var tw = baseFrame.width;
-        var th = baseFrame.height;
-        if (rotate) {
-            // width and height div 2 div baseFrame size
-            var w2 = frame.width / 2 / tw;
-            var h2 = frame.height / 2 / th;
-            // coordinates of center
-            var cX = (frame.x / tw) + w2;
-            var cY = (frame.y / th) + h2;
-            rotate = groupD8.add(rotate, groupD8.NW); // NW is top-left corner
-            this.x0 = cX + (w2 * groupD8.uX(rotate));
-            this.y0 = cY + (h2 * groupD8.uY(rotate));
-            rotate = groupD8.add(rotate, 2); // rotate 90 degrees clockwise
-            this.x1 = cX + (w2 * groupD8.uX(rotate));
-            this.y1 = cY + (h2 * groupD8.uY(rotate));
-            rotate = groupD8.add(rotate, 2);
-            this.x2 = cX + (w2 * groupD8.uX(rotate));
-            this.y2 = cY + (h2 * groupD8.uY(rotate));
-            rotate = groupD8.add(rotate, 2);
-            this.x3 = cX + (w2 * groupD8.uX(rotate));
-            this.y3 = cY + (h2 * groupD8.uY(rotate));
-        }
-        else {
-            this.x0 = frame.x / tw;
-            this.y0 = frame.y / th;
-            this.x1 = (frame.x + frame.width) / tw;
-            this.y1 = frame.y / th;
-            this.x2 = (frame.x + frame.width) / tw;
-            this.y2 = (frame.y + frame.height) / th;
-            this.x3 = frame.x / tw;
-            this.y3 = (frame.y + frame.height) / th;
-        }
-        this.uvsFloat32[0] = this.x0;
-        this.uvsFloat32[1] = this.y0;
-        this.uvsFloat32[2] = this.x1;
-        this.uvsFloat32[3] = this.y1;
-        this.uvsFloat32[4] = this.x2;
-        this.uvsFloat32[5] = this.y2;
-        this.uvsFloat32[6] = this.x3;
-        this.uvsFloat32[7] = this.y3;
-    };
-    return TextureUvs;
-}());
+    this.x0 = 0;
+
+    /**
+     * Y-component of top-left corner `(x0,y0)`.
+     *
+     * @member {number}
+     */
+    this.y0 = 0;
+
+    /**
+     * X-component of top-right corner `(x1,y1)`.
+     *
+     * @member {number}
+     */
+    this.x1 = 1;
+
+    /**
+     * Y-component of top-right corner `(x1,y1)`.
+     *
+     * @member {number}
+     */
+    this.y1 = 0;
+
+    /**
+     * X-component of bottom-right corner `(x2,y2)`.
+     *
+     * @member {number}
+     */
+    this.x2 = 1;
+
+    /**
+     * Y-component of bottom-right corner `(x2,y2)`.
+     *
+     * @member {number}
+     */
+    this.y2 = 1;
+
+    /**
+     * X-component of bottom-left corner `(x3,y3)`.
+     *
+     * @member {number}
+     */
+    this.x3 = 0;
+
+    /**
+     * Y-component of bottom-right corner `(x3,y3)`.
+     *
+     * @member {number}
+     */
+    this.y3 = 1;
+
+    this.uvsFloat32 = new Float32Array(8);
+};
+
+/**
+ * Sets the texture Uvs based on the given frame information.
+ *
+ * @protected
+ * @param {PIXI.Rectangle} frame - The frame of the texture
+ * @param {PIXI.Rectangle} baseFrame - The base frame of the texture
+ * @param {number} rotate - Rotation of frame, see {@link PIXI.groupD8}
+ */
+TextureUvs.prototype.set = function set (frame, baseFrame, rotate)
+{
+    var tw = baseFrame.width;
+    var th = baseFrame.height;
+
+    if (rotate)
+    {
+        // width and height div 2 div baseFrame size
+        var w2 = frame.width / 2 / tw;
+        var h2 = frame.height / 2 / th;
+
+        // coordinates of center
+        var cX = (frame.x / tw) + w2;
+        var cY = (frame.y / th) + h2;
+
+        rotate = groupD8.add(rotate, groupD8.NW); // NW is top-left corner
+        this.x0 = cX + (w2 * groupD8.uX(rotate));
+        this.y0 = cY + (h2 * groupD8.uY(rotate));
+
+        rotate = groupD8.add(rotate, 2); // rotate 90 degrees clockwise
+        this.x1 = cX + (w2 * groupD8.uX(rotate));
+        this.y1 = cY + (h2 * groupD8.uY(rotate));
+
+        rotate = groupD8.add(rotate, 2);
+        this.x2 = cX + (w2 * groupD8.uX(rotate));
+        this.y2 = cY + (h2 * groupD8.uY(rotate));
+
+        rotate = groupD8.add(rotate, 2);
+        this.x3 = cX + (w2 * groupD8.uX(rotate));
+        this.y3 = cY + (h2 * groupD8.uY(rotate));
+    }
+    else
+    {
+        this.x0 = frame.x / tw;
+        this.y0 = frame.y / th;
+
+        this.x1 = (frame.x + frame.width) / tw;
+        this.y1 = frame.y / th;
+
+        this.x2 = (frame.x + frame.width) / tw;
+        this.y2 = (frame.y + frame.height) / th;
+
+        this.x3 = frame.x / tw;
+        this.y3 = (frame.y + frame.height) / th;
+    }
+
+    this.uvsFloat32[0] = this.x0;
+    this.uvsFloat32[1] = this.y0;
+    this.uvsFloat32[2] = this.x1;
+    this.uvsFloat32[3] = this.y1;
+    this.uvsFloat32[4] = this.x2;
+    this.uvsFloat32[5] = this.y2;
+    this.uvsFloat32[6] = this.x3;
+    this.uvsFloat32[7] = this.y3;
+};
 
 var DEFAULT_UVS = new TextureUvs();
+
 /**
  * A texture stores the information that represents an image or part of an image.
  *
@@ -11019,18 +12214,11 @@ var DEFAULT_UVS = new TextureUvs();
  * @extends PIXI.utils.EventEmitter
  * @memberof PIXI
  */
-var Texture = /** @class */ (function (_super) {
-    __extends(Texture, _super);
-    /**
-     * @param {PIXI.BaseTexture} baseTexture - The base texture source to create the texture from
-     * @param {PIXI.Rectangle} [frame] - The rectangle frame of the texture to show
-     * @param {PIXI.Rectangle} [orig] - The area of original texture
-     * @param {PIXI.Rectangle} [trim] - Trimmed rectangle of original texture
-     * @param {number} [rotate] - indicates how the texture was rotated by texture packer. See {@link PIXI.groupD8}
-     * @param {PIXI.IPointData} [anchor] - Default anchor point used for sprite placement / rotation
-     */
-    function Texture(baseTexture, frame, orig, trim, rotate, anchor) {
-        var _this = _super.call(this) || this;
+var Texture = /*@__PURE__*/(function (EventEmitter) {
+    function Texture(baseTexture, frame, orig, trim, rotate, anchor)
+    {
+        EventEmitter.call(this);
+
         /**
          * Does this Texture have any frame data assigned to it?
          *
@@ -11049,75 +12237,99 @@ var Texture = /** @class */ (function (_super) {
          *
          * @member {boolean}
          */
-        _this.noFrame = false;
-        if (!frame) {
-            _this.noFrame = true;
+        this.noFrame = false;
+
+        if (!frame)
+        {
+            this.noFrame = true;
             frame = new Rectangle(0, 0, 1, 1);
         }
-        if (baseTexture instanceof Texture) {
+
+        if (baseTexture instanceof Texture)
+        {
             baseTexture = baseTexture.baseTexture;
         }
+
         /**
          * The base texture that this texture uses.
          *
          * @member {PIXI.BaseTexture}
          */
-        _this.baseTexture = baseTexture;
+        this.baseTexture = baseTexture;
+
         /**
          * This is the area of the BaseTexture image to actually copy to the Canvas / WebGL when rendering,
          * irrespective of the actual frame size or placement (which can be influenced by trimmed texture atlases)
          *
          * @member {PIXI.Rectangle}
          */
-        _this._frame = frame;
+        this._frame = frame;
+
         /**
          * This is the trimmed area of original texture, before it was put in atlas
          * Please call `updateUvs()` after you change coordinates of `trim` manually.
          *
          * @member {PIXI.Rectangle}
          */
-        _this.trim = trim;
+        this.trim = trim;
+
         /**
          * This will let the renderer know if the texture is valid. If it's not then it cannot be rendered.
          *
          * @member {boolean}
          */
-        _this.valid = false;
+        this.valid = false;
+
+        /**
+         * This will let a renderer know that a texture has been updated (used mainly for WebGL uv updates)
+         *
+         * @member {boolean}
+         */
+        this.requiresUpdate = false;
+
         /**
          * The WebGL UV data cache. Can be used as quad UV
          *
          * @member {PIXI.TextureUvs}
          * @protected
          */
-        _this._uvs = DEFAULT_UVS;
+        this._uvs = DEFAULT_UVS;
+
         /**
          * Default TextureMatrix instance for this texture
          * By default that object is not created because its heavy
          *
          * @member {PIXI.TextureMatrix}
          */
-        _this.uvMatrix = null;
+        this.uvMatrix = null;
+
         /**
          * This is the area of original texture, before it was put in atlas
          *
          * @member {PIXI.Rectangle}
          */
-        _this.orig = orig || frame; // new Rectangle(0, 0, 1, 1);
-        _this._rotate = Number(rotate || 0);
-        if (rotate === true) {
+        this.orig = orig || frame;// new Rectangle(0, 0, 1, 1);
+
+        this._rotate = Number(rotate || 0);
+
+        if (rotate === true)
+        {
             // this is old texturepacker legacy, some games/libraries are passing "true" for rotated textures
-            _this._rotate = 2;
+            this._rotate = 2;
         }
-        else if (_this._rotate % 2 !== 0) {
+        else if (this._rotate % 2 !== 0)
+        {
             throw new Error('attempt to use diamond-shaped UVs. If you are sure, set rotation manually');
         }
+
         /**
          * Anchor point that is used as default if sprite is created with this texture.
          * Changing the `defaultAnchor` at a later point of time will not update Sprite's anchor point.
          * @member {PIXI.Point}
          * @default {0,0}
          */
-        _this.defaultAnchor = anchor ? new Point(anchor.x, anchor.y) : new Point(0, 0);
+        this.defaultAnchor = anchor ? new Point(anchor.x, anchor.y) : new Point(0, 0);
+
         /**
          * Update ID is observed by sprites and TextureMatrix instances.
          * Call updateUvs() to increment it.
@@ -11125,7 +12337,9 @@ var Texture = /** @class */ (function (_super) {
          * @member {number}
          * @protected
          */
-        _this._updateID = 0;
+
+        this._updateID = 0;
+
         /**
          * The ids under which this Texture has been added to the texture cache. This is
          * automatically set as long as Texture.addToCache is used, but may not be set if a
@@ -11133,24 +12347,37 @@ var Texture = /** @class */ (function (_super) {
          *
          * @member {string[]}
          */
-        _this.textureCacheIds = [];
-        if (!baseTexture.valid) {
-            baseTexture.once('loaded', _this.onBaseTextureUpdated, _this);
+        this.textureCacheIds = [];
+
+        if (!baseTexture.valid)
+        {
+            baseTexture.once('loaded', this.onBaseTextureUpdated, this);
         }
-        else if (_this.noFrame) {
+        else if (this.noFrame)
+        {
             // if there is no frame we should monitor for any base texture changes..
-            if (baseTexture.valid) {
-                _this.onBaseTextureUpdated(baseTexture);
+            if (baseTexture.valid)
+            {
+                this.onBaseTextureUpdated(baseTexture);
             }
         }
-        else {
-            _this.frame = frame;
+        else
+        {
+            this.frame = frame;
         }
-        if (_this.noFrame) {
-            baseTexture.on('update', _this.onBaseTextureUpdated, _this);
+
+        if (this.noFrame)
+        {
+            baseTexture.on('update', this.onBaseTextureUpdated, this);
         }
-        return _this;
     }
+
+    if ( EventEmitter ) Texture.__proto__ = EventEmitter;
+    Texture.prototype = Object.create( EventEmitter && EventEmitter.prototype );
+    Texture.prototype.constructor = Texture;
+
+    var prototypeAccessors = { resolution: { configurable: true },frame: { configurable: true },rotate: { configurable: true },width: { configurable: true },height: { configurable: true } };
+
     /**
      * Updates this texture on the gpu.
      *
@@ -11159,81 +12386,110 @@ var Texture = /** @class */ (function (_super) {
      * If you adjusted `frame` manually, please call `updateUvs()` instead.
      *
      */
-    Texture.prototype.update = function () {
-        if (this.baseTexture.resource) {
+    Texture.prototype.update = function update ()
+    {
+        if (this.baseTexture.resource)
+        {
             this.baseTexture.resource.update();
         }
     };
+
     /**
      * Called when the base texture is updated
      *
      * @protected
      * @param {PIXI.BaseTexture} baseTexture - The base texture.
      */
-    Texture.prototype.onBaseTextureUpdated = function (baseTexture) {
-        if (this.noFrame) {
-            if (!this.baseTexture.valid) {
+    Texture.prototype.onBaseTextureUpdated = function onBaseTextureUpdated (baseTexture)
+    {
+        if (this.noFrame)
+        {
+            if (!this.baseTexture.valid)
+            {
                 return;
             }
+
             this._frame.width = baseTexture.width;
             this._frame.height = baseTexture.height;
             this.valid = true;
             this.updateUvs();
         }
-        else {
+        else
+        {
             // TODO this code looks confusing.. boo to abusing getters and setters!
             // if user gave us frame that has bigger size than resized texture it can be a problem
             this.frame = this._frame;
         }
+
         this.emit('update', this);
     };
+
     /**
      * Destroys this texture
      *
-     * @param {boolean} [destroyBase=false] - Whether to destroy the base texture as well
+     * @param {boolean} [destroyBase=false] Whether to destroy the base texture as well
      */
-    Texture.prototype.destroy = function (destroyBase) {
-        if (this.baseTexture) {
-            if (destroyBase) {
-                var resource = this.baseTexture;
+    Texture.prototype.destroy = function destroy (destroyBase)
+    {
+        if (this.baseTexture)
+        {
+            if (destroyBase)
+            {
+                var ref = this.baseTexture;
+                var resource = ref.resource;
+
                 // delete the texture if it exists in the texture cache..
                 // this only needs to be removed if the base texture is actually destroyed too..
-                if (resource && resource.url && TextureCache[resource.url]) {
+                if (resource && TextureCache[resource.url])
+                {
                     Texture.removeFromCache(resource.url);
                 }
+
                 this.baseTexture.destroy();
             }
-            this.baseTexture.off('loaded', this.onBaseTextureUpdated, this);
+
             this.baseTexture.off('update', this.onBaseTextureUpdated, this);
+
             this.baseTexture = null;
         }
+
         this._frame = null;
         this._uvs = null;
         this.trim = null;
         this.orig = null;
+
         this.valid = false;
+
         Texture.removeFromCache(this);
         this.textureCacheIds = null;
     };
+
     /**
      * Creates a new texture object that acts the same as this one.
      *
      * @return {PIXI.Texture} The new texture
      */
-    Texture.prototype.clone = function () {
-        return new Texture(this.baseTexture, this.frame.clone(), this.orig.clone(), this.trim && this.trim.clone(), this.rotate, this.defaultAnchor);
+    Texture.prototype.clone = function clone ()
+    {
+        return new Texture(this.baseTexture, this.frame, this.orig, this.trim, this.rotate, this.defaultAnchor);
     };
+
     /**
      * Updates the internal WebGL UV cache. Use it after you change `frame` or `trim` of the texture.
      * Call it after changing the frame
      */
-    Texture.prototype.updateUvs = function () {
-        if (this._uvs === DEFAULT_UVS) {
+    Texture.prototype.updateUvs = function updateUvs ()
+    {
+        if (this._uvs === DEFAULT_UVS)
+        {
             this._uvs = new TextureUvs();
         }
+
         this._uvs.set(this._frame, this.baseTexture, this.rotate);
+
         this._updateID++;
     };
+
     /**
      * Helper function that creates a new Texture based on the source you provide.
      * The source can be - frame id, image url, video url, canvas element, video element, base texture
@@ -11242,73 +12498,73 @@ var Texture = /** @class */ (function (_super) {
      * @param {string|HTMLImageElement|HTMLCanvasElement|HTMLVideoElement|PIXI.BaseTexture} source
      *        Source to create texture from
      * @param {object} [options] See {@link PIXI.BaseTexture}'s constructor for options.
-     * @param {boolean} [strict] - Enforce strict-mode, see {@link PIXI.settings.STRICT_TEXTURE_CACHE}.
+     * @param {boolean} [strict] Enforce strict-mode, see {@link PIXI.settings.STRICT_TEXTURE_CACHE}.
      * @return {PIXI.Texture} The newly created texture
      */
-    Texture.from = function (source, options, strict) {
-        if (options === void 0) { options = {}; }
-        if (strict === void 0) { strict = settings.STRICT_TEXTURE_CACHE; }
+    Texture.from = function from (source, options, strict)
+    {
+        if ( options === void 0 ) options = {};
+        if ( strict === void 0 ) strict = settings.STRICT_TEXTURE_CACHE;
+
         var isFrame = typeof source === 'string';
         var cacheId = null;
-        if (isFrame) {
+
+        if (isFrame)
+        {
             cacheId = source;
         }
-        else {
-            if (!source._pixiId) {
-                source._pixiId = "pixiid_" + uid();
+        else
+        {
+            if (!source._pixiId)
+            {
+                source._pixiId = "pixiid_" + (uid());
             }
+
             cacheId = source._pixiId;
         }
+
         var texture = TextureCache[cacheId];
+
         // Strict-mode rejects invalid cacheIds
-        if (isFrame && strict && !texture) {
-            throw new Error("The cacheId \"" + cacheId + "\" does not exist in TextureCache.");
+        if (isFrame && strict && !texture)
+        {
+            throw new Error(("The cacheId \"" + cacheId + "\" does not exist in TextureCache."));
         }
-        if (!texture) {
-            if (!options.resolution) {
+
+        if (!texture)
+        {
+            if (!options.resolution)
+            {
                 options.resolution = getResolutionOfUrl(source);
             }
+
             texture = new Texture(new BaseTexture(source, options));
             texture.baseTexture.cacheId = cacheId;
+
             BaseTexture.addToCache(texture.baseTexture, cacheId);
             Texture.addToCache(texture, cacheId);
         }
+
         // lets assume its a base texture!
         return texture;
     };
-    /**
-     * Useful for loading textures via URLs. Use instead of `Texture.from` because
-     * it does a better job of handling failed URLs more effectively. This also ignores
-     * `PIXI.settings.STRICT_TEXTURE_CACHE`. Works for Videos, SVGs, Images.
-     * @param {string} url The remote URL to load.
-     * @param {object} [options] Optional options to include
-     * @return {Promise<PIXI.Texture>} A Promise that resolves to a Texture.
-     */
-    Texture.fromURL = function (url, options) {
-        var resourceOptions = Object.assign({ autoLoad: false }, options === null || options === void 0 ? void 0 : options.resourceOptions);
-        var texture = Texture.from(url, Object.assign({ resourceOptions: resourceOptions }, options), false);
-        var resource = texture.baseTexture.resource;
-        // The texture was already loaded
-        if (texture.baseTexture.valid) {
-            return Promise.resolve(texture);
-        }
-        // Manually load the texture, this should allow users to handle load errors
-        return resource.load().then(function () { return Promise.resolve(texture); });
-    };
+
     /**
      * Create a new Texture with a BufferResource from a Float32Array.
      * RGBA values are floats from 0 to 1.
      * @static
-     * @param {Float32Array|Uint8Array} buffer - The optional array to use, if no data
+     * @param {Float32Array|Uint8Array} buffer The optional array to use, if no data
      *        is provided, a new Float32Array is created.
      * @param {number} width - Width of the resource
      * @param {number} height - Height of the resource
      * @param {object} [options] See {@link PIXI.BaseTexture}'s constructor for options.
      * @return {PIXI.Texture} The resulting new BaseTexture
      */
-    Texture.fromBuffer = function (buffer, width, height, options) {
+    Texture.fromBuffer = function fromBuffer (buffer, width, height, options)
+    {
         return new Texture(BaseTexture.fromBuffer(buffer, width, height, options));
     };
+
     /**
      * Create a texture from a source and add to the cache.
      *
@@ -11319,28 +12575,39 @@ var Texture = /** @class */ (function (_super) {
      *        specified, only `imageUrl` will be used as the cache ID.
      * @return {PIXI.Texture} Output texture
      */
-    Texture.fromLoader = function (source, imageUrl, name) {
+    Texture.fromLoader = function fromLoader (source, imageUrl, name)
+    {
         var resource = new ImageResource(source);
+
         resource.url = imageUrl;
+
         var baseTexture = new BaseTexture(resource, {
             scaleMode: settings.SCALE_MODE,
             resolution: getResolutionOfUrl(imageUrl),
         });
+
         var texture = new Texture(baseTexture);
+
         // No name, use imageUrl instead
-        if (!name) {
+        if (!name)
+        {
             name = imageUrl;
         }
+
         // lets also add the frame to pixi's global cache for 'fromLoader' function
         BaseTexture.addToCache(texture.baseTexture, name);
         Texture.addToCache(texture, name);
+
         // also add references by url if they are different.
-        if (name !== imageUrl) {
+        if (name !== imageUrl)
+        {
             BaseTexture.addToCache(texture.baseTexture, imageUrl);
             Texture.addToCache(texture, imageUrl);
         }
+
         return texture;
     };
+
     /**
      * Adds a Texture to the global TextureCache. This cache is shared across the whole PIXI object.
      *
@@ -11348,18 +12615,25 @@ var Texture = /** @class */ (function (_super) {
      * @param {PIXI.Texture} texture - The Texture to add to the cache.
      * @param {string} id - The id that the Texture will be stored against.
      */
-    Texture.addToCache = function (texture, id) {
-        if (id) {
-            if (texture.textureCacheIds.indexOf(id) === -1) {
+    Texture.addToCache = function addToCache (texture, id)
+    {
+        if (id)
+        {
+            if (texture.textureCacheIds.indexOf(id) === -1)
+            {
                 texture.textureCacheIds.push(id);
             }
-            if (TextureCache[id]) {
+
+            if (TextureCache[id])
+            {
                 // eslint-disable-next-line no-console
-                console.warn("Texture added to the cache with an id [" + id + "] that already had an entry");
+                console.warn(("Texture added to the cache with an id [" + id + "] that already had an entry"));
             }
+
             TextureCache[id] = texture;
         }
     };
+
     /**
      * Remove a Texture from the global TextureCache.
      *
@@ -11367,146 +12641,174 @@ var Texture = /** @class */ (function (_super) {
      * @param {string|PIXI.Texture} texture - id of a Texture to be removed, or a Texture instance itself
      * @return {PIXI.Texture|null} The Texture that was removed
      */
-    Texture.removeFromCache = function (texture) {
-        if (typeof texture === 'string') {
+    Texture.removeFromCache = function removeFromCache (texture)
+    {
+        if (typeof texture === 'string')
+        {
             var textureFromCache = TextureCache[texture];
-            if (textureFromCache) {
+
+            if (textureFromCache)
+            {
                 var index = textureFromCache.textureCacheIds.indexOf(texture);
-                if (index > -1) {
+
+                if (index > -1)
+                {
                     textureFromCache.textureCacheIds.splice(index, 1);
                 }
+
                 delete TextureCache[texture];
+
                 return textureFromCache;
             }
         }
-        else if (texture && texture.textureCacheIds) {
-            for (var i = 0; i < texture.textureCacheIds.length; ++i) {
+        else if (texture && texture.textureCacheIds)
+        {
+            for (var i = 0; i < texture.textureCacheIds.length; ++i)
+            {
                 // Check that texture matches the one being passed in before deleting it from the cache.
-                if (TextureCache[texture.textureCacheIds[i]] === texture) {
+                if (TextureCache[texture.textureCacheIds[i]] === texture)
+                {
                     delete TextureCache[texture.textureCacheIds[i]];
                 }
             }
+
             texture.textureCacheIds.length = 0;
+
             return texture;
         }
+
         return null;
     };
-    Object.defineProperty(Texture.prototype, "resolution", {
-        /**
-         * Returns resolution of baseTexture
-         *
-         * @member {number}
-         * @readonly
-         */
-        get: function () {
-            return this.baseTexture.resolution;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Texture.prototype, "frame", {
-        /**
-         * The frame specifies the region of the base texture that this texture uses.
-         * Please call `updateUvs()` after you change coordinates of `frame` manually.
-         *
-         * @member {PIXI.Rectangle}
-         */
-        get: function () {
-            return this._frame;
-        },
-        set: function (frame) {
-            this._frame = frame;
-            this.noFrame = false;
-            var x = frame.x, y = frame.y, width = frame.width, height = frame.height;
-            var xNotFit = x + width > this.baseTexture.width;
-            var yNotFit = y + height > this.baseTexture.height;
-            if (xNotFit || yNotFit) {
-                var relationship = xNotFit && yNotFit ? 'and' : 'or';
-                var errorX = "X: " + x + " + " + width + " = " + (x + width) + " > " + this.baseTexture.width;
-                var errorY = "Y: " + y + " + " + height + " = " + (y + height) + " > " + this.baseTexture.height;
-                throw new Error('Texture Error: frame does not fit inside the base Texture dimensions: '
-                    + (errorX + " " + relationship + " " + errorY));
-            }
-            this.valid = width && height && this.baseTexture.valid;
-            if (!this.trim && !this.rotate) {
-                this.orig = frame;
-            }
-            if (this.valid) {
-                this.updateUvs();
-            }
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Texture.prototype, "rotate", {
-        /**
-         * Indicates whether the texture is rotated inside the atlas
-         * set to 2 to compensate for texture packer rotation
-         * set to 6 to compensate for spine packer rotation
-         * can be used to rotate or mirror sprites
-         * See {@link PIXI.groupD8} for explanation
-         *
-         * @member {number}
-         */
-        get: function () {
-            return this._rotate;
-        },
-        set: function (rotate) {
-            this._rotate = rotate;
-            if (this.valid) {
-                this.updateUvs();
-            }
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Texture.prototype, "width", {
-        /**
-         * The width of the Texture in pixels.
-         *
-         * @member {number}
-         */
-        get: function () {
-            return this.orig.width;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Texture.prototype, "height", {
-        /**
-         * The height of the Texture in pixels.
-         *
-         * @member {number}
-         */
-        get: function () {
-            return this.orig.height;
-        },
-        enumerable: false,
-        configurable: true
-    });
+
     /**
-     * Utility function for BaseTexture|Texture cast
+     * Returns resolution of baseTexture
+     *
+     * @member {number}
+     * @readonly
      */
-    Texture.prototype.castToBaseTexture = function () {
-        return this.baseTexture;
+    prototypeAccessors.resolution.get = function ()
+    {
+        return this.baseTexture.resolution;
     };
+
+    /**
+     * The frame specifies the region of the base texture that this texture uses.
+     * Please call `updateUvs()` after you change coordinates of `frame` manually.
+     *
+     * @member {PIXI.Rectangle}
+     */
+    prototypeAccessors.frame.get = function ()
+    {
+        return this._frame;
+    };
+
+    prototypeAccessors.frame.set = function (frame) // eslint-disable-line require-jsdoc
+    {
+        this._frame = frame;
+
+        this.noFrame = false;
+
+        var x = frame.x;
+        var y = frame.y;
+        var width = frame.width;
+        var height = frame.height;
+        var xNotFit = x + width > this.baseTexture.width;
+        var yNotFit = y + height > this.baseTexture.height;
+
+        if (xNotFit || yNotFit)
+        {
+            var relationship = xNotFit && yNotFit ? 'and' : 'or';
+            var errorX = "X: " + x + " + " + width + " = " + (x + width) + " > " + (this.baseTexture.width);
+            var errorY = "Y: " + y + " + " + height + " = " + (y + height) + " > " + (this.baseTexture.height);
+
+            throw new Error('Texture Error: frame does not fit inside the base Texture dimensions: '
+                + errorX + " " + relationship + " " + errorY);
+        }
+
+        this.valid = width && height && this.baseTexture.valid;
+
+        if (!this.trim && !this.rotate)
+        {
+            this.orig = frame;
+        }
+
+        if (this.valid)
+        {
+            this.updateUvs();
+        }
+    };
+
+    /**
+     * Indicates whether the texture is rotated inside the atlas
+     * set to 2 to compensate for texture packer rotation
+     * set to 6 to compensate for spine packer rotation
+     * can be used to rotate or mirror sprites
+     * See {@link PIXI.groupD8} for explanation
+     *
+     * @member {number}
+     */
+    prototypeAccessors.rotate.get = function ()
+    {
+        return this._rotate;
+    };
+
+    prototypeAccessors.rotate.set = function (rotate) // eslint-disable-line require-jsdoc
+    {
+        this._rotate = rotate;
+        if (this.valid)
+        {
+            this.updateUvs();
+        }
+    };
+
+    /**
+     * The width of the Texture in pixels.
+     *
+     * @member {number}
+     */
+    prototypeAccessors.width.get = function ()
+    {
+        return this.orig.width;
+    };
+
+    /**
+     * The height of the Texture in pixels.
+     *
+     * @member {number}
+     */
+    prototypeAccessors.height.get = function ()
+    {
+        return this.orig.height;
+    };
+
+    Object.defineProperties( Texture.prototype, prototypeAccessors );
+
     return Texture;
 }(eventemitter3));
-function createWhiteTexture() {
+
+function createWhiteTexture()
+{
     var canvas = document.createElement('canvas');
+
     canvas.width = 16;
     canvas.height = 16;
+
     var context = canvas.getContext('2d');
+
     context.fillStyle = 'white';
     context.fillRect(0, 0, 16, 16);
+
     return new Texture(new BaseTexture(new CanvasResource(canvas)));
 }
-function removeAllHandlers(tex) {
-    tex.destroy = function _emptyDestroy() { };
-    tex.on = function _emptyOn() { };
-    tex.once = function _emptyOnce() { };
-    tex.emit = function _emptyEmit() { };
+
+function removeAllHandlers(tex)
+{
+    tex.destroy = function _emptyDestroy() { /* empty */ };
+    tex.on = function _emptyOn() { /* empty */ };
+    tex.once = function _emptyOnce() { /* empty */ };
+    tex.emit = function _emptyEmit() { /* empty */ };
 }
+
 /**
  * An empty texture, used often to not have to create multiple empty textures.
  * Can not be destroyed.
@@ -11518,6 +12820,7 @@ function removeAllHandlers(tex) {
 Texture.EMPTY = new Texture(new BaseTexture());
 removeAllHandlers(Texture.EMPTY);
 removeAllHandlers(Texture.EMPTY.baseTexture);
+
 /**
  * A white texture of 16x16 size, used for graphics and other things
  * Can not be destroyed.
@@ -11530,339 +12833,8 @@ Texture.WHITE = createWhiteTexture();
 removeAllHandlers(Texture.WHITE);
 removeAllHandlers(Texture.WHITE.baseTexture);
 
-/**
- * A RenderTexture is a special texture that allows any PixiJS display object to be rendered to it.
- *
- * __Hint__: All DisplayObjects (i.e. Sprites) that render to a RenderTexture should be preloaded
- * otherwise black rectangles will be drawn instead.
- *
- * __Hint-2__: The actual memory allocation will happen on first render.
- * You shouldn't create renderTextures each frame just to delete them after, try to reuse them.
- *
- * A RenderTexture takes a snapshot of any Display Object given to its render method. For example:
- *
- * ```js
- * let renderer = PIXI.autoDetectRenderer();
- * let renderTexture = PIXI.RenderTexture.create({ width: 800, height: 600 });
- * let sprite = PIXI.Sprite.from("spinObj_01.png");
- *
- * sprite.position.x = 800/2;
- * sprite.position.y = 600/2;
- * sprite.anchor.x = 0.5;
- * sprite.anchor.y = 0.5;
- *
- * renderer.render(sprite, renderTexture);
- * ```
- *
- * The Sprite in this case will be rendered using its local transform. To render this sprite at 0,0
- * you can clear the transform
- *
- * ```js
- *
- * sprite.setTransform()
- *
- * let renderTexture = new PIXI.RenderTexture.create(100, 100);
- *
- * renderer.render(sprite, renderTexture);  // Renders to center of RenderTexture
- * ```
- *
- * @class
- * @extends PIXI.Texture
- * @memberof PIXI
- */
-var RenderTexture = /** @class */ (function (_super) {
-    __extends(RenderTexture, _super);
-    /**
-     * @param {PIXI.BaseRenderTexture} baseRenderTexture - The base texture object that this texture uses
-     * @param {PIXI.Rectangle} [frame] - The rectangle frame of the texture to show
-     */
-    function RenderTexture(baseRenderTexture, frame) {
-        var _this = this;
-        // support for legacy..
-        var _legacyRenderer = null;
-        if (!(baseRenderTexture instanceof BaseRenderTexture)) {
-            /* eslint-disable prefer-rest-params, no-console */
-            var width = arguments[1];
-            var height = arguments[2];
-            var scaleMode = arguments[3];
-            var resolution = arguments[4];
-            // we have an old render texture..
-            console.warn("Please use RenderTexture.create(" + width + ", " + height + ") instead of the ctor directly.");
-            _legacyRenderer = arguments[0];
-            /* eslint-enable prefer-rest-params, no-console */
-            frame = null;
-            baseRenderTexture = new BaseRenderTexture({
-                width: width,
-                height: height,
-                scaleMode: scaleMode,
-                resolution: resolution,
-            });
-        }
-        /**
-         * The base texture object that this texture uses
-         *
-         * @member {PIXI.BaseTexture}
-         */
-        _this = _super.call(this, baseRenderTexture, frame) || this;
-        _this.legacyRenderer = _legacyRenderer;
-        /**
-         * This will let the renderer know if the texture is valid. If it's not then it cannot be rendered.
-         *
-         * @member {boolean}
-         */
-        _this.valid = true;
-        /**
-         * Stores `sourceFrame` when this texture is inside current filter stack.
-         * You can read it inside filters.
-         *
-         * @readonly
-         * @member {PIXI.Rectangle}
-         */
-        _this.filterFrame = null;
-        /**
-         * The key for pooled texture of FilterSystem
-         * @protected
-         * @member {string}
-         */
-        _this.filterPoolKey = null;
-        _this.updateUvs();
-        return _this;
-    }
-    Object.defineProperty(RenderTexture.prototype, "framebuffer", {
-        /**
-         * Shortcut to `this.baseTexture.framebuffer`, saves baseTexture cast.
-         * @member {PIXI.Framebuffer}
-         * @readonly
-         */
-        get: function () {
-            return this.baseTexture.framebuffer;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    /**
-     * Resizes the RenderTexture.
-     *
-     * @param {number} width - The width to resize to.
-     * @param {number} height - The height to resize to.
-     * @param {boolean} [resizeBaseTexture=true] - Should the baseTexture.width and height values be resized as well?
-     */
-    RenderTexture.prototype.resize = function (width, height, resizeBaseTexture) {
-        if (resizeBaseTexture === void 0) { resizeBaseTexture = true; }
-        width = Math.ceil(width);
-        height = Math.ceil(height);
-        // TODO - could be not required..
-        this.valid = (width > 0 && height > 0);
-        this._frame.width = this.orig.width = width;
-        this._frame.height = this.orig.height = height;
-        if (resizeBaseTexture) {
-            this.baseTexture.resize(width, height);
-        }
-        this.updateUvs();
-    };
-    /**
-     * Changes the resolution of baseTexture, but does not change framebuffer size.
-     *
-     * @param {number} resolution - The new resolution to apply to RenderTexture
-     */
-    RenderTexture.prototype.setResolution = function (resolution) {
-        var baseTexture = this.baseTexture;
-        if (baseTexture.resolution === resolution) {
-            return;
-        }
-        baseTexture.setResolution(resolution);
-        this.resize(baseTexture.width, baseTexture.height, false);
-    };
-    /**
-     * A short hand way of creating a render texture.
-     *
-     * @param {object} [options] - Options
-     * @param {number} [options.width=100] - The width of the render texture
-     * @param {number} [options.height=100] - The height of the render texture
-     * @param {number} [options.scaleMode=PIXI.settings.SCALE_MODE] - See {@link PIXI.SCALE_MODES} for possible values
-     * @param {number} [options.resolution=1] - The resolution / device pixel ratio of the texture being generated
-     * @return {PIXI.RenderTexture} The new render texture
-     */
-    RenderTexture.create = function (options) {
-        // fallback, old-style: create(width, height, scaleMode, resolution)
-        if (typeof options === 'number') {
-            /* eslint-disable prefer-rest-params */
-            options = {
-                width: options,
-                height: arguments[1],
-                scaleMode: arguments[2],
-                resolution: arguments[3],
-            };
-            /* eslint-enable prefer-rest-params */
-        }
-        return new RenderTexture(new BaseRenderTexture(options));
-    };
-    return RenderTexture;
-}(Texture));
-
-/**
- * Experimental!
- *
- * Texture pool, used by FilterSystem and plugins
- * Stores collection of temporary pow2 or screen-sized renderTextures
- *
- * If you use custom RenderTexturePool for your filters, you can use methods
- * `getFilterTexture` and `returnFilterTexture` same as in
- *
- * @class
- * @memberof PIXI
- */
-var RenderTexturePool = /** @class */ (function () {
-    /**
-     * @param {object} [textureOptions] - options that will be passed to BaseRenderTexture constructor
-     * @param {PIXI.SCALE_MODES} [textureOptions.scaleMode] - See {@link PIXI.SCALE_MODES} for possible values.
-     */
-    function RenderTexturePool(textureOptions) {
-        this.texturePool = {};
-        this.textureOptions = textureOptions || {};
-        /**
-         * Allow renderTextures of the same size as screen, not just pow2
-         *
-         * Automatically sets to true after `setScreenSize`
-         *
-         * @member {boolean}
-         * @default false
-         */
-        this.enableFullScreen = false;
-        this._pixelsWidth = 0;
-        this._pixelsHeight = 0;
-    }
-    /**
-     * creates of texture with params that were specified in pool constructor
-     *
-     * @param {number} realWidth - width of texture in pixels
-     * @param {number} realHeight - height of texture in pixels
-     * @returns {RenderTexture}
-     */
-    RenderTexturePool.prototype.createTexture = function (realWidth, realHeight) {
-        var baseRenderTexture = new BaseRenderTexture(Object.assign({
-            width: realWidth,
-            height: realHeight,
-            resolution: 1,
-        }, this.textureOptions));
-        return new RenderTexture(baseRenderTexture);
-    };
-    /**
-     * Gets a Power-of-Two render texture or fullScreen texture
-     *
-     * @protected
-     * @param {number} minWidth - The minimum width of the render texture in real pixels.
-     * @param {number} minHeight - The minimum height of the render texture in real pixels.
-     * @param {number} [resolution=1] - The resolution of the render texture.
-     * @return {PIXI.RenderTexture} The new render texture.
-     */
-    RenderTexturePool.prototype.getOptimalTexture = function (minWidth, minHeight, resolution) {
-        if (resolution === void 0) { resolution = 1; }
-        var key = RenderTexturePool.SCREEN_KEY;
-        minWidth *= resolution;
-        minHeight *= resolution;
-        if (!this.enableFullScreen || minWidth !== this._pixelsWidth || minHeight !== this._pixelsHeight) {
-            minWidth = nextPow2(minWidth);
-            minHeight = nextPow2(minHeight);
-            key = ((minWidth & 0xFFFF) << 16) | (minHeight & 0xFFFF);
-        }
-        if (!this.texturePool[key]) {
-            this.texturePool[key] = [];
-        }
-        var renderTexture = this.texturePool[key].pop();
-        if (!renderTexture) {
-            renderTexture = this.createTexture(minWidth, minHeight);
-        }
-        renderTexture.filterPoolKey = key;
-        renderTexture.setResolution(resolution);
-        return renderTexture;
-    };
-    /**
-     * Gets extra texture of the same size as input renderTexture
-     *
-     * `getFilterTexture(input, 0.5)` or `getFilterTexture(0.5, input)`
-     *
-     * @param {PIXI.RenderTexture} input - renderTexture from which size and resolution will be copied
-     * @param {number} [resolution] - override resolution of the renderTexture
-     *  It overrides, it does not multiply
-     * @returns {PIXI.RenderTexture}
-     */
-    RenderTexturePool.prototype.getFilterTexture = function (input, resolution) {
-        var filterTexture = this.getOptimalTexture(input.width, input.height, resolution || input.resolution);
-        filterTexture.filterFrame = input.filterFrame;
-        return filterTexture;
-    };
-    /**
-     * Place a render texture back into the pool.
-     * @param {PIXI.RenderTexture} renderTexture - The renderTexture to free
-     */
-    RenderTexturePool.prototype.returnTexture = function (renderTexture) {
-        var key = renderTexture.filterPoolKey;
-        renderTexture.filterFrame = null;
-        this.texturePool[key].push(renderTexture);
-    };
-    /**
-     * Alias for returnTexture, to be compliant with FilterSystem interface
-     * @param {PIXI.RenderTexture} renderTexture - The renderTexture to free
-     */
-    RenderTexturePool.prototype.returnFilterTexture = function (renderTexture) {
-        this.returnTexture(renderTexture);
-    };
-    /**
-     * Clears the pool
-     *
-     * @param {boolean} [destroyTextures=true] - destroy all stored textures
-     */
-    RenderTexturePool.prototype.clear = function (destroyTextures) {
-        destroyTextures = destroyTextures !== false;
-        if (destroyTextures) {
-            for (var i in this.texturePool) {
-                var textures = this.texturePool[i];
-                if (textures) {
-                    for (var j = 0; j < textures.length; j++) {
-                        textures[j].destroy(true);
-                    }
-                }
-            }
-        }
-        this.texturePool = {};
-    };
-    /**
-     * If screen size was changed, drops all screen-sized textures,
-     * sets new screen size, sets `enableFullScreen` to true
-     *
-     * Size is measured in pixels, `renderer.view` can be passed here, not `renderer.screen`
-     *
-     * @param {PIXI.ISize} size - Initial size of screen
-     */
-    RenderTexturePool.prototype.setScreenSize = function (size) {
-        if (size.width === this._pixelsWidth
-            && size.height === this._pixelsHeight) {
-            return;
-        }
-        var screenKey = RenderTexturePool.SCREEN_KEY;
-        var textures = this.texturePool[screenKey];
-        this.enableFullScreen = size.width > 0 && size.height > 0;
-        if (textures) {
-            for (var j = 0; j < textures.length; j++) {
-                textures[j].destroy(true);
-            }
-        }
-        this.texturePool[screenKey] = [];
-        this._pixelsWidth = size.width;
-        this._pixelsHeight = size.height;
-    };
-    /**
-     * Key that is used to store fullscreen renderTextures in a pool
-     *
-     * @static
-     * @const {string}
-     */
-    RenderTexturePool.SCREEN_KEY = 'screen';
-    return RenderTexturePool;
-}());
-
 /* eslint-disable max-len */
+
 /**
  * Holds the information for a single attribute structure required to render geometry.
  *
@@ -11872,144 +12844,162 @@ var RenderTexturePool = /** @class */ (function () {
  * @class
  * @memberof PIXI
  */
-var Attribute = /** @class */ (function () {
-    /**
-     * @param {string} buffer - the id of the buffer that this attribute will look for
-     * @param {Number} [size=0] - the size of the attribute. If you have 2 floats per vertex (eg position x and y) this would be 2.
-     * @param {Boolean} [normalized=false] - should the data be normalized.
-     * @param {Number} [type=PIXI.TYPES.FLOAT] - what type of number is the attribute. Check {@link PIXI.TYPES} to see the ones available
-     * @param {Number} [stride=0] - How far apart (in floats) the start of each value is. (used for interleaving data)
-     * @param {Number} [start=0] - How far into the array to start reading values (used for interleaving data)
-     */
-    function Attribute(buffer, size, normalized, type, stride, start, instance) {
-        if (size === void 0) { size = 0; }
-        if (normalized === void 0) { normalized = false; }
-        if (type === void 0) { type = 5126; }
-        this.buffer = buffer;
-        this.size = size;
-        this.normalized = normalized;
-        this.type = type;
-        this.stride = stride;
-        this.start = start;
-        this.instance = instance;
-    }
-    /**
-     * Destroys the Attribute.
-     */
-    Attribute.prototype.destroy = function () {
-        this.buffer = null;
-    };
-    /**
-     * Helper function that creates an Attribute based on the information provided
-     *
-     * @static
-     * @param {string} buffer - the id of the buffer that this attribute will look for
-     * @param {Number} [size=0] - the size of the attribute. If you have 2 floats per vertex (eg position x and y) this would be 2
-     * @param {Boolean} [normalized=false] - should the data be normalized.
-     * @param {Number} [type=PIXI.TYPES.FLOAT] - what type of number is the attribute. Check {@link PIXI.TYPES} to see the ones available
-     * @param {Number} [stride=0] - How far apart (in floats) the start of each value is. (used for interleaving data)
-     *
-     * @returns {PIXI.Attribute} A new {@link PIXI.Attribute} based on the information provided
-     */
-    Attribute.from = function (buffer, size, normalized, type, stride) {
-        return new Attribute(buffer, size, normalized, type, stride);
-    };
-    return Attribute;
-}());
+var Attribute = function Attribute(buffer, size, normalized, type, stride, start, instance)
+{
+    if ( normalized === void 0 ) normalized = false;
+    if ( type === void 0 ) type = 5126;
+
+    this.buffer = buffer;
+    this.size = size;
+    this.normalized = normalized;
+    this.type = type;
+    this.stride = stride;
+    this.start = start;
+    this.instance = instance;
+};
+
+/**
+ * Destroys the Attribute.
+ */
+Attribute.prototype.destroy = function destroy ()
+{
+    this.buffer = null;
+};
+
+/**
+ * Helper function that creates an Attribute based on the information provided
+ *
+ * @static
+ * @param {string} buffer  the id of the buffer that this attribute will look for
+ * @param {Number} [size=0] the size of the attribute. If you have 2 floats per vertex (eg position x and y) this would be 2
+ * @param {Boolean} [normalized=false] should the data be normalized.
+ * @param {Number} [start=0] How far into the array to start reading values (used for interleaving data)
+ * @param {Number} [type=PIXI.TYPES.FLOAT] what type of number is the attribute. Check {@link PIXI.TYPES} to see the ones available
+ * @param {Number} [stride=0] How far apart (in floats) the start of each value is. (used for interleaving data)
+ *
+ * @returns {PIXI.Attribute} A new {@link PIXI.Attribute} based on the information provided
+ */
+Attribute.from = function from (buffer, size, normalized, type, stride)
+{
+    return new Attribute(buffer, size, normalized, type, stride);
+};
 
 var UID = 0;
+/* eslint-disable max-len */
+
 /**
  * A wrapper for data so that it can be used and uploaded by WebGL
  *
  * @class
  * @memberof PIXI
  */
-var Buffer = /** @class */ (function () {
-    /**
-     * @param {ArrayBuffer| SharedArrayBuffer|ArrayBufferView} data - the data to store in the buffer.
-     * @param {boolean} [_static=true] - `true` for static buffer
-     * @param {boolean} [index=false] - `true` for index buffer
-     */
-    function Buffer(data, _static, index) {
-        if (_static === void 0) { _static = true; }
-        if (index === void 0) { index = false; }
-        /**
-         * The data in the buffer, as a typed array
-         *
-         * @member {ArrayBuffer| SharedArrayBuffer | ArrayBufferView}
-         */
-        this.data = (data || new Float32Array(1));
-        /**
-         * A map of renderer IDs to webgl buffer
-         *
-         * @private
-         * @member {object<number, GLBuffer>}
-         */
-        this._glBuffers = {};
-        this._updateID = 0;
-        this.index = index;
-        this.static = _static;
-        this.id = UID++;
-        this.disposeRunner = new Runner('disposeBuffer');
-    }
-    // TODO could explore flagging only a partial upload?
-    /**
-     * flags this buffer as requiring an upload to the GPU
-     * @param {ArrayBuffer|SharedArrayBuffer|ArrayBufferView} [data] - the data to update in the buffer.
-     */
-    Buffer.prototype.update = function (data) {
-        this.data = data || this.data;
-        this._updateID++;
-    };
-    /**
-     * disposes WebGL resources that are connected to this geometry
-     */
-    Buffer.prototype.dispose = function () {
-        this.disposeRunner.emit(this, false);
-    };
-    /**
-     * Destroys the buffer
-     */
-    Buffer.prototype.destroy = function () {
-        this.dispose();
-        this.data = null;
-    };
-    /**
-     * Helper function that creates a buffer based on an array or TypedArray
-     *
-     * @static
-     * @param {ArrayBufferView | number[]} data - the TypedArray that the buffer will store. If this is a regular Array it will be converted to a Float32Array.
-     * @return {PIXI.Buffer} A new Buffer based on the data provided.
-     */
-    Buffer.from = function (data) {
-        if (data instanceof Array) {
-            data = new Float32Array(data);
-        }
-        return new Buffer(data);
-    };
-    return Buffer;
-}());
+var Buffer = function Buffer(data, _static, index)
+{
+    if ( _static === void 0 ) _static = true;
+    if ( index === void 0 ) index = false;
 
-function getBufferType(array) {
-    if (array.BYTES_PER_ELEMENT === 4) {
-        if (array instanceof Float32Array) {
+    /**
+     * The data in the buffer, as a typed array
+     *
+     * @member {ArrayBuffer| SharedArrayBuffer|ArrayBufferView}
+     */
+    this.data = data || new Float32Array(1);
+
+    /**
+     * A map of renderer IDs to webgl buffer
+     *
+     * @private
+     * @member {object<number, GLBuffer>}
+     */
+    this._glBuffers = {};
+
+    this._updateID = 0;
+
+    this.index = index;
+
+    this.static = _static;
+
+    this.id = UID++;
+
+    this.disposeRunner = new Runner('disposeBuffer', 2);
+};
+
+// TODO could explore flagging only a partial upload?
+/**
+ * flags this buffer as requiring an upload to the GPU
+ * @param {ArrayBuffer|SharedArrayBuffer|ArrayBufferView} [data] the data to update in the buffer.
+ */
+Buffer.prototype.update = function update (data)
+{
+    this.data = data || this.data;
+    this._updateID++;
+};
+
+/**
+ * disposes WebGL resources that are connected to this geometry
+ */
+Buffer.prototype.dispose = function dispose ()
+{
+    this.disposeRunner.run(this, false);
+};
+
+/**
+ * Destroys the buffer
+ */
+Buffer.prototype.destroy = function destroy ()
+{
+    this.dispose();
+
+    this.data = null;
+};
+
+/**
+ * Helper function that creates a buffer based on an array or TypedArray
+ *
+ * @static
+ * @param {ArrayBufferView | number[]} data the TypedArray that the buffer will store. If this is a regular Array it will be converted to a Float32Array.
+ * @return {PIXI.Buffer} A new Buffer based on the data provided.
+ */
+Buffer.from = function from (data)
+{
+    if (data instanceof Array)
+    {
+        data = new Float32Array(data);
+    }
+
+    return new Buffer(data);
+};
+
+function getBufferType(array)
+{
+    if (array.BYTES_PER_ELEMENT === 4)
+    {
+        if (array instanceof Float32Array)
+        {
             return 'Float32Array';
         }
-        else if (array instanceof Uint32Array) {
+        else if (array instanceof Uint32Array)
+        {
             return 'Uint32Array';
         }
+
         return 'Int32Array';
     }
-    else if (array.BYTES_PER_ELEMENT === 2) {
-        if (array instanceof Uint16Array) {
+    else if (array.BYTES_PER_ELEMENT === 2)
+    {
+        if (array instanceof Uint16Array)
+        {
             return 'Uint16Array';
         }
     }
-    else if (array.BYTES_PER_ELEMENT === 1) {
-        if (array instanceof Uint8Array) {
+    else if (array.BYTES_PER_ELEMENT === 1)
+    {
+        if (array instanceof Uint8Array)
+        {
             return 'Uint8Array';
         }
     }
+
     // TODO map out the rest of the array elements!
     return null;
 }
@@ -12021,37 +13011,55 @@ var map = {
     Int32Array: Int32Array,
     Uint8Array: Uint8Array,
 };
-function interleaveTypedArrays(arrays, sizes) {
+
+function interleaveTypedArrays(arrays, sizes)
+{
     var outSize = 0;
     var stride = 0;
     var views = {};
-    for (var i = 0; i < arrays.length; i++) {
+
+    for (var i = 0; i < arrays.length; i++)
+    {
         stride += sizes[i];
         outSize += arrays[i].length;
     }
+
     var buffer = new ArrayBuffer(outSize * 4);
+
     var out = null;
     var littleOffset = 0;
-    for (var i = 0; i < arrays.length; i++) {
-        var size = sizes[i];
-        var array = arrays[i];
+
+    for (var i$1 = 0; i$1 < arrays.length; i$1++)
+    {
+        var size = sizes[i$1];
+        var array = arrays[i$1];
+
         var type = getBufferType(array);
-        if (!views[type]) {
+
+        if (!views[type])
+        {
             views[type] = new map[type](buffer);
         }
+
         out = views[type];
-        for (var j = 0; j < array.length; j++) {
+
+        for (var j = 0; j < array.length; j++)
+        {
             var indexStart = ((j / size | 0) * stride) + littleOffset;
             var index = j % size;
+
             out[indexStart + index] = array[j];
         }
+
         littleOffset += size;
     }
+
     return new Float32Array(buffer);
 }
 
 var byteSizeMap = { 5126: 4, 5123: 2, 5121: 1 };
 var UID$1 = 0;
+
 /* eslint-disable object-shorthand */
 var map$1 = {
     Float32Array: Float32Array,
@@ -12060,7 +13068,9 @@ var map$1 = {
     Uint8Array: Uint8Array,
     Uint16Array: Uint16Array,
 };
+
 /* eslint-disable max-len */
+
 /**
  * The Geometry represents a model. It consists of two components:
  * - GeometryStyle - The structure of the model such as the attributes layout
@@ -12080,850 +13090,461 @@ var map$1 = {
  * @class
  * @memberof PIXI
  */
-var Geometry = /** @class */ (function () {
+var Geometry = function Geometry(buffers, attributes)
+{
+    if ( buffers === void 0 ) buffers = [];
+    if ( attributes === void 0 ) attributes = {};
+
+    this.buffers = buffers;
+
+    this.indexBuffer = null;
+
+    this.attributes = attributes;
+
     /**
-     * @param {PIXI.Buffer[]} [buffers] - an array of buffers. optional.
-     * @param {object} [attributes] - of the geometry, optional structure of the attributes layout
-     */
-    function Geometry(buffers, attributes) {
-        if (buffers === void 0) { buffers = []; }
-        if (attributes === void 0) { attributes = {}; }
-        this.buffers = buffers;
-        this.indexBuffer = null;
-        this.attributes = attributes;
-        /**
-         * A map of renderer IDs to webgl VAOs
-         *
-         * @protected
-         * @type {object}
-         */
-        this.glVertexArrayObjects = {};
-        this.id = UID$1++;
-        this.instanced = false;
-        /**
-         * Number of instances in this geometry, pass it to `GeometrySystem.draw()`
-         * @member {number}
-         * @default 1
-         */
-        this.instanceCount = 1;
-        this.disposeRunner = new Runner('disposeGeometry');
-        /**
-         * Count of existing (not destroyed) meshes that reference this geometry
-         * @member {number}
-         */
-        this.refCount = 0;
-    }
-    /**
-    *
-    * Adds an attribute to the geometry
-    * Note: `stride` and `start` should be `undefined` if you dont know them, not 0!
-    *
-    * @param {String} id - the name of the attribute (matching up to a shader)
-    * @param {PIXI.Buffer|number[]} [buffer] - the buffer that holds the data of the attribute . You can also provide an Array and a buffer will be created from it.
-    * @param {Number} [size=0] - the size of the attribute. If you have 2 floats per vertex (eg position x and y) this would be 2
-    * @param {Boolean} [normalized=false] - should the data be normalized.
-    * @param {Number} [type=PIXI.TYPES.FLOAT] - what type of number is the attribute. Check {PIXI.TYPES} to see the ones available
-    * @param {Number} [stride] - How far apart (in floats) the start of each value is. (used for interleaving data)
-    * @param {Number} [start] - How far into the array to start reading values (used for interleaving data)
-    * @param {boolean} [instance=false] - Instancing flag
-    *
-    * @return {PIXI.Geometry} returns self, useful for chaining.
-    */
-    Geometry.prototype.addAttribute = function (id, buffer, size, normalized, type, stride, start, instance) {
-        if (size === void 0) { size = 0; }
-        if (normalized === void 0) { normalized = false; }
-        if (instance === void 0) { instance = false; }
-        if (!buffer) {
-            throw new Error('You must pass a buffer when creating an attribute');
-        }
-        // check if this is a buffer!
-        if (!(buffer instanceof Buffer)) {
-            // its an array!
-            if (buffer instanceof Array) {
-                buffer = new Float32Array(buffer);
-            }
-            buffer = new Buffer(buffer);
-        }
-        var ids = id.split('|');
-        if (ids.length > 1) {
-            for (var i = 0; i < ids.length; i++) {
-                this.addAttribute(ids[i], buffer, size, normalized, type);
-            }
-            return this;
-        }
-        var bufferIndex = this.buffers.indexOf(buffer);
-        if (bufferIndex === -1) {
-            this.buffers.push(buffer);
-            bufferIndex = this.buffers.length - 1;
-        }
-        this.attributes[id] = new Attribute(bufferIndex, size, normalized, type, stride, start, instance);
-        // assuming that if there is instanced data then this will be drawn with instancing!
-        this.instanced = this.instanced || instance;
-        return this;
-    };
-    /**
-     * returns the requested attribute
+     * A map of renderer IDs to webgl VAOs
      *
-     * @param {String} id - the name of the attribute required
-     * @return {PIXI.Attribute} the attribute requested.
+     * @protected
+     * @type {object}
      */
-    Geometry.prototype.getAttribute = function (id) {
-        return this.attributes[id];
-    };
+    this.glVertexArrayObjects = {};
+
+    this.id = UID$1++;
+
+    this.instanced = false;
+
     /**
-     * returns the requested buffer
-     *
-     * @param {String} id - the name of the buffer required
-     * @return {PIXI.Buffer} the buffer requested.
+     * Number of instances in this geometry, pass it to `GeometrySystem.draw()`
+     * @member {number}
+     * @default 1
      */
-    Geometry.prototype.getBuffer = function (id) {
-        return this.buffers[this.getAttribute(id).buffer];
-    };
+    this.instanceCount = 1;
+
+    this.disposeRunner = new Runner('disposeGeometry', 2);
+
     /**
-    *
-    * Adds an index buffer to the geometry
-    * The index buffer contains integers, three for each triangle in the geometry, which reference the various attribute buffers (position, colour, UV coordinates, other UV coordinates, normal, …). There is only ONE index buffer.
-    *
-    * @param {PIXI.Buffer|number[]} [buffer] - the buffer that holds the data of the index buffer. You can also provide an Array and a buffer will be created from it.
-    * @return {PIXI.Geometry} returns self, useful for chaining.
-    */
-    Geometry.prototype.addIndex = function (buffer) {
-        if (!(buffer instanceof Buffer)) {
-            // its an array!
-            if (buffer instanceof Array) {
-                buffer = new Uint16Array(buffer);
-            }
-            buffer = new Buffer(buffer);
-        }
-        buffer.index = true;
-        this.indexBuffer = buffer;
-        if (this.buffers.indexOf(buffer) === -1) {
-            this.buffers.push(buffer);
-        }
-        return this;
-    };
-    /**
-     * returns the index buffer
-     *
-     * @return {PIXI.Buffer} the index buffer.
+     * Count of existing (not destroyed) meshes that reference this geometry
+     * @member {number}
      */
-    Geometry.prototype.getIndex = function () {
-        return this.indexBuffer;
-    };
-    /**
-     * this function modifies the structure so that all current attributes become interleaved into a single buffer
-     * This can be useful if your model remains static as it offers a little performance boost
-     *
-     * @return {PIXI.Geometry} returns self, useful for chaining.
-     */
-    Geometry.prototype.interleave = function () {
-        // a simple check to see if buffers are already interleaved..
-        if (this.buffers.length === 1 || (this.buffers.length === 2 && this.indexBuffer))
-            { return this; }
-        // assume already that no buffers are interleaved
-        var arrays = [];
-        var sizes = [];
-        var interleavedBuffer = new Buffer();
-        var i;
-        for (i in this.attributes) {
-            var attribute = this.attributes[i];
-            var buffer = this.buffers[attribute.buffer];
-            arrays.push(buffer.data);
-            sizes.push((attribute.size * byteSizeMap[attribute.type]) / 4);
-            attribute.buffer = 0;
-        }
-        interleavedBuffer.data = interleaveTypedArrays(arrays, sizes);
-        for (i = 0; i < this.buffers.length; i++) {
-            if (this.buffers[i] !== this.indexBuffer) {
-                this.buffers[i].destroy();
-            }
-        }
-        this.buffers = [interleavedBuffer];
-        if (this.indexBuffer) {
-            this.buffers.push(this.indexBuffer);
-        }
-        return this;
-    };
-    Geometry.prototype.getSize = function () {
-        for (var i in this.attributes) {
-            var attribute = this.attributes[i];
-            var buffer = this.buffers[attribute.buffer];
-            return buffer.data.length / ((attribute.stride / 4) || attribute.size);
-        }
-        return 0;
-    };
-    /**
-     * disposes WebGL resources that are connected to this geometry
-     */
-    Geometry.prototype.dispose = function () {
-        this.disposeRunner.emit(this, false);
-    };
-    /**
-     * Destroys the geometry.
-     */
-    Geometry.prototype.destroy = function () {
-        this.dispose();
-        this.buffers = null;
-        this.indexBuffer = null;
-        this.attributes = null;
-    };
-    /**
-     * returns a clone of the geometry
-     *
-     * @returns {PIXI.Geometry} a new clone of this geometry
-     */
-    Geometry.prototype.clone = function () {
-        var geometry = new Geometry();
-        for (var i = 0; i < this.buffers.length; i++) {
-            geometry.buffers[i] = new Buffer(this.buffers[i].data.slice(0));
-        }
-        for (var i in this.attributes) {
-            var attrib = this.attributes[i];
-            geometry.attributes[i] = new Attribute(attrib.buffer, attrib.size, attrib.normalized, attrib.type, attrib.stride, attrib.start, attrib.instance);
-        }
-        if (this.indexBuffer) {
-            geometry.indexBuffer = geometry.buffers[this.buffers.indexOf(this.indexBuffer)];
-            geometry.indexBuffer.index = true;
-        }
-        return geometry;
-    };
-    /**
-     * merges an array of geometries into a new single one
-     * geometry attribute styles must match for this operation to work
-     *
-     * @param {PIXI.Geometry[]} geometries - array of geometries to merge
-     * @returns {PIXI.Geometry} shiny new geometry!
-     */
-    Geometry.merge = function (geometries) {
-        // todo add a geometry check!
-        // also a size check.. cant be too big!]
-        var geometryOut = new Geometry();
-        var arrays = [];
-        var sizes = [];
-        var offsets = [];
-        var geometry;
-        // pass one.. get sizes..
-        for (var i = 0; i < geometries.length; i++) {
-            geometry = geometries[i];
-            for (var j = 0; j < geometry.buffers.length; j++) {
-                sizes[j] = sizes[j] || 0;
-                sizes[j] += geometry.buffers[j].data.length;
-                offsets[j] = 0;
-            }
-        }
-        // build the correct size arrays..
-        for (var i = 0; i < geometry.buffers.length; i++) {
-            // TODO types!
-            arrays[i] = new map$1[getBufferType(geometry.buffers[i].data)](sizes[i]);
-            geometryOut.buffers[i] = new Buffer(arrays[i]);
-        }
-        // pass to set data..
-        for (var i = 0; i < geometries.length; i++) {
-            geometry = geometries[i];
-            for (var j = 0; j < geometry.buffers.length; j++) {
-                arrays[j].set(geometry.buffers[j].data, offsets[j]);
-                offsets[j] += geometry.buffers[j].data.length;
-            }
-        }
-        geometryOut.attributes = geometry.attributes;
-        if (geometry.indexBuffer) {
-            geometryOut.indexBuffer = geometryOut.buffers[geometry.buffers.indexOf(geometry.indexBuffer)];
-            geometryOut.indexBuffer.index = true;
-            var offset = 0;
-            var stride = 0;
-            var offset2 = 0;
-            var bufferIndexToCount = 0;
-            // get a buffer
-            for (var i = 0; i < geometry.buffers.length; i++) {
-                if (geometry.buffers[i] !== geometry.indexBuffer) {
-                    bufferIndexToCount = i;
-                    break;
-                }
-            }
-            // figure out the stride of one buffer..
-            for (var i in geometry.attributes) {
-                var attribute = geometry.attributes[i];
-                if ((attribute.buffer | 0) === bufferIndexToCount) {
-                    stride += ((attribute.size * byteSizeMap[attribute.type]) / 4);
-                }
-            }
-            // time to off set all indexes..
-            for (var i = 0; i < geometries.length; i++) {
-                var indexBufferData = geometries[i].indexBuffer.data;
-                for (var j = 0; j < indexBufferData.length; j++) {
-                    geometryOut.indexBuffer.data[j + offset2] += offset;
-                }
-                offset += geometry.buffers[bufferIndexToCount].data.length / (stride);
-                offset2 += indexBufferData.length;
-            }
-        }
-        return geometryOut;
-    };
-    return Geometry;
-}());
+    this.refCount = 0;
+};
 
 /**
- * Helper class to create a quad
- *
- * @class
- * @memberof PIXI
- */
-var Quad = /** @class */ (function (_super) {
-    __extends(Quad, _super);
-    function Quad() {
-        var _this = _super.call(this) || this;
-        _this.addAttribute('aVertexPosition', new Float32Array([
-            0, 0,
-            1, 0,
-            1, 1,
-            0, 1 ]))
-            .addIndex([0, 1, 3, 2]);
-        return _this;
+*
+* Adds an attribute to the geometry
+*
+* @param {String} id - the name of the attribute (matching up to a shader)
+* @param {PIXI.Buffer|number[]} [buffer] the buffer that holds the data of the attribute . You can also provide an Array and a buffer will be created from it.
+* @param {Number} [size=0] the size of the attribute. If you have 2 floats per vertex (eg position x and y) this would be 2
+* @param {Boolean} [normalized=false] should the data be normalized.
+* @param {Number} [type=PIXI.TYPES.FLOAT] what type of number is the attribute. Check {PIXI.TYPES} to see the ones available
+* @param {Number} [stride=0] How far apart (in floats) the start of each value is. (used for interleaving data)
+* @param {Number} [start=0] How far into the array to start reading values (used for interleaving data)
+*
+* @return {PIXI.Geometry} returns self, useful for chaining.
+*/
+Geometry.prototype.addAttribute = function addAttribute (id, buffer, size, normalized, type, stride, start, instance)
+{
+        if ( normalized === void 0 ) normalized = false;
+        if ( instance === void 0 ) instance = false;
+
+    if (!buffer)
+    {
+        throw new Error('You must pass a buffer when creating an attribute');
     }
-    return Quad;
-}(Geometry));
+
+    // check if this is a buffer!
+    if (!buffer.data)
+    {
+        // its an array!
+        if (buffer instanceof Array)
+        {
+            buffer = new Float32Array(buffer);
+        }
+
+        buffer = new Buffer(buffer);
+    }
+
+    var ids = id.split('|');
+
+    if (ids.length > 1)
+    {
+        for (var i = 0; i < ids.length; i++)
+        {
+            this.addAttribute(ids[i], buffer, size, normalized, type);
+        }
+
+        return this;
+    }
+
+    var bufferIndex = this.buffers.indexOf(buffer);
+
+    if (bufferIndex === -1)
+    {
+        this.buffers.push(buffer);
+        bufferIndex = this.buffers.length - 1;
+    }
+
+    this.attributes[id] = new Attribute(bufferIndex, size, normalized, type, stride, start, instance);
+
+    // assuming that if there is instanced data then this will be drawn with instancing!
+    this.instanced = this.instanced || instance;
+
+    return this;
+};
 
 /**
- * Helper class to create a quad with uvs like in v4
+ * returns the requested attribute
  *
- * @class
- * @memberof PIXI
- * @extends PIXI.Geometry
+ * @param {String} id  the name of the attribute required
+ * @return {PIXI.Attribute} the attribute requested.
  */
-var QuadUv = /** @class */ (function (_super) {
-    __extends(QuadUv, _super);
-    function QuadUv() {
-        var _this = _super.call(this) || this;
-        /**
-         * An array of vertices
-         *
-         * @member {Float32Array}
-         */
-        _this.vertices = new Float32Array([
-            -1, -1,
-            1, -1,
-            1, 1,
-            -1, 1 ]);
-        /**
-         * The Uvs of the quad
-         *
-         * @member {Float32Array}
-         */
-        _this.uvs = new Float32Array([
-            0, 0,
-            1, 0,
-            1, 1,
-            0, 1 ]);
-        _this.vertexBuffer = new Buffer(_this.vertices);
-        _this.uvBuffer = new Buffer(_this.uvs);
-        _this.addAttribute('aVertexPosition', _this.vertexBuffer)
-            .addAttribute('aTextureCoord', _this.uvBuffer)
-            .addIndex([0, 1, 2, 0, 2, 3]);
-        return _this;
+Geometry.prototype.getAttribute = function getAttribute (id)
+{
+    return this.attributes[id];
+};
+
+/**
+ * returns the requested buffer
+ *
+ * @param {String} id  the name of the buffer required
+ * @return {PIXI.Buffer} the buffer requested.
+ */
+Geometry.prototype.getBuffer = function getBuffer (id)
+{
+    return this.buffers[this.getAttribute(id).buffer];
+};
+
+/**
+*
+* Adds an index buffer to the geometry
+* The index buffer contains integers, three for each triangle in the geometry, which reference the various attribute buffers (position, colour, UV coordinates, other UV coordinates, normal, …). There is only ONE index buffer.
+*
+* @param {PIXI.Buffer|number[]} [buffer] the buffer that holds the data of the index buffer. You can also provide an Array and a buffer will be created from it.
+* @return {PIXI.Geometry} returns self, useful for chaining.
+*/
+Geometry.prototype.addIndex = function addIndex (buffer)
+{
+    if (!buffer.data)
+    {
+        // its an array!
+        if (buffer instanceof Array)
+        {
+            buffer = new Uint16Array(buffer);
+        }
+
+        buffer = new Buffer(buffer);
     }
-    /**
-     * Maps two Rectangle to the quad.
-     *
-     * @param {PIXI.Rectangle} targetTextureFrame - the first rectangle
-     * @param {PIXI.Rectangle} destinationFrame - the second rectangle
-     * @return {PIXI.Quad} Returns itself.
-     */
-    QuadUv.prototype.map = function (targetTextureFrame, destinationFrame) {
-        var x = 0; // destinationFrame.x / targetTextureFrame.width;
-        var y = 0; // destinationFrame.y / targetTextureFrame.height;
-        this.uvs[0] = x;
-        this.uvs[1] = y;
-        this.uvs[2] = x + (destinationFrame.width / targetTextureFrame.width);
-        this.uvs[3] = y;
-        this.uvs[4] = x + (destinationFrame.width / targetTextureFrame.width);
-        this.uvs[5] = y + (destinationFrame.height / targetTextureFrame.height);
-        this.uvs[6] = x;
-        this.uvs[7] = y + (destinationFrame.height / targetTextureFrame.height);
-        x = destinationFrame.x;
-        y = destinationFrame.y;
-        this.vertices[0] = x;
-        this.vertices[1] = y;
-        this.vertices[2] = x + destinationFrame.width;
-        this.vertices[3] = y;
-        this.vertices[4] = x + destinationFrame.width;
-        this.vertices[5] = y + destinationFrame.height;
-        this.vertices[6] = x;
-        this.vertices[7] = y + destinationFrame.height;
-        this.invalidate();
-        return this;
-    };
-    /**
-     * legacy upload method, just marks buffers dirty
-     * @returns {PIXI.QuadUv} Returns itself.
-     */
-    QuadUv.prototype.invalidate = function () {
-        this.vertexBuffer._updateID++;
-        this.uvBuffer._updateID++;
-        return this;
-    };
-    return QuadUv;
-}(Geometry));
+
+    buffer.index = true;
+    this.indexBuffer = buffer;
+
+    if (this.buffers.indexOf(buffer) === -1)
+    {
+        this.buffers.push(buffer);
+    }
+
+    return this;
+};
+
+/**
+ * returns the index buffer
+ *
+ * @return {PIXI.Buffer} the index buffer.
+ */
+Geometry.prototype.getIndex = function getIndex ()
+{
+    return this.indexBuffer;
+};
+
+/**
+ * this function modifies the structure so that all current attributes become interleaved into a single buffer
+ * This can be useful if your model remains static as it offers a little performance boost
+ *
+ * @return {PIXI.Geometry} returns self, useful for chaining.
+ */
+Geometry.prototype.interleave = function interleave ()
+{
+    // a simple check to see if buffers are already interleaved..
+    if (this.buffers.length === 1 || (this.buffers.length === 2 && this.indexBuffer)) { return this; }
+
+    // assume already that no buffers are interleaved
+    var arrays = [];
+    var sizes = [];
+    var interleavedBuffer = new Buffer();
+    var i;
+
+    for (i in this.attributes)
+    {
+        var attribute = this.attributes[i];
+
+        var buffer = this.buffers[attribute.buffer];
+
+        arrays.push(buffer.data);
+
+        sizes.push((attribute.size * byteSizeMap[attribute.type]) / 4);
+
+        attribute.buffer = 0;
+    }
+
+    interleavedBuffer.data = interleaveTypedArrays(arrays, sizes);
+
+    for (i = 0; i < this.buffers.length; i++)
+    {
+        if (this.buffers[i] !== this.indexBuffer)
+        {
+            this.buffers[i].destroy();
+        }
+    }
+
+    this.buffers = [interleavedBuffer];
+
+    if (this.indexBuffer)
+    {
+        this.buffers.push(this.indexBuffer);
+    }
+
+    return this;
+};
+
+Geometry.prototype.getSize = function getSize ()
+{
+    for (var i in this.attributes)
+    {
+        var attribute = this.attributes[i];
+        var buffer = this.buffers[attribute.buffer];
+
+        return buffer.data.length / ((attribute.stride / 4) || attribute.size);
+    }
+
+    return 0;
+};
+
+/**
+ * disposes WebGL resources that are connected to this geometry
+ */
+Geometry.prototype.dispose = function dispose ()
+{
+    this.disposeRunner.run(this, false);
+};
+
+/**
+ * Destroys the geometry.
+ */
+Geometry.prototype.destroy = function destroy ()
+{
+    this.dispose();
+
+    this.buffers = null;
+    this.indexBuffer = null;
+    this.attributes = null;
+};
+
+/**
+ * returns a clone of the geometry
+ *
+ * @returns {PIXI.Geometry} a new clone of this geometry
+ */
+Geometry.prototype.clone = function clone ()
+{
+    var geometry = new Geometry();
+
+    for (var i = 0; i < this.buffers.length; i++)
+    {
+        geometry.buffers[i] = new Buffer(this.buffers[i].data.slice());
+    }
+
+    for (var i$1 in this.attributes)
+    {
+        var attrib = this.attributes[i$1];
+
+        geometry.attributes[i$1] = new Attribute(
+            attrib.buffer,
+            attrib.size,
+            attrib.normalized,
+            attrib.type,
+            attrib.stride,
+            attrib.start,
+            attrib.instance
+        );
+    }
+
+    if (this.indexBuffer)
+    {
+        geometry.indexBuffer = geometry.buffers[this.buffers.indexOf(this.indexBuffer)];
+        geometry.indexBuffer.index = true;
+    }
+
+    return geometry;
+};
+
+/**
+ * merges an array of geometries into a new single one
+ * geometry attribute styles must match for this operation to work
+ *
+ * @param {PIXI.Geometry[]} geometries array of geometries to merge
+ * @returns {PIXI.Geometry} shiny new geometry!
+ */
+Geometry.merge = function merge (geometries)
+{
+    // todo add a geometry check!
+    // also a size check.. cant be too big!]
+
+    var geometryOut = new Geometry();
+
+    var arrays = [];
+    var sizes = [];
+    var offsets = [];
+
+    var geometry;
+
+    // pass one.. get sizes..
+    for (var i = 0; i < geometries.length; i++)
+    {
+        geometry = geometries[i];
+
+        for (var j = 0; j < geometry.buffers.length; j++)
+        {
+            sizes[j] = sizes[j] || 0;
+            sizes[j] += geometry.buffers[j].data.length;
+            offsets[j] = 0;
+        }
+    }
+
+    // build the correct size arrays..
+    for (var i$1 = 0; i$1 < geometry.buffers.length; i$1++)
+    {
+        // TODO types!
+        arrays[i$1] = new map$1[getBufferType(geometry.buffers[i$1].data)](sizes[i$1]);
+        geometryOut.buffers[i$1] = new Buffer(arrays[i$1]);
+    }
+
+    // pass to set data..
+    for (var i$2 = 0; i$2 < geometries.length; i$2++)
+    {
+        geometry = geometries[i$2];
+
+        for (var j$1 = 0; j$1 < geometry.buffers.length; j$1++)
+        {
+            arrays[j$1].set(geometry.buffers[j$1].data, offsets[j$1]);
+            offsets[j$1] += geometry.buffers[j$1].data.length;
+        }
+    }
+
+    geometryOut.attributes = geometry.attributes;
+
+    if (geometry.indexBuffer)
+    {
+        geometryOut.indexBuffer = geometryOut.buffers[geometry.buffers.indexOf(geometry.indexBuffer)];
+        geometryOut.indexBuffer.index = true;
+
+        var offset = 0;
+        var stride = 0;
+        var offset2 = 0;
+        var bufferIndexToCount = 0;
+
+        // get a buffer
+        for (var i$3 = 0; i$3 < geometry.buffers.length; i$3++)
+        {
+            if (geometry.buffers[i$3] !== geometry.indexBuffer)
+            {
+                bufferIndexToCount = i$3;
+                break;
+            }
+        }
+
+        // figure out the stride of one buffer..
+        for (var i$4 in geometry.attributes)
+        {
+            var attribute = geometry.attributes[i$4];
+
+            if ((attribute.buffer | 0) === bufferIndexToCount)
+            {
+                stride += ((attribute.size * byteSizeMap[attribute.type]) / 4);
+            }
+        }
+
+        // time to off set all indexes..
+        for (var i$5 = 0; i$5 < geometries.length; i$5++)
+        {
+            var indexBufferData = geometries[i$5].indexBuffer.data;
+
+            for (var j$2 = 0; j$2 < indexBufferData.length; j$2++)
+            {
+                geometryOut.indexBuffer.data[j$2 + offset2] += offset;
+            }
+
+            offset += geometry.buffers[bufferIndexToCount].data.length / (stride);
+            offset2 += indexBufferData.length;
+        }
+    }
+
+    return geometryOut;
+};
 
 var UID$2 = 0;
+
 /**
  * Uniform group holds uniform map and some ID's for work
  *
  * @class
  * @memberof PIXI
  */
-var UniformGroup = /** @class */ (function () {
+var UniformGroup = function UniformGroup(uniforms, _static)
+{
     /**
-     * @param {object} [uniforms] - Custom uniforms to use to augment the built-in ones.
-     * @param {boolean} [_static] - Uniforms wont be changed after creation
+     * uniform values
+     * @member {object}
+     * @readonly
      */
-    function UniformGroup(uniforms, _static) {
-        /**
-         * uniform values
-         * @member {object}
-         * @readonly
-         */
-        this.uniforms = uniforms;
-        /**
-         * Its a group and not a single uniforms
-         * @member {boolean}
-         * @readonly
-         * @default true
-         */
-        this.group = true;
-        // lets generate this when the shader ?
-        this.syncUniforms = {};
-        /**
-         * dirty version
-         * @protected
-         * @member {number}
-         */
-        this.dirtyId = 0;
-        /**
-         * unique id
-         * @protected
-         * @member {number}
-         */
-        this.id = UID$2++;
-        /**
-         * Uniforms wont be changed after creation
-         * @member {boolean}
-         */
-        this.static = !!_static;
-    }
-    UniformGroup.prototype.update = function () {
-        this.dirtyId++;
-    };
-    UniformGroup.prototype.add = function (name, uniforms, _static) {
-        this.uniforms[name] = new UniformGroup(uniforms, _static);
-    };
-    UniformGroup.from = function (uniforms, _static) {
-        return new UniformGroup(uniforms, _static);
-    };
-    return UniformGroup;
-}());
+    this.uniforms = uniforms;
 
-/**
- * System plugin to the renderer to manage filter states.
- *
- * @class
- * @private
- */
-var FilterState = /** @class */ (function () {
-    function FilterState() {
-        this.renderTexture = null;
-        /**
-         * Target of the filters
-         * We store for case when custom filter wants to know the element it was applied on
-         * @member {PIXI.DisplayObject}
-         * @private
-         */
-        this.target = null;
-        /**
-         * Compatibility with PixiJS v4 filters
-         * @member {boolean}
-         * @default false
-         * @private
-         */
-        this.legacy = false;
-        /**
-         * Resolution of filters
-         * @member {number}
-         * @default 1
-         * @private
-         */
-        this.resolution = 1;
-        // next three fields are created only for root
-        // re-assigned for everything else
-        /**
-         * Source frame
-         * @member {PIXI.Rectangle}
-         * @private
-         */
-        this.sourceFrame = new Rectangle();
-        /**
-         * Destination frame
-         * @member {PIXI.Rectangle}
-         * @private
-         */
-        this.destinationFrame = new Rectangle();
-        /**
-         * Collection of filters
-         * @member {PIXI.Filter[]}
-         * @private
-         */
-        this.filters = [];
-    }
     /**
-     * clears the state
-     * @private
+     * Its a group and not a single uniforms
+     * @member {boolean}
+     * @readonly
+     * @default true
      */
-    FilterState.prototype.clear = function () {
-        this.target = null;
-        this.filters = null;
-        this.renderTexture = null;
-    };
-    return FilterState;
-}());
+    this.group = true;
 
-/**
- * System plugin to the renderer to manage the filters.
- *
- * @class
- * @memberof PIXI.systems
- * @extends PIXI.System
- */
-var FilterSystem = /** @class */ (function (_super) {
-    __extends(FilterSystem, _super);
+    // lets generate this when the shader ?
+    this.syncUniforms = {};
+
     /**
-     * @param {PIXI.Renderer} renderer - The renderer this System works for.
-     */
-    function FilterSystem(renderer) {
-        var _this = _super.call(this, renderer) || this;
-        /**
-         * List of filters for the FilterSystem
-         * @member {Object[]}
-         * @readonly
-         */
-        _this.defaultFilterStack = [{}];
-        /**
-         * stores a bunch of PO2 textures used for filtering
-         * @member {Object}
-         */
-        _this.texturePool = new RenderTexturePool();
-        _this.texturePool.setScreenSize(renderer.view);
-        /**
-         * a pool for storing filter states, save us creating new ones each tick
-         * @member {Object[]}
-         */
-        _this.statePool = [];
-        /**
-         * A very simple geometry used when drawing a filter effect to the screen
-         * @member {PIXI.Quad}
-         */
-        _this.quad = new Quad();
-        /**
-         * Quad UVs
-         * @member {PIXI.QuadUv}
-         */
-        _this.quadUv = new QuadUv();
-        /**
-         * Temporary rect for maths
-         * @type {PIXI.Rectangle}
-         */
-        _this.tempRect = new Rectangle();
-        /**
-         * Active state
-         * @member {object}
-         */
-        _this.activeState = {};
-        /**
-         * This uniform group is attached to filter uniforms when used
-         * @member {PIXI.UniformGroup}
-         * @property {PIXI.Rectangle} outputFrame
-         * @property {Float32Array} inputSize
-         * @property {Float32Array} inputPixel
-         * @property {Float32Array} inputClamp
-         * @property {Number} resolution
-         * @property {Float32Array} filterArea
-         * @property {Fload32Array} filterClamp
-         */
-        _this.globalUniforms = new UniformGroup({
-            outputFrame: _this.tempRect,
-            inputSize: new Float32Array(4),
-            inputPixel: new Float32Array(4),
-            inputClamp: new Float32Array(4),
-            resolution: 1,
-            // legacy variables
-            filterArea: new Float32Array(4),
-            filterClamp: new Float32Array(4),
-        }, true);
-        /**
-         * Whether to clear output renderTexture in AUTO/BLIT mode. See {@link PIXI.CLEAR_MODES}
-         * @member {boolean}
-         */
-        _this.forceClear = false;
-        /**
-         * Old padding behavior is to use the max amount instead of sum padding.
-         * Use this flag if you need the old behavior.
-         * @member {boolean}
-         * @default false
-         */
-        _this.useMaxPadding = false;
-        return _this;
-    }
-    /**
-     * Adds a new filter to the System.
-     *
-     * @param {PIXI.DisplayObject} target - The target of the filter to render.
-     * @param {PIXI.Filter[]} filters - The filters to apply.
-     */
-    FilterSystem.prototype.push = function (target, filters) {
-        var renderer = this.renderer;
-        var filterStack = this.defaultFilterStack;
-        var state = this.statePool.pop() || new FilterState();
-        var resolution = filters[0].resolution;
-        var padding = filters[0].padding;
-        var autoFit = filters[0].autoFit;
-        var legacy = filters[0].legacy;
-        for (var i = 1; i < filters.length; i++) {
-            var filter = filters[i];
-            // lets use the lowest resolution..
-            resolution = Math.min(resolution, filter.resolution);
-            // figure out the padding required for filters
-            padding = this.useMaxPadding
-                // old behavior: use largest amount of padding!
-                ? Math.max(padding, filter.padding)
-                // new behavior: sum the padding
-                : padding + filter.padding;
-            // only auto fit if all filters are autofit
-            autoFit = autoFit || filter.autoFit;
-            legacy = legacy || filter.legacy;
-        }
-        if (filterStack.length === 1) {
-            this.defaultFilterStack[0].renderTexture = renderer.renderTexture.current;
-        }
-        filterStack.push(state);
-        state.resolution = resolution;
-        state.legacy = legacy;
-        state.target = target;
-        state.sourceFrame.copyFrom(target.filterArea || target.getBounds(true));
-        state.sourceFrame.pad(padding);
-        if (autoFit) {
-            state.sourceFrame.fit(this.renderer.renderTexture.sourceFrame);
-        }
-        // round to whole number based on resolution
-        state.sourceFrame.ceil(resolution);
-        state.renderTexture = this.getOptimalFilterTexture(state.sourceFrame.width, state.sourceFrame.height, resolution);
-        state.filters = filters;
-        state.destinationFrame.width = state.renderTexture.width;
-        state.destinationFrame.height = state.renderTexture.height;
-        var destinationFrame = this.tempRect;
-        destinationFrame.width = state.sourceFrame.width;
-        destinationFrame.height = state.sourceFrame.height;
-        state.renderTexture.filterFrame = state.sourceFrame;
-        renderer.renderTexture.bind(state.renderTexture, state.sourceFrame, destinationFrame);
-        renderer.renderTexture.clear();
-    };
-    /**
-     * Pops off the filter and applies it.
-     *
-     */
-    FilterSystem.prototype.pop = function () {
-        var filterStack = this.defaultFilterStack;
-        var state = filterStack.pop();
-        var filters = state.filters;
-        this.activeState = state;
-        var globalUniforms = this.globalUniforms.uniforms;
-        globalUniforms.outputFrame = state.sourceFrame;
-        globalUniforms.resolution = state.resolution;
-        var inputSize = globalUniforms.inputSize;
-        var inputPixel = globalUniforms.inputPixel;
-        var inputClamp = globalUniforms.inputClamp;
-        inputSize[0] = state.destinationFrame.width;
-        inputSize[1] = state.destinationFrame.height;
-        inputSize[2] = 1.0 / inputSize[0];
-        inputSize[3] = 1.0 / inputSize[1];
-        inputPixel[0] = inputSize[0] * state.resolution;
-        inputPixel[1] = inputSize[1] * state.resolution;
-        inputPixel[2] = 1.0 / inputPixel[0];
-        inputPixel[3] = 1.0 / inputPixel[1];
-        inputClamp[0] = 0.5 * inputPixel[2];
-        inputClamp[1] = 0.5 * inputPixel[3];
-        inputClamp[2] = (state.sourceFrame.width * inputSize[2]) - (0.5 * inputPixel[2]);
-        inputClamp[3] = (state.sourceFrame.height * inputSize[3]) - (0.5 * inputPixel[3]);
-        // only update the rect if its legacy..
-        if (state.legacy) {
-            var filterArea = globalUniforms.filterArea;
-            filterArea[0] = state.destinationFrame.width;
-            filterArea[1] = state.destinationFrame.height;
-            filterArea[2] = state.sourceFrame.x;
-            filterArea[3] = state.sourceFrame.y;
-            globalUniforms.filterClamp = globalUniforms.inputClamp;
-        }
-        this.globalUniforms.update();
-        var lastState = filterStack[filterStack.length - 1];
-        if (state.renderTexture.framebuffer.multisample > 1) {
-            this.renderer.framebuffer.blit();
-        }
-        if (filters.length === 1) {
-            filters[0].apply(this, state.renderTexture, lastState.renderTexture, CLEAR_MODES.BLEND, state);
-            this.returnFilterTexture(state.renderTexture);
-        }
-        else {
-            var flip = state.renderTexture;
-            var flop = this.getOptimalFilterTexture(flip.width, flip.height, state.resolution);
-            flop.filterFrame = flip.filterFrame;
-            var i = 0;
-            for (i = 0; i < filters.length - 1; ++i) {
-                filters[i].apply(this, flip, flop, CLEAR_MODES.CLEAR, state);
-                var t = flip;
-                flip = flop;
-                flop = t;
-            }
-            filters[i].apply(this, flip, lastState.renderTexture, CLEAR_MODES.BLEND, state);
-            this.returnFilterTexture(flip);
-            this.returnFilterTexture(flop);
-        }
-        state.clear();
-        this.statePool.push(state);
-    };
-    /**
-     * Binds a renderTexture with corresponding `filterFrame`, clears it if mode corresponds.
-     * @param {PIXI.RenderTexture} filterTexture - renderTexture to bind, should belong to filter pool or filter stack
-     * @param {PIXI.CLEAR_MODES} [clearMode] - clearMode, by default its CLEAR/YES. See {@link PIXI.CLEAR_MODES}
-     */
-    FilterSystem.prototype.bindAndClear = function (filterTexture, clearMode) {
-        if (clearMode === void 0) { clearMode = CLEAR_MODES.CLEAR; }
-        if (filterTexture && filterTexture.filterFrame) {
-            var destinationFrame = this.tempRect;
-            destinationFrame.width = filterTexture.filterFrame.width;
-            destinationFrame.height = filterTexture.filterFrame.height;
-            this.renderer.renderTexture.bind(filterTexture, filterTexture.filterFrame, destinationFrame);
-        }
-        else {
-            this.renderer.renderTexture.bind(filterTexture);
-        }
-        // TODO: remove in next major version
-        if (typeof clearMode === 'boolean') {
-            clearMode = clearMode ? CLEAR_MODES.CLEAR : CLEAR_MODES.BLEND;
-            // get deprecation function from utils
-            deprecation('5.2.1', 'Use CLEAR_MODES when using clear applyFilter option');
-        }
-        if (clearMode === CLEAR_MODES.CLEAR
-            || (clearMode === CLEAR_MODES.BLIT && this.forceClear)) {
-            this.renderer.renderTexture.clear();
-        }
-    };
-    /**
-     * Draws a filter.
-     *
-     * @param {PIXI.Filter} filter - The filter to draw.
-     * @param {PIXI.RenderTexture} input - The input render target.
-     * @param {PIXI.RenderTexture} output - The target to output to.
-     * @param {PIXI.CLEAR_MODES} [clearMode] - Should the output be cleared before rendering to it
-     */
-    FilterSystem.prototype.applyFilter = function (filter, input, output, clearMode) {
-        var renderer = this.renderer;
-        this.bindAndClear(output, clearMode);
-        // set the uniforms..
-        filter.uniforms.uSampler = input;
-        filter.uniforms.filterGlobals = this.globalUniforms;
-        // TODO make it so that the order of this does not matter..
-        // because it does at the moment cos of global uniforms.
-        // they need to get resynced
-        renderer.state.set(filter.state);
-        renderer.shader.bind(filter);
-        if (filter.legacy) {
-            this.quadUv.map(input._frame, input.filterFrame);
-            renderer.geometry.bind(this.quadUv);
-            renderer.geometry.draw(DRAW_MODES.TRIANGLES);
-        }
-        else {
-            renderer.geometry.bind(this.quad);
-            renderer.geometry.draw(DRAW_MODES.TRIANGLE_STRIP);
-        }
-    };
-    /**
-     * Multiply _input normalized coordinates_ to this matrix to get _sprite texture normalized coordinates_.
-     *
-     * Use `outputMatrix * vTextureCoord` in the shader.
-     *
-     * @param {PIXI.Matrix} outputMatrix - The matrix to output to.
-     * @param {PIXI.Sprite} sprite - The sprite to map to.
-     * @return {PIXI.Matrix} The mapped matrix.
-     */
-    FilterSystem.prototype.calculateSpriteMatrix = function (outputMatrix, sprite) {
-        var _a = this.activeState, sourceFrame = _a.sourceFrame, destinationFrame = _a.destinationFrame;
-        var orig = sprite._texture.orig;
-        var mappedMatrix = outputMatrix.set(destinationFrame.width, 0, 0, destinationFrame.height, sourceFrame.x, sourceFrame.y);
-        var worldTransform = sprite.worldTransform.copyTo(Matrix.TEMP_MATRIX);
-        worldTransform.invert();
-        mappedMatrix.prepend(worldTransform);
-        mappedMatrix.scale(1.0 / orig.width, 1.0 / orig.height);
-        mappedMatrix.translate(sprite.anchor.x, sprite.anchor.y);
-        return mappedMatrix;
-    };
-    /**
-     * Destroys this Filter System.
-     */
-    FilterSystem.prototype.destroy = function () {
-        // Those textures has to be destroyed by RenderTextureSystem or FramebufferSystem
-        this.texturePool.clear(false);
-    };
-    /**
-     * Gets a Power-of-Two render texture or fullScreen texture
-     *
+     * dirty version
      * @protected
-     * @param {number} minWidth - The minimum width of the render texture in real pixels.
-     * @param {number} minHeight - The minimum height of the render texture in real pixels.
-     * @param {number} [resolution=1] - The resolution of the render texture.
-     * @return {PIXI.RenderTexture} The new render texture.
+     * @member {number}
      */
-    FilterSystem.prototype.getOptimalFilterTexture = function (minWidth, minHeight, resolution) {
-        if (resolution === void 0) { resolution = 1; }
-        return this.texturePool.getOptimalTexture(minWidth, minHeight, resolution);
-    };
+    this.dirtyId = 0;
+
     /**
-     * Gets extra render texture to use inside current filter
-     * To be compliant with older filters, you can use params in any order
-     *
-     * @param {PIXI.RenderTexture} [input] - renderTexture from which size and resolution will be copied
-     * @param {number} [resolution] - override resolution of the renderTexture
-     * @returns {PIXI.RenderTexture}
+     * unique id
+     * @protected
+     * @member {number}
      */
-    FilterSystem.prototype.getFilterTexture = function (input, resolution) {
-        if (typeof input === 'number') {
-            var swap = input;
-            input = resolution;
-            resolution = swap;
-        }
-        input = input || this.activeState.renderTexture;
-        var filterTexture = this.texturePool.getOptimalTexture(input.width, input.height, resolution || input.resolution);
-        filterTexture.filterFrame = input.filterFrame;
-        return filterTexture;
-    };
+    this.id = UID$2++;
+
     /**
-     * Frees a render texture back into the pool.
-     *
-     * @param {PIXI.RenderTexture} renderTexture - The renderTarget to free
+     * Uniforms wont be changed after creation
+     * @member {boolean}
      */
-    FilterSystem.prototype.returnFilterTexture = function (renderTexture) {
-        this.texturePool.returnTexture(renderTexture);
-    };
-    /**
-     * Empties the texture pool.
-     */
-    FilterSystem.prototype.emptyPool = function () {
-        this.texturePool.clear(true);
-    };
-    /**
-     * calls `texturePool.resize()`, affects fullScreen renderTextures
-     */
-    FilterSystem.prototype.resize = function () {
-        this.texturePool.setScreenSize(this.renderer.view);
-    };
-    return FilterSystem;
-}(System));
+    this.static = !!_static;
+};
+
+UniformGroup.prototype.update = function update ()
+{
+    this.dirtyId++;
+};
+
+UniformGroup.prototype.add = function add (name, uniforms, _static)
+{
+    this.uniforms[name] = new UniformGroup(uniforms, _static);
+};
+
+UniformGroup.from = function from (uniforms, _static)
+{
+    return new UniformGroup(uniforms, _static);
+};
 
 /**
  * Base for a common object renderer that can be used as a
@@ -12933,1444 +13554,101 @@ var FilterSystem = /** @class */ (function (_super) {
  * @extends PIXI.System
  * @memberof PIXI
  */
-var ObjectRenderer = /** @class */ (function () {
+var ObjectRenderer = function ObjectRenderer(renderer)
+{
     /**
-     * @param {PIXI.Renderer} renderer - The renderer this manager works for.
-     */
-    function ObjectRenderer(renderer) {
-        /**
-         * The renderer this manager works for.
-         *
-         * @member {PIXI.Renderer}
-         */
-        this.renderer = renderer;
-    }
-    /**
-     * Stub method that should be used to empty the current
-     * batch by rendering objects now.
-     */
-    ObjectRenderer.prototype.flush = function () {
-        // flush!
-    };
-    /**
-     * Generic destruction method that frees all resources. This
-     * should be called by subclasses.
-     */
-    ObjectRenderer.prototype.destroy = function () {
-        this.renderer = null;
-    };
-    /**
-     * Stub method that initializes any state required before
-     * rendering starts. It is different from the `prerender`
-     * signal, which occurs every frame, in that it is called
-     * whenever an object requests _this_ renderer specifically.
-     */
-    ObjectRenderer.prototype.start = function () {
-        // set the shader..
-    };
-    /**
-     * Stops the renderer. It should free up any state and
-     * become dormant.
-     */
-    ObjectRenderer.prototype.stop = function () {
-        this.flush();
-    };
-    /**
-     * Keeps the object to render. It doesn't have to be
-     * rendered immediately.
+     * The renderer this manager works for.
      *
-     * @param {PIXI.DisplayObject} object - The object to render.
+     * @member {PIXI.Renderer}
      */
-    ObjectRenderer.prototype.render = function (_object) {
-        // render the object
-    };
-    return ObjectRenderer;
-}());
+    this.renderer = renderer;
+};
 
 /**
- * System plugin to the renderer to manage batching.
+ * Stub method that should be used to empty the current
+ * batch by rendering objects now.
+ */
+ObjectRenderer.prototype.flush = function flush ()
+{
+    // flush!
+};
+
+/**
+ * Generic destruction method that frees all resources. This
+ * should be called by subclasses.
+ */
+ObjectRenderer.prototype.destroy = function destroy ()
+{
+    this.renderer = null;
+};
+
+/**
+ * Stub method that initializes any state required before
+ * rendering starts. It is different from the `prerender`
+ * signal, which occurs every frame, in that it is called
+ * whenever an object requests _this_ renderer specifically.
+ */
+ObjectRenderer.prototype.start = function start ()
+{
+    // set the shader..
+};
+
+/**
+ * Stops the renderer. It should free up any state and
+ * become dormant.
+ */
+ObjectRenderer.prototype.stop = function stop ()
+{
+    this.flush();
+};
+
+/**
+ * Keeps the object to render. It doesn't have to be
+ * rendered immediately.
  *
- * @class
- * @extends PIXI.System
- * @memberof PIXI.systems
+ * @param {PIXI.DisplayObject} object - The object to render.
  */
-var BatchSystem = /** @class */ (function (_super) {
-    __extends(BatchSystem, _super);
-    /**
-     * @param {PIXI.Renderer} renderer - The renderer this System works for.
-     */
-    function BatchSystem(renderer) {
-        var _this = _super.call(this, renderer) || this;
-        /**
-         * An empty renderer.
-         *
-         * @member {PIXI.ObjectRenderer}
-         */
-        _this.emptyRenderer = new ObjectRenderer(renderer);
-        /**
-         * The currently active ObjectRenderer.
-         *
-         * @member {PIXI.ObjectRenderer}
-         */
-        _this.currentRenderer = _this.emptyRenderer;
-        return _this;
-    }
-    /**
-     * Changes the current renderer to the one given in parameter
-     *
-     * @param {PIXI.ObjectRenderer} objectRenderer - The object renderer to use.
-     */
-    BatchSystem.prototype.setObjectRenderer = function (objectRenderer) {
-        if (this.currentRenderer === objectRenderer) {
-            return;
-        }
-        this.currentRenderer.stop();
-        this.currentRenderer = objectRenderer;
-        this.currentRenderer.start();
-    };
-    /**
-     * This should be called if you wish to do some custom rendering
-     * It will basically render anything that may be batched up such as sprites
-     */
-    BatchSystem.prototype.flush = function () {
-        this.setObjectRenderer(this.emptyRenderer);
-    };
-    /**
-     * Reset the system to an empty renderer
-     */
-    BatchSystem.prototype.reset = function () {
-        this.setObjectRenderer(this.emptyRenderer);
-    };
-    /**
-     * Handy function for batch renderers: copies bound textures in first maxTextures locations to array
-     * sets actual _batchLocation for them
-     *
-     * @param {PIXI.BaseTexture[]} - arr copy destination
-     * @param {number} maxTextures - number of copied elements
-     */
-    BatchSystem.prototype.copyBoundTextures = function (arr, maxTextures) {
-        var boundTextures = this.renderer.texture.boundTextures;
-        for (var i = maxTextures - 1; i >= 0; --i) {
-            arr[i] = boundTextures[i] || null;
-            if (arr[i]) {
-                arr[i]._batchLocation = i;
-            }
-        }
-    };
-    /**
-     * Assigns batch locations to textures in array based on boundTextures state.
-     * All textures in texArray should have `_batchEnabled = _batchId`,
-     * and their count should be less than `maxTextures`.
-     *
-     * @param {PIXI.BatchTextureArray} texArray - textures to bound
-     * @param {PIXI.BaseTexture[]} boundTextures - current state of bound textures
-     * @param {number} batchId - marker for _batchEnabled param of textures in texArray
-     * @param {number} maxTextures - number of texture locations to manipulate
-     */
-    BatchSystem.prototype.boundArray = function (texArray, boundTextures, batchId, maxTextures) {
-        var elements = texArray.elements, ids = texArray.ids, count = texArray.count;
-        var j = 0;
-        for (var i = 0; i < count; i++) {
-            var tex = elements[i];
-            var loc = tex._batchLocation;
-            if (loc >= 0 && loc < maxTextures
-                && boundTextures[loc] === tex) {
-                ids[i] = loc;
-                continue;
-            }
-            while (j < maxTextures) {
-                var bound = boundTextures[j];
-                if (bound && bound._batchEnabled === batchId
-                    && bound._batchLocation === j) {
-                    j++;
-                    continue;
-                }
-                ids[i] = j;
-                tex._batchLocation = j;
-                boundTextures[j] = tex;
-                break;
-            }
-        }
-    };
-    return BatchSystem;
-}(System));
+ObjectRenderer.prototype.render = function render (object) // eslint-disable-line no-unused-vars
+{
+    // render the object
+};
 
-var CONTEXT_UID_COUNTER = 0;
 /**
- * System plugin to the renderer to manage the context.
+ * The maximum support for using WebGL. If a device does not
+ * support WebGL version, for instance WebGL 2, it will still
+ * attempt to fallback support to WebGL 1. If you want to
+ * explicitly remove feature support to target a more stable
+ * baseline, prefer a lower environment.
  *
- * @class
- * @extends PIXI.System
- * @memberof PIXI.systems
- */
-var ContextSystem = /** @class */ (function (_super) {
-    __extends(ContextSystem, _super);
-    /* eslint-enable camelcase */
-    /**
-     * @param {PIXI.Renderer} renderer - The renderer this System works for.
-     */
-    function ContextSystem(renderer) {
-        var _this = _super.call(this, renderer) || this;
-        /**
-         * Either 1 or 2 to reflect the WebGL version being used
-         * @member {number}
-         * @readonly
-         */
-        _this.webGLVersion = 1;
-        /**
-         * Extensions being used
-         * @member {object}
-         * @readonly
-         * @property {WEBGL_draw_buffers} drawBuffers - WebGL v1 extension
-         * @property {WEBGL_depth_texture} depthTexture - WebGL v1 extension
-         * @property {OES_texture_float} floatTexture - WebGL v1 extension
-         * @property {WEBGL_lose_context} loseContext - WebGL v1 extension
-         * @property {OES_vertex_array_object} vertexArrayObject - WebGL v1 extension
-         * @property {EXT_texture_filter_anisotropic} anisotropicFiltering - WebGL v1 and v2 extension
-         */
-        _this.extensions = {};
-        /**
-         * Features supported by current context
-         * @member {object}
-         * @private
-         * @readonly
-         * @property {boolean} uint32Indices - Supports of 32-bit indices buffer
-         */
-        _this.supports = {
-            uint32Indices: false,
-        };
-        // Bind functions
-        _this.handleContextLost = _this.handleContextLost.bind(_this);
-        _this.handleContextRestored = _this.handleContextRestored.bind(_this);
-        renderer.view.addEventListener('webglcontextlost', _this.handleContextLost, false);
-        renderer.view.addEventListener('webglcontextrestored', _this.handleContextRestored, false);
-        return _this;
-    }
-    Object.defineProperty(ContextSystem.prototype, "isLost", {
-        /**
-         * `true` if the context is lost
-         * @member {boolean}
-         * @readonly
-         */
-        get: function () {
-            return (!this.gl || this.gl.isContextLost());
-        },
-        enumerable: false,
-        configurable: true
-    });
-    /**
-     * Handle the context change event
-     * @param {WebGLRenderingContext} gl - new webgl context
-     */
-    ContextSystem.prototype.contextChange = function (gl) {
-        this.gl = gl;
-        this.renderer.gl = gl;
-        this.renderer.CONTEXT_UID = CONTEXT_UID_COUNTER++;
-        // restore a context if it was previously lost
-        if (gl.isContextLost() && gl.getExtension('WEBGL_lose_context')) {
-            gl.getExtension('WEBGL_lose_context').restoreContext();
-        }
-    };
-    /**
-     * Initialize the context
-     *
-     * @protected
-     * @param {WebGLRenderingContext} gl - WebGL context
-     */
-    ContextSystem.prototype.initFromContext = function (gl) {
-        this.gl = gl;
-        this.validateContext(gl);
-        this.renderer.gl = gl;
-        this.renderer.CONTEXT_UID = CONTEXT_UID_COUNTER++;
-        this.renderer.runners.contextChange.emit(gl);
-    };
-    /**
-     * Initialize from context options
-     *
-     * @protected
-     * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/getContext
-     * @param {object} options - context attributes
-     */
-    ContextSystem.prototype.initFromOptions = function (options) {
-        var gl = this.createContext(this.renderer.view, options);
-        this.initFromContext(gl);
-    };
-    /**
-     * Helper class to create a WebGL Context
-     *
-     * @param canvas {HTMLCanvasElement} the canvas element that we will get the context from
-     * @param options {object} An options object that gets passed in to the canvas element containing the context attributes
-     * @see https://developer.mozilla.org/en/docs/Web/API/HTMLCanvasElement/getContext
-     * @return {WebGLRenderingContext} the WebGL context
-     */
-    ContextSystem.prototype.createContext = function (canvas, options) {
-        var gl;
-        if (settings.PREFER_ENV >= ENV.WEBGL2) {
-            gl = canvas.getContext('webgl2', options);
-        }
-        if (gl) {
-            this.webGLVersion = 2;
-        }
-        else {
-            this.webGLVersion = 1;
-            gl = canvas.getContext('webgl', options)
-                || canvas.getContext('experimental-webgl', options);
-            if (!gl) {
-                // fail, not able to get a context
-                throw new Error('This browser does not support WebGL. Try using the canvas renderer');
-            }
-        }
-        this.gl = gl;
-        this.getExtensions();
-        return this.gl;
-    };
-    /**
-     * Auto-populate the extensions
-     *
-     * @protected
-     */
-    ContextSystem.prototype.getExtensions = function () {
-        // time to set up default extensions that Pixi uses.
-        var gl = this.gl;
-        if (this.webGLVersion === 1) {
-            Object.assign(this.extensions, {
-                drawBuffers: gl.getExtension('WEBGL_draw_buffers'),
-                depthTexture: gl.getExtension('WEBGL_depth_texture'),
-                loseContext: gl.getExtension('WEBGL_lose_context'),
-                vertexArrayObject: gl.getExtension('OES_vertex_array_object')
-                    || gl.getExtension('MOZ_OES_vertex_array_object')
-                    || gl.getExtension('WEBKIT_OES_vertex_array_object'),
-                anisotropicFiltering: gl.getExtension('EXT_texture_filter_anisotropic'),
-                uint32ElementIndex: gl.getExtension('OES_element_index_uint'),
-                // Floats and half-floats
-                floatTexture: gl.getExtension('OES_texture_float'),
-                floatTextureLinear: gl.getExtension('OES_texture_float_linear'),
-                textureHalfFloat: gl.getExtension('OES_texture_half_float'),
-                textureHalfFloatLinear: gl.getExtension('OES_texture_half_float_linear'),
-            });
-        }
-        else if (this.webGLVersion === 2) {
-            Object.assign(this.extensions, {
-                anisotropicFiltering: gl.getExtension('EXT_texture_filter_anisotropic'),
-                // Floats and half-floats
-                colorBufferFloat: gl.getExtension('EXT_color_buffer_float'),
-                floatTextureLinear: gl.getExtension('OES_texture_float_linear'),
-            });
-        }
-    };
-    /**
-     * Handles a lost webgl context
-     *
-     * @protected
-     * @param {WebGLContextEvent} event - The context lost event.
-     */
-    ContextSystem.prototype.handleContextLost = function (event) {
-        event.preventDefault();
-    };
-    /**
-     * Handles a restored webgl context
-     *
-     * @protected
-     */
-    ContextSystem.prototype.handleContextRestored = function () {
-        this.renderer.runners.contextChange.emit(this.gl);
-    };
-    ContextSystem.prototype.destroy = function () {
-        var view = this.renderer.view;
-        // remove listeners
-        view.removeEventListener('webglcontextlost', this.handleContextLost);
-        view.removeEventListener('webglcontextrestored', this.handleContextRestored);
-        this.gl.useProgram(null);
-        if (this.extensions.loseContext) {
-            this.extensions.loseContext.loseContext();
-        }
-    };
-    /**
-     * Handle the post-render runner event
-     *
-     * @protected
-     */
-    ContextSystem.prototype.postrender = function () {
-        if (this.renderer.renderingToScreen) {
-            this.gl.flush();
-        }
-    };
-    /**
-     * Validate context
-     *
-     * @protected
-     * @param {WebGLRenderingContext} gl - Render context
-     */
-    ContextSystem.prototype.validateContext = function (gl) {
-        var attributes = gl.getContextAttributes();
-        // this is going to be fairly simple for now.. but at least we have room to grow!
-        if (!attributes.stencil) {
-            /* eslint-disable max-len, no-console */
-            console.warn('Provided WebGL context does not have a stencil buffer, masks may not render correctly');
-            /* eslint-enable max-len, no-console */
-        }
-        var hasuint32 = ('WebGL2RenderingContext' in window && gl instanceof window.WebGL2RenderingContext)
-            || !!gl.getExtension('OES_element_index_uint');
-        this.supports.uint32Indices = hasuint32;
-        if (!hasuint32) {
-            /* eslint-disable max-len, no-console */
-            console.warn('Provided WebGL context does not support 32 index buffer, complex graphics may not render correctly');
-            /* eslint-enable max-len, no-console */
-        }
-    };
-    return ContextSystem;
-}(System));
-
-/**
- * Internal framebuffer for WebGL context
- * @class
- * @memberof PIXI
- */
-var GLFramebuffer = /** @class */ (function () {
-    function GLFramebuffer(framebuffer) {
-        /**
-         * The WebGL framebuffer
-         * @member {WebGLFramebuffer}
-         */
-        this.framebuffer = framebuffer;
-        /**
-         * stencil+depth , usually costs 32bits per pixel
-         * @member {WebGLRenderbuffer}
-         */
-        this.stencil = null;
-        /**
-         * latest known version of framebuffer
-         * @member {number}
-         * @protected
-         */
-        this.dirtyId = 0;
-        /**
-         * latest known version of framebuffer format
-         * @member {number}
-         * @protected
-         */
-        this.dirtyFormat = 0;
-        /**
-         * latest known version of framebuffer size
-         * @member {number}
-         * @protected
-         */
-        this.dirtySize = 0;
-        /**
-         * Detected AA samples number
-         * @member {PIXI.MSAA_QUALITY}
-         */
-        this.multisample = MSAA_QUALITY.NONE;
-        /**
-         * In case MSAA, we use this Renderbuffer instead of colorTextures[0] when we write info
-         * @member {WebGLRenderbuffer}
-         */
-        this.msaaBuffer = null;
-        /**
-         * In case we use MSAA, this is actual framebuffer that has colorTextures[0]
-         * The contents of that framebuffer are read when we use that renderTexture in sprites
-         * @member {PIXI.Framebuffer}
-         */
-        this.blitFramebuffer = null;
-    }
-    return GLFramebuffer;
-}());
-
-var tempRectangle = new Rectangle();
-/**
- * System plugin to the renderer to manage framebuffers.
+ * Due to {@link https://bugs.chromium.org/p/chromium/issues/detail?id=934823|bug in chromium}
+ * we disable webgl2 by default for all non-apple mobile devices.
  *
- * @class
- * @extends PIXI.System
- * @memberof PIXI.systems
+ * @static
+ * @name PREFER_ENV
+ * @memberof PIXI.settings
+ * @type {number}
+ * @default PIXI.ENV.WEBGL2
  */
-var FramebufferSystem = /** @class */ (function (_super) {
-    __extends(FramebufferSystem, _super);
-    /**
-     * @param {PIXI.Renderer} renderer - The renderer this System works for.
-     */
-    function FramebufferSystem(renderer) {
-        var _this = _super.call(this, renderer) || this;
-        /**
-         * A list of managed framebuffers
-         * @member {PIXI.Framebuffer[]}
-         * @readonly
-         */
-        _this.managedFramebuffers = [];
-        /**
-         * Framebuffer value that shows that we don't know what is bound
-         * @member {Framebuffer}
-         * @readonly
-         */
-        _this.unknownFramebuffer = new Framebuffer(10, 10);
-        _this.msaaSamples = null;
-        return _this;
-    }
-    /**
-     * Sets up the renderer context and necessary buffers.
-     */
-    FramebufferSystem.prototype.contextChange = function () {
-        var gl = this.gl = this.renderer.gl;
-        this.CONTEXT_UID = this.renderer.CONTEXT_UID;
-        this.current = this.unknownFramebuffer;
-        this.viewport = new Rectangle();
-        this.hasMRT = true;
-        this.writeDepthTexture = true;
-        this.disposeAll(true);
-        // webgl2
-        if (this.renderer.context.webGLVersion === 1) {
-            // webgl 1!
-            var nativeDrawBuffersExtension_1 = this.renderer.context.extensions.drawBuffers;
-            var nativeDepthTextureExtension = this.renderer.context.extensions.depthTexture;
-            if (settings.PREFER_ENV === ENV.WEBGL_LEGACY) {
-                nativeDrawBuffersExtension_1 = null;
-                nativeDepthTextureExtension = null;
-            }
-            if (nativeDrawBuffersExtension_1) {
-                gl.drawBuffers = function (activeTextures) {
-                    return nativeDrawBuffersExtension_1.drawBuffersWEBGL(activeTextures);
-                };
-            }
-            else {
-                this.hasMRT = false;
-                gl.drawBuffers = function () {
-                    // empty
-                };
-            }
-            if (!nativeDepthTextureExtension) {
-                this.writeDepthTexture = false;
-            }
-        }
-        else {
-            // WebGL2
-            // cache possible MSAA samples
-            this.msaaSamples = gl.getInternalformatParameter(gl.RENDERBUFFER, gl.RGBA8, gl.SAMPLES);
-        }
-    };
-    /**
-     * Bind a framebuffer
-     *
-     * @param {PIXI.Framebuffer} framebuffer
-     * @param {PIXI.Rectangle} [frame] frame, default is framebuffer size
-     */
-    FramebufferSystem.prototype.bind = function (framebuffer, frame) {
-        var gl = this.gl;
-        if (framebuffer) {
-            // TODO caching layer!
-            var fbo = framebuffer.glFramebuffers[this.CONTEXT_UID] || this.initFramebuffer(framebuffer);
-            if (this.current !== framebuffer) {
-                this.current = framebuffer;
-                gl.bindFramebuffer(gl.FRAMEBUFFER, fbo.framebuffer);
-            }
-            // make sure all textures are unbound..
-            // now check for updates...
-            if (fbo.dirtyId !== framebuffer.dirtyId) {
-                fbo.dirtyId = framebuffer.dirtyId;
-                if (fbo.dirtyFormat !== framebuffer.dirtyFormat) {
-                    fbo.dirtyFormat = framebuffer.dirtyFormat;
-                    this.updateFramebuffer(framebuffer);
-                }
-                else if (fbo.dirtySize !== framebuffer.dirtySize) {
-                    fbo.dirtySize = framebuffer.dirtySize;
-                    this.resizeFramebuffer(framebuffer);
-                }
-            }
-            for (var i = 0; i < framebuffer.colorTextures.length; i++) {
-                var tex = framebuffer.colorTextures[i];
-                this.renderer.texture.unbind(tex.parentTextureArray || tex);
-            }
-            if (framebuffer.depthTexture) {
-                this.renderer.texture.unbind(framebuffer.depthTexture);
-            }
-            if (frame) {
-                this.setViewport(frame.x, frame.y, frame.width, frame.height);
-            }
-            else {
-                this.setViewport(0, 0, framebuffer.width, framebuffer.height);
-            }
-        }
-        else {
-            if (this.current) {
-                this.current = null;
-                gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-            }
-            if (frame) {
-                this.setViewport(frame.x, frame.y, frame.width, frame.height);
-            }
-            else {
-                this.setViewport(0, 0, this.renderer.width, this.renderer.height);
-            }
-        }
-    };
-    /**
-     * Set the WebGLRenderingContext's viewport.
-     *
-     * @param {Number} x - X position of viewport
-     * @param {Number} y - Y position of viewport
-     * @param {Number} width - Width of viewport
-     * @param {Number} height - Height of viewport
-     */
-    FramebufferSystem.prototype.setViewport = function (x, y, width, height) {
-        var v = this.viewport;
-        if (v.width !== width || v.height !== height || v.x !== x || v.y !== y) {
-            v.x = x;
-            v.y = y;
-            v.width = width;
-            v.height = height;
-            this.gl.viewport(x, y, width, height);
-        }
-    };
-    Object.defineProperty(FramebufferSystem.prototype, "size", {
-        /**
-         * Get the size of the current width and height. Returns object with `width` and `height` values.
-         *
-         * @member {object}
-         * @readonly
-         */
-        get: function () {
-            if (this.current) {
-                // TODO store temp
-                return { x: 0, y: 0, width: this.current.width, height: this.current.height };
-            }
-            return { x: 0, y: 0, width: this.renderer.width, height: this.renderer.height };
-        },
-        enumerable: false,
-        configurable: true
-    });
-    /**
-     * Clear the color of the context
-     *
-     * @param {Number} r - Red value from 0 to 1
-     * @param {Number} g - Green value from 0 to 1
-     * @param {Number} b - Blue value from 0 to 1
-     * @param {Number} a - Alpha value from 0 to 1
-     * @param {PIXI.BUFFER_BITS} [mask=BUFFER_BITS.COLOR | BUFFER_BITS.DEPTH] - Bitwise OR of masks
-     *  that indicate the buffers to be cleared, by default COLOR and DEPTH buffers.
-     */
-    FramebufferSystem.prototype.clear = function (r, g, b, a, mask) {
-        if (mask === void 0) { mask = BUFFER_BITS.COLOR | BUFFER_BITS.DEPTH; }
-        var gl = this.gl;
-        // TODO clear color can be set only one right?
-        gl.clearColor(r, g, b, a);
-        gl.clear(mask);
-    };
-    /**
-     * Initialize framebuffer for this context
-     *
-     * @protected
-     * @param {PIXI.Framebuffer} framebuffer
-     * @returns {PIXI.GLFramebuffer} created GLFramebuffer
-     */
-    FramebufferSystem.prototype.initFramebuffer = function (framebuffer) {
-        var gl = this.gl;
-        var fbo = new GLFramebuffer(gl.createFramebuffer());
-        fbo.multisample = this.detectSamples(framebuffer.multisample);
-        framebuffer.glFramebuffers[this.CONTEXT_UID] = fbo;
-        this.managedFramebuffers.push(framebuffer);
-        framebuffer.disposeRunner.add(this);
-        return fbo;
-    };
-    /**
-     * Resize the framebuffer
-     *
-     * @protected
-     * @param {PIXI.Framebuffer} framebuffer
-     */
-    FramebufferSystem.prototype.resizeFramebuffer = function (framebuffer) {
-        var gl = this.gl;
-        var fbo = framebuffer.glFramebuffers[this.CONTEXT_UID];
-        if (fbo.stencil) {
-            gl.bindRenderbuffer(gl.RENDERBUFFER, fbo.stencil);
-            gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_STENCIL, framebuffer.width, framebuffer.height);
-        }
-        var colorTextures = framebuffer.colorTextures;
-        for (var i = 0; i < colorTextures.length; i++) {
-            this.renderer.texture.bind(colorTextures[i], 0);
-        }
-        if (framebuffer.depthTexture) {
-            this.renderer.texture.bind(framebuffer.depthTexture, 0);
-        }
-    };
-    /**
-     * Update the framebuffer
-     *
-     * @protected
-     * @param {PIXI.Framebuffer} framebuffer
-     */
-    FramebufferSystem.prototype.updateFramebuffer = function (framebuffer) {
-        var gl = this.gl;
-        var fbo = framebuffer.glFramebuffers[this.CONTEXT_UID];
-        // bind the color texture
-        var colorTextures = framebuffer.colorTextures;
-        var count = colorTextures.length;
-        if (!gl.drawBuffers) {
-            count = Math.min(count, 1);
-        }
-        if (fbo.multisample > 1) {
-            fbo.msaaBuffer = gl.createRenderbuffer();
-            gl.bindRenderbuffer(gl.RENDERBUFFER, fbo.msaaBuffer);
-            gl.renderbufferStorageMultisample(gl.RENDERBUFFER, fbo.multisample, gl.RGBA8, framebuffer.width, framebuffer.height);
-            gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.RENDERBUFFER, fbo.msaaBuffer);
-        }
-        var activeTextures = [];
-        for (var i = 0; i < count; i++) {
-            if (i === 0 && fbo.multisample > 1) {
-                continue;
-            }
-            var texture = framebuffer.colorTextures[i];
-            var parentTexture = texture.parentTextureArray || texture;
-            this.renderer.texture.bind(parentTexture, 0);
-            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0 + i, texture.target, parentTexture._glTextures[this.CONTEXT_UID].texture, 0);
-            activeTextures.push(gl.COLOR_ATTACHMENT0 + i);
-        }
-        if (activeTextures.length > 1) {
-            gl.drawBuffers(activeTextures);
-        }
-        if (framebuffer.depthTexture) {
-            var writeDepthTexture = this.writeDepthTexture;
-            if (writeDepthTexture) {
-                var depthTexture = framebuffer.depthTexture;
-                this.renderer.texture.bind(depthTexture, 0);
-                gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, depthTexture._glTextures[this.CONTEXT_UID].texture, 0);
-            }
-        }
-        if (!fbo.stencil && (framebuffer.stencil || framebuffer.depth)) {
-            fbo.stencil = gl.createRenderbuffer();
-            gl.bindRenderbuffer(gl.RENDERBUFFER, fbo.stencil);
-            gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_STENCIL, framebuffer.width, framebuffer.height);
-            // TODO.. this is depth AND stencil?
-            if (!framebuffer.depthTexture) { // you can't have both, so one should take priority if enabled
-                gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_STENCIL_ATTACHMENT, gl.RENDERBUFFER, fbo.stencil);
-            }
-        }
-    };
-    /**
-     * Detects number of samples that is not more than a param but as close to it as possible
-     *
-     * @param {PIXI.MSAA_QUALITY} samples - number of samples
-     * @returns {PIXI.MSAA_QUALITY} - recommended number of samples
-     */
-    FramebufferSystem.prototype.detectSamples = function (samples) {
-        var msaaSamples = this.msaaSamples;
-        var res = MSAA_QUALITY.NONE;
-        if (samples <= 1 || msaaSamples === null) {
-            return res;
-        }
-        for (var i = 0; i < msaaSamples.length; i++) {
-            if (msaaSamples[i] <= samples) {
-                res = msaaSamples[i];
-                break;
-            }
-        }
-        if (res === 1) {
-            res = MSAA_QUALITY.NONE;
-        }
-        return res;
-    };
-    /**
-     * Only works with WebGL2
-     *
-     * blits framebuffer to another of the same or bigger size
-     * after that target framebuffer is bound
-     *
-     * Fails with WebGL warning if blits multisample framebuffer to different size
-     *
-     * @param {PIXI.Framebuffer} [framebuffer] - by default it blits "into itself", from renderBuffer to texture.
-     * @param {PIXI.Rectangle} [sourcePixels] - source rectangle in pixels
-     * @param {PIXI.Rectangle} [destPixels] - dest rectangle in pixels, assumed to be the same as sourcePixels
-     */
-    FramebufferSystem.prototype.blit = function (framebuffer, sourcePixels, destPixels) {
-        var _a = this, current = _a.current, renderer = _a.renderer, gl = _a.gl, CONTEXT_UID = _a.CONTEXT_UID;
-        if (renderer.context.webGLVersion !== 2) {
-            return;
-        }
-        if (!current) {
-            return;
-        }
-        var fbo = current.glFramebuffers[CONTEXT_UID];
-        if (!fbo) {
-            return;
-        }
-        if (!framebuffer) {
-            if (fbo.multisample <= 1) {
-                return;
-            }
-            if (!fbo.blitFramebuffer) {
-                fbo.blitFramebuffer = new Framebuffer(current.width, current.height);
-                fbo.blitFramebuffer.addColorTexture(0, current.colorTextures[0]);
-            }
-            framebuffer = fbo.blitFramebuffer;
-            framebuffer.width = current.width;
-            framebuffer.height = current.height;
-        }
-        if (!sourcePixels) {
-            sourcePixels = tempRectangle;
-            sourcePixels.width = current.width;
-            sourcePixels.height = current.height;
-        }
-        if (!destPixels) {
-            destPixels = sourcePixels;
-        }
-        var sameSize = sourcePixels.width === destPixels.width && sourcePixels.height === destPixels.height;
-        this.bind(framebuffer);
-        gl.bindFramebuffer(gl.READ_FRAMEBUFFER, fbo.framebuffer);
-        gl.blitFramebuffer(sourcePixels.x, sourcePixels.y, sourcePixels.width, sourcePixels.height, destPixels.x, destPixels.y, destPixels.width, destPixels.height, gl.COLOR_BUFFER_BIT, sameSize ? gl.NEAREST : gl.LINEAR);
-    };
-    /**
-     * Disposes framebuffer
-     * @param {PIXI.Framebuffer} framebuffer - framebuffer that has to be disposed of
-     * @param {boolean} [contextLost=false] - If context was lost, we suppress all delete function calls
-     */
-    FramebufferSystem.prototype.disposeFramebuffer = function (framebuffer, contextLost) {
-        var fbo = framebuffer.glFramebuffers[this.CONTEXT_UID];
-        var gl = this.gl;
-        if (!fbo) {
-            return;
-        }
-        delete framebuffer.glFramebuffers[this.CONTEXT_UID];
-        var index = this.managedFramebuffers.indexOf(framebuffer);
-        if (index >= 0) {
-            this.managedFramebuffers.splice(index, 1);
-        }
-        framebuffer.disposeRunner.remove(this);
-        if (!contextLost) {
-            gl.deleteFramebuffer(fbo.framebuffer);
-            if (fbo.stencil) {
-                gl.deleteRenderbuffer(fbo.stencil);
-            }
-        }
-    };
-    /**
-     * Disposes all framebuffers, but not textures bound to them
-     * @param {boolean} [contextLost=false] - If context was lost, we suppress all delete function calls
-     */
-    FramebufferSystem.prototype.disposeAll = function (contextLost) {
-        var list = this.managedFramebuffers;
-        this.managedFramebuffers = [];
-        for (var i = 0; i < list.length; i++) {
-            this.disposeFramebuffer(list[i], contextLost);
-        }
-    };
-    /**
-     * Forcing creation of stencil buffer for current framebuffer, if it wasn't done before.
-     * Used by MaskSystem, when its time to use stencil mask for Graphics element.
-     *
-     * Its an alternative for public lazy `framebuffer.enableStencil`, in case we need stencil without rebind.
-     *
-     * @private
-     */
-    FramebufferSystem.prototype.forceStencil = function () {
-        var framebuffer = this.current;
-        if (!framebuffer) {
-            return;
-        }
-        var fbo = framebuffer.glFramebuffers[this.CONTEXT_UID];
-        if (!fbo || fbo.stencil) {
-            return;
-        }
-        framebuffer.enableStencil();
-        var w = framebuffer.width;
-        var h = framebuffer.height;
-        var gl = this.gl;
-        var stencil = gl.createRenderbuffer();
-        gl.bindRenderbuffer(gl.RENDERBUFFER, stencil);
-        gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_STENCIL, w, h);
-        fbo.stencil = stencil;
-        gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_STENCIL_ATTACHMENT, gl.RENDERBUFFER, stencil);
-    };
-    /**
-     * resets framebuffer stored state, binds screen framebuffer
-     *
-     * should be called before renderTexture reset()
-     */
-    FramebufferSystem.prototype.reset = function () {
-        this.current = this.unknownFramebuffer;
-        this.viewport = new Rectangle();
-    };
-    return FramebufferSystem;
-}(System));
-
-var GLBuffer = /** @class */ (function () {
-    function GLBuffer(buffer) {
-        this.buffer = buffer || null;
-        this.updateID = -1;
-        this.byteLength = -1;
-        this.refCount = 0;
-    }
-    return GLBuffer;
-}());
-
-var byteSizeMap$1 = { 5126: 4, 5123: 2, 5121: 1 };
-/**
- * System plugin to the renderer to manage geometry.
- *
- * @class
- * @extends PIXI.System
- * @memberof PIXI.systems
- */
-var GeometrySystem = /** @class */ (function (_super) {
-    __extends(GeometrySystem, _super);
-    /**
-     * @param {PIXI.Renderer} renderer - The renderer this System works for.
-     */
-    function GeometrySystem(renderer) {
-        var _this = _super.call(this, renderer) || this;
-        _this._activeGeometry = null;
-        _this._activeVao = null;
-        /**
-         * `true` if we has `*_vertex_array_object` extension
-         * @member {boolean}
-         * @readonly
-         */
-        _this.hasVao = true;
-        /**
-         * `true` if has `ANGLE_instanced_arrays` extension
-         * @member {boolean}
-         * @readonly
-         */
-        _this.hasInstance = true;
-        /**
-         * `true` if support `gl.UNSIGNED_INT` in `gl.drawElements` or `gl.drawElementsInstanced`
-         * @member {boolean}
-         * @readonly
-         */
-        _this.canUseUInt32ElementIndex = false;
-        /**
-         * Cache for all geometries by id, used in case renderer gets destroyed or for profiling
-         * @member {object}
-         * @readonly
-         */
-        _this.managedGeometries = {};
-        /**
-         * Cache for all buffers by id, used in case renderer gets destroyed or for profiling
-         * @member {object}
-         * @readonly
-         */
-        _this.managedBuffers = {};
-        return _this;
-    }
-    /**
-     * Sets up the renderer context and necessary buffers.
-     */
-    GeometrySystem.prototype.contextChange = function () {
-        this.disposeAll(true);
-        var gl = this.gl = this.renderer.gl;
-        var context = this.renderer.context;
-        this.CONTEXT_UID = this.renderer.CONTEXT_UID;
-        // webgl2
-        if (!gl.createVertexArray) {
-            // webgl 1!
-            var nativeVaoExtension_1 = this.renderer.context.extensions.vertexArrayObject;
-            if (settings.PREFER_ENV === ENV.WEBGL_LEGACY) {
-                nativeVaoExtension_1 = null;
-            }
-            if (nativeVaoExtension_1) {
-                gl.createVertexArray = function () {
-                    return nativeVaoExtension_1.createVertexArrayOES();
-                };
-                gl.bindVertexArray = function (vao) {
-                    return nativeVaoExtension_1.bindVertexArrayOES(vao);
-                };
-                gl.deleteVertexArray = function (vao) {
-                    return nativeVaoExtension_1.deleteVertexArrayOES(vao);
-                };
-            }
-            else {
-                this.hasVao = false;
-                gl.createVertexArray = function () {
-                    return null;
-                };
-                gl.bindVertexArray = function () {
-                    return null;
-                };
-                gl.deleteVertexArray = function () {
-                    return null;
-                };
-            }
-        }
-        if (!gl.vertexAttribDivisor) {
-            var instanceExt_1 = gl.getExtension('ANGLE_instanced_arrays');
-            if (instanceExt_1) {
-                gl.vertexAttribDivisor = function (a, b) {
-                    return instanceExt_1.vertexAttribDivisorANGLE(a, b);
-                };
-                gl.drawElementsInstanced = function (a, b, c, d, e) {
-                    return instanceExt_1.drawElementsInstancedANGLE(a, b, c, d, e);
-                };
-                gl.drawArraysInstanced = function (a, b, c, d) {
-                    return instanceExt_1.drawArraysInstancedANGLE(a, b, c, d);
-                };
-            }
-            else {
-                this.hasInstance = false;
-            }
-        }
-        this.canUseUInt32ElementIndex = context.webGLVersion === 2 || !!context.extensions.uint32ElementIndex;
-    };
-    /**
-     * Binds geometry so that is can be drawn. Creating a Vao if required
-     *
-     * @param {PIXI.Geometry} geometry - instance of geometry to bind
-     * @param {PIXI.Shader} [shader] - instance of shader to use vao for
-     */
-    GeometrySystem.prototype.bind = function (geometry, shader) {
-        shader = shader || this.renderer.shader.shader;
-        var gl = this.gl;
-        // not sure the best way to address this..
-        // currently different shaders require different VAOs for the same geometry
-        // Still mulling over the best way to solve this one..
-        // will likely need to modify the shader attribute locations at run time!
-        var vaos = geometry.glVertexArrayObjects[this.CONTEXT_UID];
-        if (!vaos) {
-            this.managedGeometries[geometry.id] = geometry;
-            geometry.disposeRunner.add(this);
-            geometry.glVertexArrayObjects[this.CONTEXT_UID] = vaos = {};
-        }
-        var vao = vaos[shader.program.id] || this.initGeometryVao(geometry, shader.program);
-        this._activeGeometry = geometry;
-        if (this._activeVao !== vao) {
-            this._activeVao = vao;
-            if (this.hasVao) {
-                gl.bindVertexArray(vao);
-            }
-            else {
-                this.activateVao(geometry, shader.program);
-            }
-        }
-        // TODO - optimise later!
-        // don't need to loop through if nothing changed!
-        // maybe look to add an 'autoupdate' to geometry?
-        this.updateBuffers();
-    };
-    /**
-     * Reset and unbind any active VAO and geometry
-     */
-    GeometrySystem.prototype.reset = function () {
-        this.unbind();
-    };
-    /**
-     * Update buffers
-     * @protected
-     */
-    GeometrySystem.prototype.updateBuffers = function () {
-        var geometry = this._activeGeometry;
-        var gl = this.gl;
-        for (var i = 0; i < geometry.buffers.length; i++) {
-            var buffer = geometry.buffers[i];
-            var glBuffer = buffer._glBuffers[this.CONTEXT_UID];
-            if (buffer._updateID !== glBuffer.updateID) {
-                glBuffer.updateID = buffer._updateID;
-                // TODO can cache this on buffer! maybe added a getter / setter?
-                var type = buffer.index ? gl.ELEMENT_ARRAY_BUFFER : gl.ARRAY_BUFFER;
-                // TODO this could change if the VAO changes...
-                // need to come up with a better way to cache..
-                // if (this.boundBuffers[type] !== glBuffer)
-                // {
-                // this.boundBuffers[type] = glBuffer;
-                gl.bindBuffer(type, glBuffer.buffer);
-                // }
-                this._boundBuffer = glBuffer;
-                if (glBuffer.byteLength >= buffer.data.byteLength) {
-                    // offset is always zero for now!
-                    gl.bufferSubData(type, 0, buffer.data);
-                }
-                else {
-                    var drawType = buffer.static ? gl.STATIC_DRAW : gl.DYNAMIC_DRAW;
-                    glBuffer.byteLength = buffer.data.byteLength;
-                    gl.bufferData(type, buffer.data, drawType);
-                }
-            }
-        }
-    };
-    /**
-     * Check compability between a geometry and a program
-     * @protected
-     * @param {PIXI.Geometry} geometry - Geometry instance
-     * @param {PIXI.Program} program - Program instance
-     */
-    GeometrySystem.prototype.checkCompatibility = function (geometry, program) {
-        // geometry must have at least all the attributes that the shader requires.
-        var geometryAttributes = geometry.attributes;
-        var shaderAttributes = program.attributeData;
-        for (var j in shaderAttributes) {
-            if (!geometryAttributes[j]) {
-                throw new Error("shader and geometry incompatible, geometry missing the \"" + j + "\" attribute");
-            }
-        }
-    };
-    /**
-     * Takes a geometry and program and generates a unique signature for them.
-     *
-     * @param {PIXI.Geometry} geometry - to get signature from
-     * @param {PIXI.Program} program - to test geometry against
-     * @returns {String} Unique signature of the geometry and program
-     * @protected
-     */
-    GeometrySystem.prototype.getSignature = function (geometry, program) {
-        var attribs = geometry.attributes;
-        var shaderAttributes = program.attributeData;
-        var strings = ['g', geometry.id];
-        for (var i in attribs) {
-            if (shaderAttributes[i]) {
-                strings.push(i);
-            }
-        }
-        return strings.join('-');
-    };
-    /**
-     * Creates or gets Vao with the same structure as the geometry and stores it on the geometry.
-     * If vao is created, it is bound automatically.
-     *
-     * @protected
-     * @param {PIXI.Geometry} geometry - Instance of geometry to to generate Vao for
-     * @param {PIXI.Program} program - Instance of program
-     */
-    GeometrySystem.prototype.initGeometryVao = function (geometry, program) {
-        this.checkCompatibility(geometry, program);
-        var gl = this.gl;
-        var CONTEXT_UID = this.CONTEXT_UID;
-        var signature = this.getSignature(geometry, program);
-        var vaoObjectHash = geometry.glVertexArrayObjects[this.CONTEXT_UID];
-        var vao = vaoObjectHash[signature];
-        if (vao) {
-            // this will give us easy access to the vao
-            vaoObjectHash[program.id] = vao;
-            return vao;
-        }
-        var buffers = geometry.buffers;
-        var attributes = geometry.attributes;
-        var tempStride = {};
-        var tempStart = {};
-        for (var j in buffers) {
-            tempStride[j] = 0;
-            tempStart[j] = 0;
-        }
-        for (var j in attributes) {
-            if (!attributes[j].size && program.attributeData[j]) {
-                attributes[j].size = program.attributeData[j].size;
-            }
-            else if (!attributes[j].size) {
-                console.warn("PIXI Geometry attribute '" + j + "' size cannot be determined (likely the bound shader does not have the attribute)"); // eslint-disable-line
-            }
-            tempStride[attributes[j].buffer] += attributes[j].size * byteSizeMap$1[attributes[j].type];
-        }
-        for (var j in attributes) {
-            var attribute = attributes[j];
-            var attribSize = attribute.size;
-            if (attribute.stride === undefined) {
-                if (tempStride[attribute.buffer] === attribSize * byteSizeMap$1[attribute.type]) {
-                    attribute.stride = 0;
-                }
-                else {
-                    attribute.stride = tempStride[attribute.buffer];
-                }
-            }
-            if (attribute.start === undefined) {
-                attribute.start = tempStart[attribute.buffer];
-                tempStart[attribute.buffer] += attribSize * byteSizeMap$1[attribute.type];
-            }
-        }
-        vao = gl.createVertexArray();
-        gl.bindVertexArray(vao);
-        // first update - and create the buffers!
-        // only create a gl buffer if it actually gets
-        for (var i = 0; i < buffers.length; i++) {
-            var buffer = buffers[i];
-            if (!buffer._glBuffers[CONTEXT_UID]) {
-                buffer._glBuffers[CONTEXT_UID] = new GLBuffer(gl.createBuffer());
-                this.managedBuffers[buffer.id] = buffer;
-                buffer.disposeRunner.add(this);
-            }
-            buffer._glBuffers[CONTEXT_UID].refCount++;
-        }
-        // TODO - maybe make this a data object?
-        // lets wait to see if we need to first!
-        this.activateVao(geometry, program);
-        this._activeVao = vao;
-        // add it to the cache!
-        vaoObjectHash[program.id] = vao;
-        vaoObjectHash[signature] = vao;
-        return vao;
-    };
-    /**
-     * Disposes buffer
-     * @param {PIXI.Buffer} buffer - buffer with data
-     * @param {boolean} [contextLost=false] - If context was lost, we suppress deleteVertexArray
-     */
-    GeometrySystem.prototype.disposeBuffer = function (buffer, contextLost) {
-        if (!this.managedBuffers[buffer.id]) {
-            return;
-        }
-        delete this.managedBuffers[buffer.id];
-        var glBuffer = buffer._glBuffers[this.CONTEXT_UID];
-        var gl = this.gl;
-        buffer.disposeRunner.remove(this);
-        if (!glBuffer) {
-            return;
-        }
-        if (!contextLost) {
-            gl.deleteBuffer(glBuffer.buffer);
-        }
-        delete buffer._glBuffers[this.CONTEXT_UID];
-    };
-    /**
-     * Disposes geometry
-     * @param {PIXI.Geometry} geometry - Geometry with buffers. Only VAO will be disposed
-     * @param {boolean} [contextLost=false] - If context was lost, we suppress deleteVertexArray
-     */
-    GeometrySystem.prototype.disposeGeometry = function (geometry, contextLost) {
-        if (!this.managedGeometries[geometry.id]) {
-            return;
-        }
-        delete this.managedGeometries[geometry.id];
-        var vaos = geometry.glVertexArrayObjects[this.CONTEXT_UID];
-        var gl = this.gl;
-        var buffers = geometry.buffers;
-        geometry.disposeRunner.remove(this);
-        if (!vaos) {
-            return;
-        }
-        for (var i = 0; i < buffers.length; i++) {
-            var buf = buffers[i]._glBuffers[this.CONTEXT_UID];
-            buf.refCount--;
-            if (buf.refCount === 0 && !contextLost) {
-                this.disposeBuffer(buffers[i], contextLost);
-            }
-        }
-        if (!contextLost) {
-            for (var vaoId in vaos) {
-                // delete only signatures, everything else are copies
-                if (vaoId[0] === 'g') {
-                    var vao = vaos[vaoId];
-                    if (this._activeVao === vao) {
-                        this.unbind();
-                    }
-                    gl.deleteVertexArray(vao);
-                }
-            }
-        }
-        delete geometry.glVertexArrayObjects[this.CONTEXT_UID];
-    };
-    /**
-     * dispose all WebGL resources of all managed geometries and buffers
-     * @param {boolean} [contextLost=false] - If context was lost, we suppress `gl.delete` calls
-     */
-    GeometrySystem.prototype.disposeAll = function (contextLost) {
-        var all = Object.keys(this.managedGeometries);
-        for (var i = 0; i < all.length; i++) {
-            this.disposeGeometry(this.managedGeometries[all[i]], contextLost);
-        }
-        all = Object.keys(this.managedBuffers);
-        for (var i = 0; i < all.length; i++) {
-            this.disposeBuffer(this.managedBuffers[all[i]], contextLost);
-        }
-    };
-    /**
-     * Activate vertex array object
-     *
-     * @protected
-     * @param {PIXI.Geometry} geometry - Geometry instance
-     * @param {PIXI.Program} program - Shader program instance
-     */
-    GeometrySystem.prototype.activateVao = function (geometry, program) {
-        var gl = this.gl;
-        var CONTEXT_UID = this.CONTEXT_UID;
-        var buffers = geometry.buffers;
-        var attributes = geometry.attributes;
-        if (geometry.indexBuffer) {
-            // first update the index buffer if we have one..
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, geometry.indexBuffer._glBuffers[CONTEXT_UID].buffer);
-        }
-        var lastBuffer = null;
-        // add a new one!
-        for (var j in attributes) {
-            var attribute = attributes[j];
-            var buffer = buffers[attribute.buffer];
-            var glBuffer = buffer._glBuffers[CONTEXT_UID];
-            if (program.attributeData[j]) {
-                if (lastBuffer !== glBuffer) {
-                    gl.bindBuffer(gl.ARRAY_BUFFER, glBuffer.buffer);
-                    lastBuffer = glBuffer;
-                }
-                var location = program.attributeData[j].location;
-                // TODO introduce state again
-                // we can optimise this for older devices that have no VAOs
-                gl.enableVertexAttribArray(location);
-                gl.vertexAttribPointer(location, attribute.size, attribute.type || gl.FLOAT, attribute.normalized, attribute.stride, attribute.start);
-                if (attribute.instance) {
-                    // TODO calculate instance count based of this...
-                    if (this.hasInstance) {
-                        gl.vertexAttribDivisor(location, 1);
-                    }
-                    else {
-                        throw new Error('geometry error, GPU Instancing is not supported on this device');
-                    }
-                }
-            }
-        }
-    };
-    /**
-     * Draw the geometry
-     *
-     * @param {Number} type - the type primitive to render
-     * @param {Number} [size] - the number of elements to be rendered
-     * @param {Number} [start] - Starting index
-     * @param {Number} [instanceCount] - the number of instances of the set of elements to execute
-     */
-    GeometrySystem.prototype.draw = function (type, size, start, instanceCount) {
-        var gl = this.gl;
-        var geometry = this._activeGeometry;
-        // TODO.. this should not change so maybe cache the function?
-        if (geometry.indexBuffer) {
-            var byteSize = geometry.indexBuffer.data.BYTES_PER_ELEMENT;
-            var glType = byteSize === 2 ? gl.UNSIGNED_SHORT : gl.UNSIGNED_INT;
-            if (byteSize === 2 || (byteSize === 4 && this.canUseUInt32ElementIndex)) {
-                if (geometry.instanced) {
-                    /* eslint-disable max-len */
-                    gl.drawElementsInstanced(type, size || geometry.indexBuffer.data.length, glType, (start || 0) * byteSize, instanceCount || 1);
-                    /* eslint-enable max-len */
-                }
-                else {
-                    /* eslint-disable max-len */
-                    gl.drawElements(type, size || geometry.indexBuffer.data.length, glType, (start || 0) * byteSize);
-                    /* eslint-enable max-len */
-                }
-            }
-            else {
-                console.warn('unsupported index buffer type: uint32');
-            }
-        }
-        else if (geometry.instanced) {
-            // TODO need a better way to calculate size..
-            gl.drawArraysInstanced(type, start, size || geometry.getSize(), instanceCount || 1);
-        }
-        else {
-            gl.drawArrays(type, start, size || geometry.getSize());
-        }
-        return this;
-    };
-    /**
-     * Unbind/reset everything
-     * @protected
-     */
-    GeometrySystem.prototype.unbind = function () {
-        this.gl.bindVertexArray(null);
-        this._activeVao = null;
-        this._activeGeometry = null;
-    };
-    return GeometrySystem;
-}(System));
+settings.PREFER_ENV = isMobile$1.any ? ENV.WEBGL : ENV.WEBGL2;
 
 /**
- * Component for masked elements
+ * If set to `true`, Textures and BaseTexture objects stored
+ * in the caches ({@link PIXI.utils.TextureCache TextureCache} and
+ * {@link PIXI.utils.BaseTextureCache BaseTextureCache}) can *only* be
+ * used when calling {@link PIXI.Texture.from Texture.from} or
+ * {@link PIXI.BaseTexture.from BaseTexture.from}.
+ * Otherwise, these `from` calls throw an exception. Using this property
+ * can be useful if you want to enforce preloading all assets with
+ * {@link PIXI.Loader Loader}.
  *
- * Holds mask mode and temporary data about current mask
- *
- * @class
- * @memberof PIXI
+ * @static
+ * @name STRICT_TEXTURE_CACHE
+ * @memberof PIXI.settings
+ * @type {boolean}
+ * @default false
  */
-var MaskData = /** @class */ (function () {
-    /**
-     * Create MaskData
-     *
-     * @param {PIXI.DisplayObject} [maskObject=null] - object that describes the mask
-     */
-    function MaskData(maskObject) {
-        if (maskObject === void 0) { maskObject = null; }
-        /**
-         * Mask type
-         * @member {PIXI.MASK_TYPES}
-         */
-        this.type = MASK_TYPES.NONE;
-        /**
-         * Whether we know the mask type beforehand
-         * @member {boolean}
-         * @default true
-         */
-        this.autoDetect = true;
-        /**
-         * Which element we use to mask
-         * @member {PIXI.DisplayObject}
-         */
-        this.maskObject = maskObject || null;
-        /**
-         * Whether it belongs to MaskSystem pool
-         * @member {boolean}
-         */
-        this.pooled = false;
-        /**
-         * Indicator of the type
-         * @member {boolean}
-         */
-        this.isMaskData = true;
-        /**
-         * Stencil counter above the mask in stack
-         * @member {number}
-         * @private
-         */
-        this._stencilCounter = 0;
-        /**
-         * Scissor counter above the mask in stack
-         * @member {number}
-         * @private
-         */
-        this._scissorCounter = 0;
-        /**
-         * Scissor operation above the mask in stack.
-         * Null if _scissorCounter is zero, rectangle instance if positive.
-         * @member {PIXI.Rectangle}
-         */
-        this._scissorRect = null;
-        /**
-         * Targeted element. Temporary variable set by MaskSystem
-         * @member {PIXI.DisplayObject}
-         * @private
-         */
-        this._target = null;
-    }
-    /**
-     * resets the mask data after popMask()
-     */
-    MaskData.prototype.reset = function () {
-        if (this.pooled) {
-            this.maskObject = null;
-            this.type = MASK_TYPES.NONE;
-            this.autoDetect = true;
-        }
-        this._target = null;
-    };
-    /**
-     * copies counters from maskData above, called from pushMask()
-     * @param {PIXI.MaskData|null} maskAbove
-     */
-    MaskData.prototype.copyCountersOrReset = function (maskAbove) {
-        if (maskAbove) {
-            this._stencilCounter = maskAbove._stencilCounter;
-            this._scissorCounter = maskAbove._scissorCounter;
-            this._scissorRect = maskAbove._scissorRect;
-        }
-        else {
-            this._stencilCounter = 0;
-            this._scissorCounter = 0;
-            this._scissorRect = null;
-        }
-    };
-    return MaskData;
-}());
+settings.STRICT_TEXTURE_CACHE = false;
 
-/**
- * @private
- * @param gl {WebGLRenderingContext} The current WebGL context {WebGLProgram}
- * @param type {Number} the type, can be either VERTEX_SHADER or FRAGMENT_SHADER
- * @param src {string} The vertex shader source as an array of strings.
- * @return {WebGLShader} the shader
- */
-function compileShader(gl, type, src) {
-    var shader = gl.createShader(type);
-    gl.shaderSource(shader, src);
-    gl.compileShader(shader);
-    return shader;
-}
 /**
  * @method compileProgram
  * @private
@@ -14381,52 +13659,80 @@ function compileShader(gl, type, src) {
  * @param attributeLocations {Object} An attribute location map that lets you manually set the attribute locations
  * @return {WebGLProgram} the shader program
  */
-function compileProgram(gl, vertexSrc, fragmentSrc, attributeLocations) {
+function compileProgram(gl, vertexSrc, fragmentSrc, attributeLocations)
+{
     var glVertShader = compileShader(gl, gl.VERTEX_SHADER, vertexSrc);
     var glFragShader = compileShader(gl, gl.FRAGMENT_SHADER, fragmentSrc);
+
     var program = gl.createProgram();
+
     gl.attachShader(program, glVertShader);
     gl.attachShader(program, glFragShader);
+
     // optionally, set the attributes manually for the program rather than letting WebGL decide..
-    if (attributeLocations) {
-        for (var i in attributeLocations) {
+    if (attributeLocations)
+    {
+        for (var i in attributeLocations)
+        {
             gl.bindAttribLocation(program, attributeLocations[i], i);
         }
     }
+
     gl.linkProgram(program);
+
     // if linking fails, then log and cleanup
-    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-        if (!gl.getShaderParameter(glVertShader, gl.COMPILE_STATUS)) {
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS))
+    {
+        if (!gl.getShaderParameter(glVertShader, gl.COMPILE_STATUS))
+        {
             console.warn(vertexSrc);
             console.error(gl.getShaderInfoLog(glVertShader));
         }
-        if (!gl.getShaderParameter(glFragShader, gl.COMPILE_STATUS)) {
+
+        if (!gl.getShaderParameter(glFragShader, gl.COMPILE_STATUS))
+        {
             console.warn(fragmentSrc);
             console.error(gl.getShaderInfoLog(glFragShader));
         }
+
         console.error('Pixi.js Error: Could not initialize shader.');
         console.error('gl.VALIDATE_STATUS', gl.getProgramParameter(program, gl.VALIDATE_STATUS));
         console.error('gl.getError()', gl.getError());
+
         // if there is a program info log, log it
-        if (gl.getProgramInfoLog(program) !== '') {
+        if (gl.getProgramInfoLog(program) !== '')
+        {
             console.warn('Pixi.js Warning: gl.getProgramInfoLog()', gl.getProgramInfoLog(program));
         }
+
         gl.deleteProgram(program);
         program = null;
     }
+
     // clean up some shaders
     gl.deleteShader(glVertShader);
     gl.deleteShader(glFragShader);
+
     return program;
 }
 
-function booleanArray(size) {
-    var array = new Array(size);
-    for (var i = 0; i < array.length; i++) {
-        array[i] = false;
-    }
-    return array;
+/**
+ * @private
+ * @param gl {WebGLRenderingContext} The current WebGL context {WebGLProgram}
+ * @param type {Number} the type, can be either VERTEX_SHADER or FRAGMENT_SHADER
+ * @param vertexSrc {string|string[]} The vertex shader source as an array of strings.
+ * @return {WebGLShader} the shader
+ */
+function compileShader(gl, type, src)
+{
+    var shader = gl.createShader(type);
+
+    gl.shaderSource(shader, src);
+    gl.compileShader(shader);
+
+    return shader;
 }
+
 /**
  * @method defaultValue
  * @memberof PIXI.glCore.shader
@@ -14434,52 +13740,83 @@ function booleanArray(size) {
  * @param size {Number}
  * @private
  */
-function defaultValue(type, size) {
-    switch (type) {
+function defaultValue(type, size)
+{
+    switch (type)
+    {
         case 'float':
             return 0;
+
         case 'vec2':
             return new Float32Array(2 * size);
+
         case 'vec3':
             return new Float32Array(3 * size);
+
         case 'vec4':
             return new Float32Array(4 * size);
+
         case 'int':
         case 'sampler2D':
         case 'sampler2DArray':
             return 0;
+
         case 'ivec2':
             return new Int32Array(2 * size);
+
         case 'ivec3':
             return new Int32Array(3 * size);
+
         case 'ivec4':
             return new Int32Array(4 * size);
+
         case 'bool':
             return false;
+
         case 'bvec2':
+
             return booleanArray(2 * size);
+
         case 'bvec3':
             return booleanArray(3 * size);
+
         case 'bvec4':
             return booleanArray(4 * size);
+
         case 'mat2':
             return new Float32Array([1, 0,
                 0, 1]);
+
         case 'mat3':
             return new Float32Array([1, 0, 0,
                 0, 1, 0,
                 0, 0, 1]);
+
         case 'mat4':
             return new Float32Array([1, 0, 0, 0,
                 0, 1, 0, 0,
                 0, 0, 1, 0,
                 0, 0, 0, 1]);
     }
+
     return null;
+}
+
+function booleanArray(size)
+{
+    var array = new Array(size);
+
+    for (var i = 0; i < array.length; i++)
+    {
+        array[i] = false;
+    }
+
+    return array;
 }
 
 var unknownContext = {};
 var context = unknownContext;
+
 /**
  * returns a little WebGL context to use for program inspection.
  *
@@ -14487,42 +13824,62 @@ var context = unknownContext;
  * @private
  * @returns {WebGLRenderingContext} a gl context to test with
  */
-function getTestContext() {
-    if (context === unknownContext || (context && context.isContextLost())) {
+function getTestContext()
+{
+    if (context === unknownContext || (context && context.isContextLost()))
+    {
         var canvas = document.createElement('canvas');
-        var gl = void 0;
-        if (settings.PREFER_ENV >= ENV.WEBGL2) {
+
+        var gl;
+
+        if (settings.PREFER_ENV >= ENV.WEBGL2)
+        {
             gl = canvas.getContext('webgl2', {});
         }
-        if (!gl) {
+
+        if (!gl)
+        {
             gl = canvas.getContext('webgl', {})
-                || canvas.getContext('experimental-webgl', {});
-            if (!gl) {
+            || canvas.getContext('experimental-webgl', {});
+
+            if (!gl)
+            {
                 // fail, not able to get a context
                 gl = null;
             }
-            else {
+            else
+            {
                 // for shader testing..
                 gl.getExtension('WEBGL_draw_buffers');
             }
         }
+
         context = gl;
     }
+
     return context;
 }
 
 var maxFragmentPrecision;
-function getMaxFragmentPrecision() {
-    if (!maxFragmentPrecision) {
+
+function getMaxFragmentPrecision()
+{
+    if (!maxFragmentPrecision)
+    {
         maxFragmentPrecision = PRECISION.MEDIUM;
         var gl = getTestContext();
-        if (gl) {
-            if (gl.getShaderPrecisionFormat) {
+
+        if (gl)
+        {
+            if (gl.getShaderPrecisionFormat)
+            {
                 var shaderFragment = gl.getShaderPrecisionFormat(gl.FRAGMENT_SHADER, gl.HIGH_FLOAT);
+
                 maxFragmentPrecision = shaderFragment.precision ? PRECISION.HIGH : PRECISION.MEDIUM;
             }
         }
     }
+
     return maxFragmentPrecision;
 }
 
@@ -14537,41 +13894,53 @@ function getMaxFragmentPrecision() {
  *
  * @return {string} modified shader source
  */
-function setPrecision(src, requestedPrecision, maxSupportedPrecision) {
-    if (src.substring(0, 9) !== 'precision') {
+function setPrecision(src, requestedPrecision, maxSupportedPrecision)
+{
+    if (src.substring(0, 9) !== 'precision')
+    {
         // no precision supplied, so PixiJS will add the requested level.
         var precision = requestedPrecision;
+
         // If highp is requested but not supported, downgrade precision to a level all devices support.
-        if (requestedPrecision === PRECISION.HIGH && maxSupportedPrecision !== PRECISION.HIGH) {
+        if (requestedPrecision === PRECISION.HIGH && maxSupportedPrecision !== PRECISION.HIGH)
+        {
             precision = PRECISION.MEDIUM;
         }
-        return "precision " + precision + " float;\n" + src;
+
+        return ("precision " + precision + " float;\n" + src);
     }
-    else if (maxSupportedPrecision !== PRECISION.HIGH && src.substring(0, 15) === 'precision highp') {
+    else if (maxSupportedPrecision !== PRECISION.HIGH && src.substring(0, 15) === 'precision highp')
+    {
         // precision was supplied, but at a level this device does not support, so downgrading to mediump.
         return src.replace('precision highp', 'precision mediump');
     }
+
     return src;
 }
 
 var GLSL_TO_SIZE = {
-    float: 1,
-    vec2: 2,
-    vec3: 3,
-    vec4: 4,
-    int: 1,
-    ivec2: 2,
-    ivec3: 3,
-    ivec4: 4,
-    bool: 1,
-    bvec2: 2,
-    bvec3: 3,
-    bvec4: 4,
-    mat2: 4,
-    mat3: 9,
-    mat4: 16,
-    sampler2D: 1,
+    float:    1,
+    vec2:     2,
+    vec3:     3,
+    vec4:     4,
+
+    int:      1,
+    ivec2:    2,
+    ivec3:    3,
+    ivec4:    4,
+
+    bool:     1,
+    bvec2:    2,
+    bvec3:    3,
+    bvec4:    4,
+
+    mat2:     4,
+    mat3:     9,
+    mat4:     16,
+
+    sampler2D:  1,
 };
+
 /**
  * @private
  * @method mapSize
@@ -14579,207 +13948,55 @@ var GLSL_TO_SIZE = {
  * @param type {String}
  * @return {Number}
  */
-function mapSize(type) {
+function mapSize(type)
+{
     return GLSL_TO_SIZE[type];
 }
 
 var GL_TABLE = null;
+
 var GL_TO_GLSL_TYPES = {
-    FLOAT: 'float',
-    FLOAT_VEC2: 'vec2',
-    FLOAT_VEC3: 'vec3',
-    FLOAT_VEC4: 'vec4',
-    INT: 'int',
-    INT_VEC2: 'ivec2',
-    INT_VEC3: 'ivec3',
-    INT_VEC4: 'ivec4',
-    BOOL: 'bool',
-    BOOL_VEC2: 'bvec2',
-    BOOL_VEC3: 'bvec3',
-    BOOL_VEC4: 'bvec4',
-    FLOAT_MAT2: 'mat2',
-    FLOAT_MAT3: 'mat3',
-    FLOAT_MAT4: 'mat4',
-    SAMPLER_2D: 'sampler2D',
-    INT_SAMPLER_2D: 'sampler2D',
-    UNSIGNED_INT_SAMPLER_2D: 'sampler2D',
-    SAMPLER_CUBE: 'samplerCube',
-    INT_SAMPLER_CUBE: 'samplerCube',
-    UNSIGNED_INT_SAMPLER_CUBE: 'samplerCube',
-    SAMPLER_2D_ARRAY: 'sampler2DArray',
-    INT_SAMPLER_2D_ARRAY: 'sampler2DArray',
-    UNSIGNED_INT_SAMPLER_2D_ARRAY: 'sampler2DArray',
+    FLOAT:       'float',
+    FLOAT_VEC2:  'vec2',
+    FLOAT_VEC3:  'vec3',
+    FLOAT_VEC4:  'vec4',
+
+    INT:         'int',
+    INT_VEC2:    'ivec2',
+    INT_VEC3:    'ivec3',
+    INT_VEC4:    'ivec4',
+
+    BOOL:        'bool',
+    BOOL_VEC2:   'bvec2',
+    BOOL_VEC3:   'bvec3',
+    BOOL_VEC4:   'bvec4',
+
+    FLOAT_MAT2:  'mat2',
+    FLOAT_MAT3:  'mat3',
+    FLOAT_MAT4:  'mat4',
+
+    SAMPLER_2D:  'sampler2D',
+    SAMPLER_CUBE:  'samplerCube',
+    SAMPLER_2D_ARRAY:  'sampler2DArray',
 };
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-function mapType(gl, type) {
-    if (!GL_TABLE) {
+
+function mapType(gl, type)
+{
+    if (!GL_TABLE)
+    {
         var typeNames = Object.keys(GL_TO_GLSL_TYPES);
+
         GL_TABLE = {};
-        for (var i = 0; i < typeNames.length; ++i) {
+
+        for (var i = 0; i < typeNames.length; ++i)
+        {
             var tn = typeNames[i];
+
             GL_TABLE[gl[tn]] = GL_TO_GLSL_TYPES[tn];
         }
     }
+
     return GL_TABLE[type];
-}
-
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-// Parsers, each one of these will take a look at the type of shader property and uniform.
-// if they pass the test function then the code function is called that returns a the shader upload code for that uniform.
-// Shader upload code is automagically generated with these parsers.
-// If no parser is valid then the default upload functions are used.
-// exposing Parsers means that custom upload logic can be added to pixi's shaders.
-// A good example would be a pixi rectangle can be directly set on a uniform.
-// If the shader sees it it knows how to upload the rectangle structure as a vec4
-// format is as follows:
-//
-// {
-//     test: (data, uniform) => {} <--- test is this code should be used for this uniform
-//     code: (name, uniform) => {} <--- returns the string of the piece of code that uploads the uniform
-// }
-var uniformParsers = [
-    // a float cache layer
-    {
-        test: function (data) {
-            return data.type === 'float' && data.size === 1;
-        },
-        code: function (name) {
-            return "\n            if(uv[\"" + name + "\"] !== ud[\"" + name + "\"].value)\n            {\n                ud[\"" + name + "\"].value = uv[\"" + name + "\"]\n                gl.uniform1f(ud[\"" + name + "\"].location, uv[\"" + name + "\"])\n            }\n            ";
-        },
-    },
-    // handling samplers
-    {
-        test: function (data) {
-            // eslint-disable-next-line max-len
-            return (data.type === 'sampler2D' || data.type === 'samplerCube' || data.type === 'sampler2DArray') && data.size === 1 && !data.isArray;
-        },
-        code: function (name) { return "t = syncData.textureCount++;\n\n            renderer.texture.bind(uv[\"" + name + "\"], t);\n\n            if(ud[\"" + name + "\"].value !== t)\n            {\n                ud[\"" + name + "\"].value = t;\n                gl.uniform1i(ud[\"" + name + "\"].location, t);\n; // eslint-disable-line max-len\n            }"; },
-    },
-    // uploading pixi matrix object to mat3
-    {
-        test: function (data, uniform) {
-            return data.type === 'mat3' && data.size === 1 && uniform.a !== undefined;
-        },
-        code: function (name) {
-            // TODO and some smart caching dirty ids here!
-            return "\n            gl.uniformMatrix3fv(ud[\"" + name + "\"].location, false, uv[\"" + name + "\"].toArray(true));\n            ";
-        },
-    },
-    // uploading a pixi point as a vec2 with caching layer
-    {
-        test: function (data, uniform) {
-            return data.type === 'vec2' && data.size === 1 && uniform.x !== undefined;
-        },
-        code: function (name) {
-            return "\n                cv = ud[\"" + name + "\"].value;\n                v = uv[\"" + name + "\"];\n\n                if(cv[0] !== v.x || cv[1] !== v.y)\n                {\n                    cv[0] = v.x;\n                    cv[1] = v.y;\n                    gl.uniform2f(ud[\"" + name + "\"].location, v.x, v.y);\n                }";
-        },
-    },
-    // caching layer for a vec2
-    {
-        test: function (data) {
-            return data.type === 'vec2' && data.size === 1;
-        },
-        code: function (name) {
-            return "\n                cv = ud[\"" + name + "\"].value;\n                v = uv[\"" + name + "\"];\n\n                if(cv[0] !== v[0] || cv[1] !== v[1])\n                {\n                    cv[0] = v[0];\n                    cv[1] = v[1];\n                    gl.uniform2f(ud[\"" + name + "\"].location, v[0], v[1]);\n                }\n            ";
-        },
-    },
-    // upload a pixi rectangle as a vec4 with caching layer
-    {
-        test: function (data, uniform) {
-            return data.type === 'vec4' && data.size === 1 && uniform.width !== undefined;
-        },
-        code: function (name) {
-            return "\n                cv = ud[\"" + name + "\"].value;\n                v = uv[\"" + name + "\"];\n\n                if(cv[0] !== v.x || cv[1] !== v.y || cv[2] !== v.width || cv[3] !== v.height)\n                {\n                    cv[0] = v.x;\n                    cv[1] = v.y;\n                    cv[2] = v.width;\n                    cv[3] = v.height;\n                    gl.uniform4f(ud[\"" + name + "\"].location, v.x, v.y, v.width, v.height)\n                }";
-        },
-    },
-    // a caching layer for vec4 uploading
-    {
-        test: function (data) {
-            return data.type === 'vec4' && data.size === 1;
-        },
-        code: function (name) {
-            return "\n                cv = ud[\"" + name + "\"].value;\n                v = uv[\"" + name + "\"];\n\n                if(cv[0] !== v[0] || cv[1] !== v[1] || cv[2] !== v[2] || cv[3] !== v[3])\n                {\n                    cv[0] = v[0];\n                    cv[1] = v[1];\n                    cv[2] = v[2];\n                    cv[3] = v[3];\n\n                    gl.uniform4f(ud[\"" + name + "\"].location, v[0], v[1], v[2], v[3])\n                }";
-        },
-    } ];
-
-// cv = CachedValue
-// v = value
-// ud = uniformData
-// uv = uniformValue
-// l = location
-var GLSL_TO_SINGLE_SETTERS_CACHED = {
-    float: "\n    if(cv !== v)\n    {\n        cv.v = v;\n        gl.uniform1f(location, v)\n    }",
-    vec2: "\n    if(cv[0] !== v[0] || cv[1] !== v[1])\n    {\n        cv[0] = v[0];\n        cv[1] = v[1];\n        gl.uniform2f(location, v[0], v[1])\n    }",
-    vec3: "\n    if(cv[0] !== v[0] || cv[1] !== v[1] || cv[2] !== v[2])\n    {\n        cv[0] = v[0];\n        cv[1] = v[1];\n        cv[2] = v[2];\n\n        gl.uniform3f(location, v[0], v[1], v[2])\n    }",
-    vec4: 'gl.uniform4f(location, v[0], v[1], v[2], v[3])',
-    int: 'gl.uniform1i(location, v)',
-    ivec2: 'gl.uniform2i(location, v[0], v[1])',
-    ivec3: 'gl.uniform3i(location, v[0], v[1], v[2])',
-    ivec4: 'gl.uniform4i(location, v[0], v[1], v[2], v[3])',
-    bool: 'gl.uniform1i(location, v)',
-    bvec2: 'gl.uniform2i(location, v[0], v[1])',
-    bvec3: 'gl.uniform3i(location, v[0], v[1], v[2])',
-    bvec4: 'gl.uniform4i(location, v[0], v[1], v[2], v[3])',
-    mat2: 'gl.uniformMatrix2fv(location, false, v)',
-    mat3: 'gl.uniformMatrix3fv(location, false, v)',
-    mat4: 'gl.uniformMatrix4fv(location, false, v)',
-    sampler2D: 'gl.uniform1i(location, v)',
-    samplerCube: 'gl.uniform1i(location, v)',
-    sampler2DArray: 'gl.uniform1i(location, v)',
-};
-var GLSL_TO_ARRAY_SETTERS = {
-    float: "gl.uniform1fv(location, v)",
-    vec2: "gl.uniform2fv(location, v)",
-    vec3: "gl.uniform3fv(location, v)",
-    vec4: 'gl.uniform4fv(location, v)',
-    mat4: 'gl.uniformMatrix4fv(location, false, v)',
-    mat3: 'gl.uniformMatrix3fv(location, false, v)',
-    mat2: 'gl.uniformMatrix2fv(location, false, v)',
-    int: 'gl.uniform1iv(location, v)',
-    ivec2: 'gl.uniform2iv(location, v)',
-    ivec3: 'gl.uniform3iv(location, v)',
-    ivec4: 'gl.uniform4iv(location, v)',
-    bool: 'gl.uniform1iv(location, v)',
-    bvec2: 'gl.uniform2iv(location, v)',
-    bvec3: 'gl.uniform3iv(location, v)',
-    bvec4: 'gl.uniform4iv(location, v)',
-    sampler2D: 'gl.uniform1iv(location, v)',
-    samplerCube: 'gl.uniform1iv(location, v)',
-    sampler2DArray: 'gl.uniform1iv(location, v)',
-};
-function generateUniformsSync(group, uniformData) {
-    var funcFragments = ["\n        var v = null;\n        var cv = null\n        var t = 0;\n        var gl = renderer.gl\n    "];
-    for (var i in group.uniforms) {
-        var data = uniformData[i];
-        if (!data) {
-            if (group.uniforms[i].group) {
-                funcFragments.push("\n                    renderer.shader.syncUniformGroup(uv[\"" + i + "\"], syncData);\n                ");
-            }
-            continue;
-        }
-        var uniform = group.uniforms[i];
-        var parsed = false;
-        for (var j = 0; j < uniformParsers.length; j++) {
-            if (uniformParsers[j].test(data, uniform)) {
-                funcFragments.push(uniformParsers[j].code(i, uniform));
-                parsed = true;
-                break;
-            }
-        }
-        if (!parsed) {
-            var templateType = (data.size === 1) ? GLSL_TO_SINGLE_SETTERS_CACHED : GLSL_TO_ARRAY_SETTERS;
-            var template = templateType[data.type].replace('location', "ud[\"" + i + "\"].location");
-            funcFragments.push("\n            cv = ud[\"" + i + "\"].value;\n            v = uv[\"" + i + "\"];\n            " + template + ";");
-        }
-    }
-    /**
-     * the introduction of syncData is to solve an issue where textures in uniform groups are not set correctly
-     * the texture count was always starting from 0 in each group. This needs to increment each time a texture is used
-     * no matter which group is being used
-     *
-     */
-    // eslint-disable-next-line no-new-func
-    return new Function('ud', 'uv', 'renderer', 'syncData', funcFragments.join('\n'));
 }
 
 var fragTemplate = [
@@ -14789,252 +14006,289 @@ var fragTemplate = [
     '%forloop%',
     'gl_FragColor = vec4(0.0);',
     '}' ].join('\n');
-function generateIfTestSrc(maxIfs) {
-    var src = '';
-    for (var i = 0; i < maxIfs; ++i) {
-        if (i > 0) {
-            src += '\nelse ';
-        }
-        if (i < maxIfs - 1) {
-            src += "if(test == " + i + ".0){}";
-        }
-    }
-    return src;
-}
-function checkMaxIfStatementsInShader(maxIfs, gl) {
-    if (maxIfs === 0) {
+
+function checkMaxIfStatementsInShader(maxIfs, gl)
+{
+    if (maxIfs === 0)
+    {
         throw new Error('Invalid value of `0` passed to `checkMaxIfStatementsInShader`');
     }
+
     var shader = gl.createShader(gl.FRAGMENT_SHADER);
+
     while (true) // eslint-disable-line no-constant-condition
-     {
+    {
         var fragmentSrc = fragTemplate.replace(/%forloop%/gi, generateIfTestSrc(maxIfs));
+
         gl.shaderSource(shader, fragmentSrc);
         gl.compileShader(shader);
-        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+
+        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS))
+        {
             maxIfs = (maxIfs / 2) | 0;
         }
-        else {
+        else
+        {
             // valid!
             break;
         }
     }
+
     return maxIfs;
 }
 
-// Cache the result to prevent running this over and over
-var unsafeEval;
-/**
- * Not all platforms allow to generate function code (e.g., `new Function`).
- * this provides the platform-level detection.
- *
- * @private
- * @returns {boolean}
- */
-function unsafeEvalSupported() {
-    if (typeof unsafeEval === 'boolean') {
-        return unsafeEval;
+function generateIfTestSrc(maxIfs)
+{
+    var src = '';
+
+    for (var i = 0; i < maxIfs; ++i)
+    {
+        if (i > 0)
+        {
+            src += '\nelse ';
+        }
+
+        if (i < maxIfs - 1)
+        {
+            src += "if(test == " + i + ".0){}";
+        }
     }
-    try {
-        /* eslint-disable no-new-func */
-        var func = new Function('param1', 'param2', 'param3', 'return param1[param2] === param3;');
-        /* eslint-enable no-new-func */
-        unsafeEval = func({ a: 'b' }, 'a', 'b') === true;
-    }
-    catch (e) {
-        unsafeEval = false;
-    }
-    return unsafeEval;
+
+    return src;
 }
 
 var defaultFragment = "varying vec2 vTextureCoord;\n\nuniform sampler2D uSampler;\n\nvoid main(void){\n   gl_FragColor *= texture2D(uSampler, vTextureCoord);\n}";
 
 var defaultVertex = "attribute vec2 aVertexPosition;\nattribute vec2 aTextureCoord;\n\nuniform mat3 projectionMatrix;\n\nvarying vec2 vTextureCoord;\n\nvoid main(void){\n   gl_Position = vec4((projectionMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);\n   vTextureCoord = aTextureCoord;\n}\n";
 
+// import * as from '../systems/shader/shader';
+
 var UID$3 = 0;
+
 var nameCache = {};
+
 /**
  * Helper class to create a shader program.
  *
  * @class
  * @memberof PIXI
  */
-var Program = /** @class */ (function () {
+var Program = function Program(vertexSrc, fragmentSrc, name)
+{
+    if ( name === void 0 ) name = 'pixi-shader';
+
+    this.id = UID$3++;
+
     /**
-     * @param {string} [vertexSrc] - The source of the vertex shader.
-     * @param {string} [fragmentSrc] - The source of the fragment shader.
-     * @param {string} [name] - Name for shader
+     * The vertex shader.
+     *
+     * @member {string}
      */
-    function Program(vertexSrc, fragmentSrc, name) {
-        if (name === void 0) { name = 'pixi-shader'; }
-        this.id = UID$3++;
-        /**
-         * The vertex shader.
-         *
-         * @member {string}
-         */
-        this.vertexSrc = vertexSrc || Program.defaultVertexSrc;
-        /**
-         * The fragment shader.
-         *
-         * @member {string}
-         */
-        this.fragmentSrc = fragmentSrc || Program.defaultFragmentSrc;
-        this.vertexSrc = this.vertexSrc.trim();
-        this.fragmentSrc = this.fragmentSrc.trim();
-        if (this.vertexSrc.substring(0, 8) !== '#version') {
-            name = name.replace(/\s+/g, '-');
-            if (nameCache[name]) {
-                nameCache[name]++;
-                name += "-" + nameCache[name];
-            }
-            else {
-                nameCache[name] = 1;
-            }
-            this.vertexSrc = "#define SHADER_NAME " + name + "\n" + this.vertexSrc;
-            this.fragmentSrc = "#define SHADER_NAME " + name + "\n" + this.fragmentSrc;
-            this.vertexSrc = setPrecision(this.vertexSrc, settings.PRECISION_VERTEX, PRECISION.HIGH);
-            this.fragmentSrc = setPrecision(this.fragmentSrc, settings.PRECISION_FRAGMENT, getMaxFragmentPrecision());
+    this.vertexSrc = vertexSrc || Program.defaultVertexSrc;
+
+    /**
+     * The fragment shader.
+     *
+     * @member {string}
+     */
+    this.fragmentSrc = fragmentSrc || Program.defaultFragmentSrc;
+
+    this.vertexSrc = this.vertexSrc.trim();
+    this.fragmentSrc = this.fragmentSrc.trim();
+
+    if (this.vertexSrc.substring(0, 8) !== '#version')
+    {
+        name = name.replace(/\s+/g, '-');
+
+        if (nameCache[name])
+        {
+            nameCache[name]++;
+            name += "-" + (nameCache[name]);
         }
-        // currently this does not extract structs only default types
-        this.extractData(this.vertexSrc, this.fragmentSrc);
-        // this is where we store shader references..
-        this.glPrograms = {};
-        this.syncUniforms = null;
+        else
+        {
+            nameCache[name] = 1;
+        }
+
+        this.vertexSrc = "#define SHADER_NAME " + name + "\n" + (this.vertexSrc);
+        this.fragmentSrc = "#define SHADER_NAME " + name + "\n" + (this.fragmentSrc);
+
+        this.vertexSrc = setPrecision(this.vertexSrc, settings.PRECISION_VERTEX, PRECISION.HIGH);
+        this.fragmentSrc = setPrecision(this.fragmentSrc, settings.PRECISION_FRAGMENT, getMaxFragmentPrecision());
     }
-    /**
-     * Extracts the data for a buy creating a small test program
-     * or reading the src directly.
-     * @protected
-     *
-     * @param {string} [vertexSrc] - The source of the vertex shader.
-     * @param {string} [fragmentSrc] - The source of the fragment shader.
-     */
-    Program.prototype.extractData = function (vertexSrc, fragmentSrc) {
-        var gl = getTestContext();
-        if (gl) {
-            var program = compileProgram(gl, vertexSrc, fragmentSrc);
-            this.attributeData = this.getAttributeData(program, gl);
-            this.uniformData = this.getUniformData(program, gl);
-            gl.deleteProgram(program);
-        }
-        else {
-            this.uniformData = {};
-            this.attributeData = {};
-        }
-    };
-    /**
-     * returns the attribute data from the program
-     * @private
-     *
-     * @param {WebGLProgram} [program] - the WebGL program
-     * @param {WebGLRenderingContext} [gl] - the WebGL context
-     *
-     * @returns {object} the attribute data for this program
-     */
-    Program.prototype.getAttributeData = function (program, gl) {
-        var attributes = {};
-        var attributesArray = [];
-        var totalAttributes = gl.getProgramParameter(program, gl.ACTIVE_ATTRIBUTES);
-        for (var i = 0; i < totalAttributes; i++) {
-            var attribData = gl.getActiveAttrib(program, i);
-            var type = mapType(gl, attribData.type);
-            /*eslint-disable */
-            var data = {
-                type: type,
-                name: attribData.name,
-                size: mapSize(type),
-                location: 0,
-            };
-            /* eslint-enable */
-            attributes[attribData.name] = data;
-            attributesArray.push(data);
-        }
-        attributesArray.sort(function (a, b) { return (a.name > b.name) ? 1 : -1; }); // eslint-disable-line no-confusing-arrow
-        for (var i = 0; i < attributesArray.length; i++) {
-            attributesArray[i].location = i;
-        }
-        return attributes;
-    };
-    /**
-     * returns the uniform data from the program
-     * @private
-     *
-     * @param {webGL-program} [program] - the webgl program
-     * @param {context} [gl] - the WebGL context
-     *
-     * @returns {object} the uniform data for this program
-     */
-    Program.prototype.getUniformData = function (program, gl) {
-        var uniforms = {};
-        var totalUniforms = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
-        // TODO expose this as a prop?
-        // const maskRegex = new RegExp('^(projectionMatrix|uSampler|translationMatrix)$');
-        // const maskRegex = new RegExp('^(projectionMatrix|uSampler|translationMatrix)$');
-        for (var i = 0; i < totalUniforms; i++) {
-            var uniformData = gl.getActiveUniform(program, i);
-            var name = uniformData.name.replace(/\[.*?\]$/, '');
-            var isArray = uniformData.name.match(/\[.*?\]$/);
-            var type = mapType(gl, uniformData.type);
-            /*eslint-disable */
-            uniforms[name] = {
-                type: type,
-                size: uniformData.size,
-                isArray: isArray,
-                value: defaultValue(type, uniformData.size),
-            };
-            /* eslint-enable */
-        }
-        return uniforms;
-    };
-    Object.defineProperty(Program, "defaultVertexSrc", {
-        /**
-         * The default vertex shader source
-         *
-         * @static
-         * @constant
-         * @member {string}
-         */
-        get: function () {
-            return defaultVertex;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Program, "defaultFragmentSrc", {
-        /**
-         * The default fragment shader source
-         *
-         * @static
-         * @constant
-         * @member {string}
-         */
-        get: function () {
-            return defaultFragment;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    /**
-     * A short hand function to create a program based of a vertex and fragment shader
-     * this method will also check to see if there is a cached program.
-     *
-     * @param {string} [vertexSrc] - The source of the vertex shader.
-     * @param {string} [fragmentSrc] - The source of the fragment shader.
-     * @param {string} [name=pixi-shader] - Name for shader
-     *
-     * @returns {PIXI.Program} an shiny new Pixi shader!
-     */
-    Program.from = function (vertexSrc, fragmentSrc, name) {
-        var key = vertexSrc + fragmentSrc;
-        var program = ProgramCache[key];
-        if (!program) {
-            ProgramCache[key] = program = new Program(vertexSrc, fragmentSrc, name);
-        }
-        return program;
-    };
-    return Program;
-}());
+
+    // currently this does not extract structs only default types
+    this.extractData(this.vertexSrc, this.fragmentSrc);
+
+    // this is where we store shader references..
+    this.glPrograms = {};
+
+    this.syncUniforms = null;
+};
+
+var staticAccessors = { defaultVertexSrc: { configurable: true },defaultFragmentSrc: { configurable: true } };
+
+/**
+ * Extracts the data for a buy creating a small test program
+ * or reading the src directly.
+ * @protected
+ *
+ * @param {string} [vertexSrc] - The source of the vertex shader.
+ * @param {string} [fragmentSrc] - The source of the fragment shader.
+ */
+Program.prototype.extractData = function extractData (vertexSrc, fragmentSrc)
+{
+    var gl = getTestContext();
+
+    if (gl)
+    {
+        var program = compileProgram(gl, vertexSrc, fragmentSrc);
+
+        this.attributeData = this.getAttributeData(program, gl);
+        this.uniformData = this.getUniformData(program, gl);
+
+        gl.deleteProgram(program);
+    }
+    else
+    {
+        this.uniformData = {};
+        this.attributeData = {};
+    }
+};
+
+/**
+ * returns the attribute data from the program
+ * @private
+ *
+ * @param {WebGLProgram} [program] - the WebGL program
+ * @param {WebGLRenderingContext} [gl] - the WebGL context
+ *
+ * @returns {object} the attribute data for this program
+ */
+Program.prototype.getAttributeData = function getAttributeData (program, gl)
+{
+    var attributes = {};
+    var attributesArray = [];
+
+    var totalAttributes = gl.getProgramParameter(program, gl.ACTIVE_ATTRIBUTES);
+
+    for (var i = 0; i < totalAttributes; i++)
+    {
+        var attribData = gl.getActiveAttrib(program, i);
+        var type = mapType(gl, attribData.type);
+
+        /*eslint-disable */
+        var data = {
+            type: type,
+            name: attribData.name,
+            size: mapSize(type),
+            location: 0,
+        };
+        /* eslint-enable */
+
+        attributes[attribData.name] = data;
+        attributesArray.push(data);
+    }
+
+    attributesArray.sort(function (a, b) { return (a.name > b.name) ? 1 : -1; }); // eslint-disable-line no-confusing-arrow
+
+    for (var i$1 = 0; i$1 < attributesArray.length; i$1++)
+    {
+        attributesArray[i$1].location = i$1;
+    }
+
+    return attributes;
+};
+
+/**
+ * returns the uniform data from the program
+ * @private
+ *
+ * @param {webGL-program} [program] - the webgl program
+ * @param {context} [gl] - the WebGL context
+ *
+ * @returns {object} the uniform data for this program
+ */
+Program.prototype.getUniformData = function getUniformData (program, gl)
+{
+    var uniforms = {};
+
+    var totalUniforms = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
+
+    // TODO expose this as a prop?
+    // const maskRegex = new RegExp('^(projectionMatrix|uSampler|translationMatrix)$');
+    // const maskRegex = new RegExp('^(projectionMatrix|uSampler|translationMatrix)$');
+
+    for (var i = 0; i < totalUniforms; i++)
+    {
+        var uniformData = gl.getActiveUniform(program, i);
+        var name = uniformData.name.replace(/\[.*?\]/, '');
+
+        var isArray = uniformData.name.match(/\[.*?\]/, '');
+        var type = mapType(gl, uniformData.type);
+
+        /*eslint-disable */
+        uniforms[name] = {
+            type: type,
+            size: uniformData.size,
+            isArray:isArray,
+            value: defaultValue(type, uniformData.size),
+        };
+        /* eslint-enable */
+    }
+
+    return uniforms;
+};
+
+/**
+ * The default vertex shader source
+ *
+ * @static
+ * @constant
+ * @member {string}
+ */
+staticAccessors.defaultVertexSrc.get = function ()
+{
+    return defaultVertex;
+};
+
+/**
+ * The default fragment shader source
+ *
+ * @static
+ * @constant
+ * @member {string}
+ */
+staticAccessors.defaultFragmentSrc.get = function ()
+{
+    return defaultFragment;
+};
+
+/**
+ * A short hand function to create a program based of a vertex and fragment shader
+ * this method will also check to see if there is a cached program.
+ *
+ * @param {string} [vertexSrc] - The source of the vertex shader.
+ * @param {string} [fragmentSrc] - The source of the fragment shader.
+ * @param {string} [name=pixi-shader] - Name for shader
+ *
+ * @returns {PIXI.Program} an shiny new Pixi shader!
+ */
+Program.from = function from (vertexSrc, fragmentSrc, name)
+{
+    var key = vertexSrc + fragmentSrc;
+
+    var program = ProgramCache[key];
+
+    if (!program)
+    {
+        ProgramCache[key] = program = new Program(vertexSrc, fragmentSrc, name);
+    }
+
+    return program;
+};
+
+Object.defineProperties( Program, staticAccessors );
 
 /**
  * A helper class for shaders
@@ -15042,94 +14296,114 @@ var Program = /** @class */ (function () {
  * @class
  * @memberof PIXI
  */
-var Shader = /** @class */ (function () {
+var Shader = function Shader(program, uniforms)
+{
     /**
-     * @param {PIXI.Program} [program] - The program the shader will use.
-     * @param {object} [uniforms] - Custom uniforms to use to augment the built-in ones.
+     * Program that the shader uses
+     *
+     * @member {PIXI.Program}
      */
-    function Shader(program, uniforms) {
-        /**
-         * Program that the shader uses
-         *
-         * @member {PIXI.Program}
-         */
-        this.program = program;
-        // lets see whats been passed in
-        // uniforms should be converted to a uniform group
-        if (uniforms) {
-            if (uniforms instanceof UniformGroup) {
-                this.uniformGroup = uniforms;
-            }
-            else {
-                this.uniformGroup = new UniformGroup(uniforms);
-            }
+    this.program = program;
+
+    // lets see whats been passed in
+    // uniforms should be converted to a uniform group
+    if (uniforms)
+    {
+        if (uniforms instanceof UniformGroup)
+        {
+            this.uniformGroup = uniforms;
         }
-        else {
-            this.uniformGroup = new UniformGroup({});
+        else
+        {
+            this.uniformGroup = new UniformGroup(uniforms);
         }
-        // time to build some getters and setters!
-        // I guess down the line this could sort of generate an instruction list rather than use dirty ids?
-        // does the trick for now though!
-        for (var i in program.uniformData) {
-            if (this.uniformGroup.uniforms[i] instanceof Array) {
-                this.uniformGroup.uniforms[i] = new Float32Array(this.uniformGroup.uniforms[i]);
+    }
+    else
+    {
+        this.uniformGroup = new UniformGroup({});
+    }
+
+    // time to build some getters and setters!
+    // I guess down the line this could sort of generate an instruction list rather than use dirty ids?
+    // does the trick for now though!
+    for (var i in program.uniformData)
+    {
+        if (this.uniformGroup.uniforms[i] instanceof Array)
+        {
+            this.uniformGroup.uniforms[i] = new Float32Array(this.uniformGroup.uniforms[i]);
+        }
+    }
+};
+
+var prototypeAccessors$2 = { uniforms: { configurable: true } };
+
+// TODO move to shader system..
+Shader.prototype.checkUniformExists = function checkUniformExists (name, group)
+{
+    if (group.uniforms[name])
+    {
+        return true;
+    }
+
+    for (var i in group.uniforms)
+    {
+        var uniform = group.uniforms[i];
+
+        if (uniform.group)
+        {
+            if (this.checkUniformExists(name, uniform))
+            {
+                return true;
             }
         }
     }
-    // TODO move to shader system..
-    Shader.prototype.checkUniformExists = function (name, group) {
-        if (group.uniforms[name]) {
-            return true;
-        }
-        for (var i in group.uniforms) {
-            var uniform = group.uniforms[i];
-            if (uniform.group) {
-                if (this.checkUniformExists(name, uniform)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    };
-    Shader.prototype.destroy = function () {
-        // usage count on programs?
-        // remove if not used!
-        this.uniformGroup = null;
-    };
-    Object.defineProperty(Shader.prototype, "uniforms", {
-        /**
-         * Shader uniform values, shortcut for `uniformGroup.uniforms`
-         * @readonly
-         * @member {object}
-         */
-        get: function () {
-            return this.uniformGroup.uniforms;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    /**
-     * A short hand function to create a shader based of a vertex and fragment shader
-     *
-     * @param {string} [vertexSrc] - The source of the vertex shader.
-     * @param {string} [fragmentSrc] - The source of the fragment shader.
-     * @param {object} [uniforms] - Custom uniforms to use to augment the built-in ones.
-     *
-     * @returns {PIXI.Shader} an shiny new Pixi shader!
-     */
-    Shader.from = function (vertexSrc, fragmentSrc, uniforms) {
-        var program = Program.from(vertexSrc, fragmentSrc);
-        return new Shader(program, uniforms);
-    };
-    return Shader;
-}());
+
+    return false;
+};
+
+Shader.prototype.destroy = function destroy ()
+{
+    // usage count on programs?
+    // remove if not used!
+    this.uniformGroup = null;
+};
+
+/**
+ * Shader uniform values, shortcut for `uniformGroup.uniforms`
+ * @readonly
+ * @member {object}
+ */
+prototypeAccessors$2.uniforms.get = function ()
+{
+    return this.uniformGroup.uniforms;
+};
+
+/**
+ * A short hand function to create a shader based of a vertex and fragment shader
+ *
+ * @param {string} [vertexSrc] - The source of the vertex shader.
+ * @param {string} [fragmentSrc] - The source of the fragment shader.
+ * @param {object} [uniforms] - Custom uniforms to use to augment the built-in ones.
+ *
+ * @returns {PIXI.Shader} an shiny new Pixi shader!
+ */
+Shader.from = function from (vertexSrc, fragmentSrc, uniforms)
+{
+    var program = Program.from(vertexSrc, fragmentSrc);
+
+    return new Shader(program, uniforms);
+};
+
+Object.defineProperties( Shader.prototype, prototypeAccessors$2 );
 
 /* eslint-disable max-len */
+
 var BLEND = 0;
 var OFFSET = 1;
 var CULLING = 2;
 var DEPTH_TEST = 3;
 var WINDING = 4;
+
 /**
  * This is a WebGL state, and is is passed The WebGL StateManager.
  *
@@ -15139,407 +14413,162 @@ var WINDING = 4;
  * @class
  * @memberof PIXI
  */
-var State = /** @class */ (function () {
-    function State() {
-        this.data = 0;
-        this.blendMode = BLEND_MODES.NORMAL;
-        this.polygonOffset = 0;
-        this.blend = true;
-        //  this.depthTest = true;
-    }
-    Object.defineProperty(State.prototype, "blend", {
-        /**
-         * Activates blending of the computed fragment color values
-         *
-         * @member {boolean}
-         */
-        get: function () {
-            return !!(this.data & (1 << BLEND));
-        },
-        set: function (value) {
-            if (!!(this.data & (1 << BLEND)) !== value) {
-                this.data ^= (1 << BLEND);
-            }
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(State.prototype, "offsets", {
-        /**
-         * Activates adding an offset to depth values of polygon's fragments
-         *
-         * @member {boolean}
-         * @default false
-         */
-        get: function () {
-            return !!(this.data & (1 << OFFSET));
-        },
-        set: function (value) {
-            if (!!(this.data & (1 << OFFSET)) !== value) {
-                this.data ^= (1 << OFFSET);
-            }
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(State.prototype, "culling", {
-        /**
-         * Activates culling of polygons.
-         *
-         * @member {boolean}
-         * @default false
-         */
-        get: function () {
-            return !!(this.data & (1 << CULLING));
-        },
-        set: function (value) {
-            if (!!(this.data & (1 << CULLING)) !== value) {
-                this.data ^= (1 << CULLING);
-            }
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(State.prototype, "depthTest", {
-        /**
-         * Activates depth comparisons and updates to the depth buffer.
-         *
-         * @member {boolean}
-         * @default false
-         */
-        get: function () {
-            return !!(this.data & (1 << DEPTH_TEST));
-        },
-        set: function (value) {
-            if (!!(this.data & (1 << DEPTH_TEST)) !== value) {
-                this.data ^= (1 << DEPTH_TEST);
-            }
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(State.prototype, "clockwiseFrontFace", {
-        /**
-         * Specifies whether or not front or back-facing polygons can be culled.
-         * @member {boolean}
-         * @default false
-         */
-        get: function () {
-            return !!(this.data & (1 << WINDING));
-        },
-        set: function (value) {
-            if (!!(this.data & (1 << WINDING)) !== value) {
-                this.data ^= (1 << WINDING);
-            }
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(State.prototype, "blendMode", {
-        /**
-         * The blend mode to be applied when this state is set. Apply a value of `PIXI.BLEND_MODES.NORMAL` to reset the blend mode.
-         * Setting this mode to anything other than NO_BLEND will automatically switch blending on.
-         *
-         * @member {number}
-         * @default PIXI.BLEND_MODES.NORMAL
-         * @see PIXI.BLEND_MODES
-         */
-        get: function () {
-            return this._blendMode;
-        },
-        set: function (value) {
-            this.blend = (value !== BLEND_MODES.NONE);
-            this._blendMode = value;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(State.prototype, "polygonOffset", {
-        /**
-         * The polygon offset. Setting this property to anything other than 0 will automatically enable polygon offset fill.
-         *
-         * @member {number}
-         * @default 0
-         */
-        get: function () {
-            return this._polygonOffset;
-        },
-        set: function (value) {
-            this.offsets = !!value;
-            this._polygonOffset = value;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    State.for2d = function () {
-        var state = new State();
-        state.depthTest = false;
-        state.blend = true;
-        return state;
-    };
-    return State;
-}());
+var State = function State()
+{
+    this.data = 0;
 
-var defaultVertex$1 = "attribute vec2 aVertexPosition;\n\nuniform mat3 projectionMatrix;\n\nvarying vec2 vTextureCoord;\n\nuniform vec4 inputSize;\nuniform vec4 outputFrame;\n\nvec4 filterVertexPosition( void )\n{\n    vec2 position = aVertexPosition * max(outputFrame.zw, vec2(0.)) + outputFrame.xy;\n\n    return vec4((projectionMatrix * vec3(position, 1.0)).xy, 0.0, 1.0);\n}\n\nvec2 filterTextureCoord( void )\n{\n    return aVertexPosition * (outputFrame.zw * inputSize.zw);\n}\n\nvoid main(void)\n{\n    gl_Position = filterVertexPosition();\n    vTextureCoord = filterTextureCoord();\n}\n";
+    this.blendMode = BLEND_MODES.NORMAL;
+    this.polygonOffset = 0;
 
-var defaultFragment$1 = "varying vec2 vTextureCoord;\n\nuniform sampler2D uSampler;\n\nvoid main(void){\n   gl_FragColor = texture2D(uSampler, vTextureCoord);\n}\n";
+    this.blend = true;
+    //  this.depthTest = true;
+};
+
+var prototypeAccessors$3 = { blend: { configurable: true },offsets: { configurable: true },culling: { configurable: true },depthTest: { configurable: true },clockwiseFrontFace: { configurable: true },blendMode: { configurable: true },polygonOffset: { configurable: true } };
 
 /**
- * Filter is a special type of WebGL shader that is applied to the screen.
+ * Activates blending of the computed fragment color values
  *
- * {@link http://pixijs.io/examples/#/filters/blur-filter.js Example} of the
- * {@link PIXI.filters.BlurFilter BlurFilter}.
- *
- * ### Usage
- * Filters can be applied to any DisplayObject or Container.
- * PixiJS' `FilterSystem` renders the container into temporary Framebuffer,
- * then filter renders it to the screen.
- * Multiple filters can be added to the `filters` array property and stacked on each other.
- *
- * ```
- * const filter = new PIXI.Filter(myShaderVert, myShaderFrag, { myUniform: 0.5 });
- * const container = new PIXI.Container();
- * container.filters = [filter];
- * ```
- *
- * ### Previous Version Differences
- *
- * In PixiJS **v3**, a filter was always applied to _whole screen_.
- *
- * In PixiJS **v4**, a filter can be applied _only part of the screen_.
- * Developers had to create a set of uniforms to deal with coordinates.
- *
- * In PixiJS **v5** combines _both approaches_.
- * Developers can use normal coordinates of v3 and then allow filter to use partial Framebuffers,
- * bringing those extra uniforms into account.
- *
- * Also be aware that we have changed default vertex shader, please consult
- * {@link https://github.com/pixijs/pixi.js/wiki/v5-Creating-filters Wiki}.
- *
- * ### Built-in Uniforms
- *
- * PixiJS viewport uses screen (CSS) coordinates, `(0, 0, renderer.screen.width, renderer.screen.height)`,
- * and `projectionMatrix` uniform maps it to the gl viewport.
- *
- * **uSampler**
- *
- * The most important uniform is the input texture that container was rendered into.
- * _Important note: as with all Framebuffers in PixiJS, both input and output are
- * premultiplied by alpha._
- *
- * By default, input normalized coordinates are passed to fragment shader with `vTextureCoord`.
- * Use it to sample the input.
- *
- * ```
- * const fragment = `
- * varying vec2 vTextureCoord;
- * uniform sampler2D uSampler;
- * void main(void)
- * {
- *    gl_FragColor = texture2D(uSampler, vTextureCoord);
- * }
- * `;
- *
- * const myFilter = new PIXI.Filter(null, fragment);
- * ```
- *
- * This filter is just one uniform less than {@link PIXI.filters.AlphaFilter AlphaFilter}.
- *
- * **outputFrame**
- *
- * The `outputFrame` holds the rectangle where filter is applied in screen (CSS) coordinates.
- * It's the same as `renderer.screen` for a fullscreen filter.
- * Only a part of  `outputFrame.zw` size of temporary Framebuffer is used,
- * `(0, 0, outputFrame.width, outputFrame.height)`,
- *
- * Filters uses this quad to normalized (0-1) space, its passed into `aVertexPosition` attribute.
- * To calculate vertex position in screen space using normalized (0-1) space:
- *
- * ```
- * vec4 filterVertexPosition( void )
- * {
- *     vec2 position = aVertexPosition * max(outputFrame.zw, vec2(0.)) + outputFrame.xy;
- *     return vec4((projectionMatrix * vec3(position, 1.0)).xy, 0.0, 1.0);
- * }
- * ```
- *
- * **inputSize**
- *
- * Temporary framebuffer is different, it can be either the size of screen, either power-of-two.
- * The `inputSize.xy` are size of temporary framebuffer that holds input.
- * The `inputSize.zw` is inverted, it's a shortcut to evade division inside the shader.
- *
- * Set `inputSize.xy = outputFrame.zw` for a fullscreen filter.
- *
- * To calculate input normalized coordinate, you have to map it to filter normalized space.
- * Multiply by `outputFrame.zw` to get input coordinate.
- * Divide by `inputSize.xy` to get input normalized coordinate.
- *
- * ```
- * vec2 filterTextureCoord( void )
- * {
- *     return aVertexPosition * (outputFrame.zw * inputSize.zw); // same as /inputSize.xy
- * }
- * ```
- * **resolution**
- *
- * The `resolution` is the ratio of screen (CSS) pixels to real pixels.
- *
- * **inputPixel**
- *
- * `inputPixel.xy` is the size of framebuffer in real pixels, same as `inputSize.xy * resolution`
- * `inputPixel.zw` is inverted `inputPixel.xy`.
- *
- * It's handy for filters that use neighbour pixels, like {@link PIXI.filters.FXAAFilter FXAAFilter}.
- *
- * **inputClamp**
- *
- * If you try to get info from outside of used part of Framebuffer - you'll get undefined behaviour.
- * For displacements, coordinates has to be clamped.
- *
- * The `inputClamp.xy` is left-top pixel center, you may ignore it, because we use left-top part of Framebuffer
- * `inputClamp.zw` is bottom-right pixel center.
- *
- * ```
- * vec4 color = texture2D(uSampler, clamp(modifigedTextureCoord, inputClamp.xy, inputClamp.zw))
- * ```
- * OR
- * ```
- * vec4 color = texture2D(uSampler, min(modifigedTextureCoord, inputClamp.zw))
- * ```
- *
- * ### Additional Information
- *
- * Complete documentation on Filter usage is located in the
- * {@link https://github.com/pixijs/pixi.js/wiki/v5-Creating-filters Wiki}.
- *
- * Since PixiJS only had a handful of built-in filters, additional filters can be downloaded
- * {@link https://github.com/pixijs/pixi-filters here} from the PixiJS Filters repository.
- *
- * @class
- * @memberof PIXI
- * @extends PIXI.Shader
+ * @member {boolean}
  */
-var Filter = /** @class */ (function (_super) {
-    __extends(Filter, _super);
-    /**
-     * @param {string} [vertexSrc] - The source of the vertex shader.
-     * @param {string} [fragmentSrc] - The source of the fragment shader.
-     * @param {object} [uniforms] - Custom uniforms to use to augment the built-in ones.
-     */
-    function Filter(vertexSrc, fragmentSrc, uniforms) {
-        var _this = this;
-        var program = Program.from(vertexSrc || Filter.defaultVertexSrc, fragmentSrc || Filter.defaultFragmentSrc);
-        _this = _super.call(this, program, uniforms) || this;
-        /**
-         * The padding of the filter. Some filters require extra space to breath such as a blur.
-         * Increasing this will add extra width and height to the bounds of the object that the
-         * filter is applied to.
-         *
-         * @member {number}
-         */
-        _this.padding = 0;
-        /**
-         * The resolution of the filter. Setting this to be lower will lower the quality but
-         * increase the performance of the filter.
-         *
-         * @member {number}
-         */
-        _this.resolution = settings.FILTER_RESOLUTION;
-        /**
-         * If enabled is true the filter is applied, if false it will not.
-         *
-         * @member {boolean}
-         */
-        _this.enabled = true;
-        /**
-         * If enabled, PixiJS will fit the filter area into boundaries for better performance.
-         * Switch it off if it does not work for specific shader.
-         *
-         * @member {boolean}
-         */
-        _this.autoFit = true;
-        /**
-         * Legacy filters use position and uvs from attributes
-         * @member {boolean}
-         * @readonly
-         */
-        _this.legacy = !!_this.program.attributeData.aTextureCoord;
-        /**
-         * The WebGL state the filter requires to render
-         * @member {PIXI.State}
-         */
-        _this.state = new State();
-        return _this;
+prototypeAccessors$3.blend.get = function ()
+{
+    return !!(this.data & (1 << BLEND));
+};
+
+prototypeAccessors$3.blend.set = function (value) // eslint-disable-line require-jsdoc
+{
+    if (!!(this.data & (1 << BLEND)) !== value)
+    {
+        this.data ^= (1 << BLEND);
     }
-    /**
-     * Applies the filter
-     *
-     * @param {PIXI.systems.FilterSystem} filterManager - The renderer to retrieve the filter from
-     * @param {PIXI.RenderTexture} input - The input render target.
-     * @param {PIXI.RenderTexture} output - The target to output to.
-     * @param {PIXI.CLEAR_MODES} clearMode - Should the output be cleared before rendering to it.
-     * @param {object} [currentState] - It's current state of filter.
-     *        There are some useful properties in the currentState :
-     *        target, filters, sourceFrame, destinationFrame, renderTarget, resolution
-     */
-    Filter.prototype.apply = function (filterManager, input, output, clearMode, _currentState) {
-        // do as you please!
-        filterManager.applyFilter(this, input, output, clearMode);
-        // or just do a regular render..
-    };
-    Object.defineProperty(Filter.prototype, "blendMode", {
-        /**
-         * Sets the blendmode of the filter
-         *
-         * @member {number}
-         * @default PIXI.BLEND_MODES.NORMAL
-         */
-        get: function () {
-            return this.state.blendMode;
-        },
-        set: function (value) {
-            this.state.blendMode = value;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Filter, "defaultVertexSrc", {
-        /**
-         * The default vertex shader source
-         *
-         * @static
-         * @type {string}
-         * @constant
-         */
-        get: function () {
-            return defaultVertex$1;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Filter, "defaultFragmentSrc", {
-        /**
-         * The default fragment shader source
-         *
-         * @static
-         * @type {string}
-         * @constant
-         */
-        get: function () {
-            return defaultFragment$1;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    return Filter;
-}(Shader));
+};
 
-var vertex = "attribute vec2 aVertexPosition;\nattribute vec2 aTextureCoord;\n\nuniform mat3 projectionMatrix;\nuniform mat3 otherMatrix;\n\nvarying vec2 vMaskCoord;\nvarying vec2 vTextureCoord;\n\nvoid main(void)\n{\n    gl_Position = vec4((projectionMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);\n\n    vTextureCoord = aTextureCoord;\n    vMaskCoord = ( otherMatrix * vec3( aTextureCoord, 1.0)  ).xy;\n}\n";
+/**
+ * Activates adding an offset to depth values of polygon's fragments
+ *
+ * @member {boolean}
+ * @default false
+ */
+prototypeAccessors$3.offsets.get = function ()
+{
+    return !!(this.data & (1 << OFFSET));
+};
 
-var fragment = "varying vec2 vMaskCoord;\nvarying vec2 vTextureCoord;\n\nuniform sampler2D uSampler;\nuniform sampler2D mask;\nuniform float alpha;\nuniform float npmAlpha;\nuniform vec4 maskClamp;\n\nvoid main(void)\n{\n    float clip = step(3.5,\n        step(maskClamp.x, vMaskCoord.x) +\n        step(maskClamp.y, vMaskCoord.y) +\n        step(vMaskCoord.x, maskClamp.z) +\n        step(vMaskCoord.y, maskClamp.w));\n\n    vec4 original = texture2D(uSampler, vTextureCoord);\n    vec4 masky = texture2D(mask, vMaskCoord);\n    float alphaMul = 1.0 - npmAlpha * (1.0 - masky.a);\n\n    original *= (alphaMul * masky.r * alpha * clip);\n\n    gl_FragColor = original;\n}\n";
+prototypeAccessors$3.offsets.set = function (value) // eslint-disable-line require-jsdoc
+{
+    if (!!(this.data & (1 << OFFSET)) !== value)
+    {
+        this.data ^= (1 << OFFSET);
+    }
+};
+
+/**
+ * Activates culling of polygons.
+ *
+ * @member {boolean}
+ * @default false
+ */
+prototypeAccessors$3.culling.get = function ()
+{
+    return !!(this.data & (1 << CULLING));
+};
+
+prototypeAccessors$3.culling.set = function (value) // eslint-disable-line require-jsdoc
+{
+    if (!!(this.data & (1 << CULLING)) !== value)
+    {
+        this.data ^= (1 << CULLING);
+    }
+};
+
+/**
+ * Activates depth comparisons and updates to the depth buffer.
+ *
+ * @member {boolean}
+ * @default false
+ */
+prototypeAccessors$3.depthTest.get = function ()
+{
+    return !!(this.data & (1 << DEPTH_TEST));
+};
+
+prototypeAccessors$3.depthTest.set = function (value) // eslint-disable-line require-jsdoc
+{
+    if (!!(this.data & (1 << DEPTH_TEST)) !== value)
+    {
+        this.data ^= (1 << DEPTH_TEST);
+    }
+};
+
+/**
+ * Specifies whether or not front or back-facing polygons can be culled.
+ * @member {boolean}
+ * @default false
+ */
+prototypeAccessors$3.clockwiseFrontFace.get = function ()
+{
+    return !!(this.data & (1 << WINDING));
+};
+
+prototypeAccessors$3.clockwiseFrontFace.set = function (value) // eslint-disable-line require-jsdoc
+{
+    if (!!(this.data & (1 << WINDING)) !== value)
+    {
+        this.data ^= (1 << WINDING);
+    }
+};
+
+/**
+ * The blend mode to be applied when this state is set. Apply a value of `PIXI.BLEND_MODES.NORMAL` to reset the blend mode.
+ * Setting this mode to anything other than NO_BLEND will automatically switch blending on.
+ *
+ * @member {number}
+ * @default PIXI.BLEND_MODES.NORMAL
+ * @see PIXI.BLEND_MODES
+ */
+prototypeAccessors$3.blendMode.get = function ()
+{
+    return this._blendMode;
+};
+
+prototypeAccessors$3.blendMode.set = function (value) // eslint-disable-line require-jsdoc
+{
+    this.blend = (value !== BLEND_MODES.NONE);
+    this._blendMode = value;
+};
+
+/**
+ * The polygon offset. Setting this property to anything other than 0 will automatically enable polygon offset fill.
+ *
+ * @member {number}
+ * @default 0
+ */
+prototypeAccessors$3.polygonOffset.get = function ()
+{
+    return this._polygonOffset;
+};
+
+prototypeAccessors$3.polygonOffset.set = function (value) // eslint-disable-line require-jsdoc
+{
+    this.offsets = !!value;
+    this._polygonOffset = value;
+};
+
+State.for2d = function for2d ()
+{
+    var state = new State();
+
+    state.depthTest = false;
+    state.blend = true;
+
+    return state;
+};
+
+Object.defineProperties( State.prototype, prototypeAccessors$3 );
 
 var tempMat = new Matrix();
+
 /**
  * Class controls uv mapping from Texture normal space to BaseTexture normal space.
  *
@@ -15557,2556 +14586,173 @@ var tempMat = new Matrix();
  * @class
  * @memberof PIXI
  */
-var TextureMatrix = /** @class */ (function () {
+var TextureMatrix = function TextureMatrix(texture, clampMargin)
+{
+    this._texture = texture;
+
     /**
+     * Matrix operation that converts texture region coords to texture coords
+     * @member {PIXI.Matrix}
+     * @readonly
+     */
+    this.mapCoord = new Matrix();
+
+    /**
+     * Clamp region for normalized coords, left-top pixel center in xy , bottom-right in zw.
+     * Calculated based on clampOffset.
+     * @member {Float32Array}
+     * @readonly
+     */
+    this.uClampFrame = new Float32Array(4);
+
+    /**
+     * Normalized clamp offset.
+     * Calculated based on clampOffset.
+     * @member {Float32Array}
+     * @readonly
+     */
+    this.uClampOffset = new Float32Array(2);
+
+    /**
+     * Tracks Texture frame changes
+     * @member {number}
+     * @protected
+     */
+    this._updateID = -1;
+
+    /**
+     * Changes frame clamping
+     * Works with TilingSprite and Mesh
+     * Change to 1.5 if you texture has repeated right and bottom lines, that leads to smoother borders
      *
-     * @param {PIXI.Texture} texture - observed texture
-     * @param {number} [clampMargin] - Changes frame clamping, 0.5 by default. Use -0.5 for extra border.
-     * @constructor
+     * @default 0
+     * @member {number}
      */
-    function TextureMatrix(texture, clampMargin) {
-        this._texture = texture;
-        /**
-         * Matrix operation that converts texture region coords to texture coords
-         * @member {PIXI.Matrix}
-         * @readonly
-         */
-        this.mapCoord = new Matrix();
-        /**
-         * Clamp region for normalized coords, left-top pixel center in xy , bottom-right in zw.
-         * Calculated based on clampOffset.
-         * @member {Float32Array}
-         * @readonly
-         */
-        this.uClampFrame = new Float32Array(4);
-        /**
-         * Normalized clamp offset.
-         * Calculated based on clampOffset.
-         * @member {Float32Array}
-         * @readonly
-         */
-        this.uClampOffset = new Float32Array(2);
-        /**
-         * Tracks Texture frame changes
-         * @member {number}
-         * @protected
-         */
-        this._textureID = -1;
-        /**
-         * Tracks Texture frame changes
-         * @member {number}
-         * @protected
-         */
-        this._updateID = 0;
-        /**
-         * Changes frame clamping
-         * Works with TilingSprite and Mesh
-         * Change to 1.5 if you texture has repeated right and bottom lines, that leads to smoother borders
-         *
-         * @default 0
-         * @member {number}
-         */
-        this.clampOffset = 0;
-        /**
-         * Changes frame clamping
-         * Works with TilingSprite and Mesh
-         * Change to -0.5 to add a pixel to the edge, recommended for transparent trimmed textures in atlas
-         *
-         * @default 0.5
-         * @member {number}
-         */
-        this.clampMargin = (typeof clampMargin === 'undefined') ? 0.5 : clampMargin;
-        /**
-         * If texture size is the same as baseTexture
-         * @member {boolean}
-         * @default false
-         * @readonly
-         */
-        this.isSimple = false;
-    }
-    Object.defineProperty(TextureMatrix.prototype, "texture", {
-        /**
-         * texture property
-         * @member {PIXI.Texture}
-         */
-        get: function () {
-            return this._texture;
-        },
-        set: function (value) {
-            this._texture = value;
-            this._textureID = -1;
-        },
-        enumerable: false,
-        configurable: true
-    });
+    this.clampOffset = 0;
+
     /**
-     * Multiplies uvs array to transform
-     * @param {Float32Array} uvs - mesh uvs
-     * @param {Float32Array} [out=uvs] output
-     * @returns {Float32Array} output
+     * Changes frame clamping
+     * Works with TilingSprite and Mesh
+     * Change to -0.5 to add a pixel to the edge, recommended for transparent trimmed textures in atlas
+     *
+     * @default 0.5
+     * @member {number}
      */
-    TextureMatrix.prototype.multiplyUvs = function (uvs, out) {
-        if (out === undefined) {
-            out = uvs;
-        }
-        var mat = this.mapCoord;
-        for (var i = 0; i < uvs.length; i += 2) {
-            var x = uvs[i];
-            var y = uvs[i + 1];
-            out[i] = (x * mat.a) + (y * mat.c) + mat.tx;
-            out[i + 1] = (x * mat.b) + (y * mat.d) + mat.ty;
-        }
-        return out;
-    };
+    this.clampMargin = (typeof clampMargin === 'undefined') ? 0.5 : clampMargin;
+
     /**
-     * updates matrices if texture was changed
-     * @param {boolean} [forceUpdate=false] - if true, matrices will be updated any case
-     * @returns {boolean} whether or not it was updated
+     * If texture size is the same as baseTexture
+     * @member {boolean}
+     * @default false
+     * @readonly
      */
-    TextureMatrix.prototype.update = function (forceUpdate) {
-        var tex = this._texture;
-        if (!tex || !tex.valid) {
-            return false;
-        }
-        if (!forceUpdate
-            && this._textureID === tex._updateID) {
-            return false;
-        }
-        this._textureID = tex._updateID;
-        this._updateID++;
-        var uvs = tex._uvs;
-        this.mapCoord.set(uvs.x1 - uvs.x0, uvs.y1 - uvs.y0, uvs.x3 - uvs.x0, uvs.y3 - uvs.y0, uvs.x0, uvs.y0);
-        var orig = tex.orig;
-        var trim = tex.trim;
-        if (trim) {
-            tempMat.set(orig.width / trim.width, 0, 0, orig.height / trim.height, -trim.x / trim.width, -trim.y / trim.height);
-            this.mapCoord.append(tempMat);
-        }
-        var texBase = tex.baseTexture;
-        var frame = this.uClampFrame;
-        var margin = this.clampMargin / texBase.resolution;
-        var offset = this.clampOffset;
-        frame[0] = (tex._frame.x + margin + offset) / texBase.width;
-        frame[1] = (tex._frame.y + margin + offset) / texBase.height;
-        frame[2] = (tex._frame.x + tex._frame.width - margin + offset) / texBase.width;
-        frame[3] = (tex._frame.y + tex._frame.height - margin + offset) / texBase.height;
-        this.uClampOffset[0] = offset / texBase.realWidth;
-        this.uClampOffset[1] = offset / texBase.realHeight;
-        this.isSimple = tex._frame.width === texBase.width
-            && tex._frame.height === texBase.height
-            && tex.rotate === 0;
-        return true;
-    };
-    return TextureMatrix;
-}());
+    this.isSimple = false;
+};
+
+var prototypeAccessors$4 = { texture: { configurable: true } };
 
 /**
- * This handles a Sprite acting as a mask, as opposed to a Graphic.
- *
- * WebGL only.
- *
- * @class
- * @extends PIXI.Filter
- * @memberof PIXI
+ * texture property
+ * @member {PIXI.Texture}
  */
-var SpriteMaskFilter = /** @class */ (function (_super) {
-    __extends(SpriteMaskFilter, _super);
-    /**
-     * @param {PIXI.Sprite} sprite - the target sprite
-     */
-    function SpriteMaskFilter(sprite) {
-        var _this = this;
-        var maskMatrix = new Matrix();
-        _this = _super.call(this, vertex, fragment) || this;
-        sprite.renderable = false;
-        /**
-         * Sprite mask
-         * @member {PIXI.Sprite}
-         */
-        _this.maskSprite = sprite;
-        /**
-         * Mask matrix
-         * @member {PIXI.Matrix}
-         */
-        _this.maskMatrix = maskMatrix;
-        return _this;
-    }
-    /**
-     * Applies the filter
-     *
-     * @param {PIXI.systems.FilterSystem} filterManager - The renderer to retrieve the filter from
-     * @param {PIXI.RenderTexture} input - The input render target.
-     * @param {PIXI.RenderTexture} output - The target to output to.
-     * @param {PIXI.CLEAR_MODES} clearMode - Should the output be cleared before rendering to it.
-     */
-    SpriteMaskFilter.prototype.apply = function (filterManager, input, output, clearMode) {
-        var maskSprite = this.maskSprite;
-        var tex = maskSprite._texture;
-        if (!tex.valid) {
-            return;
-        }
-        if (!tex.uvMatrix) {
-            // margin = 0.0, let it bleed a bit, shader code becomes easier
-            // assuming that atlas textures were made with 1-pixel padding
-            tex.uvMatrix = new TextureMatrix(tex, 0.0);
-        }
-        tex.uvMatrix.update();
-        this.uniforms.npmAlpha = tex.baseTexture.alphaMode ? 0.0 : 1.0;
-        this.uniforms.mask = tex;
-        // get _normalized sprite texture coords_ and convert them to _normalized atlas texture coords_ with `prepend`
-        this.uniforms.otherMatrix = filterManager.calculateSpriteMatrix(this.maskMatrix, maskSprite)
-            .prepend(tex.uvMatrix.mapCoord);
-        this.uniforms.alpha = maskSprite.worldAlpha;
-        this.uniforms.maskClamp = tex.uvMatrix.uClampFrame;
-        filterManager.applyFilter(this, input, output, clearMode);
-    };
-    return SpriteMaskFilter;
-}(Filter));
+prototypeAccessors$4.texture.get = function ()
+{
+    return this._texture;
+};
+
+prototypeAccessors$4.texture.set = function (value) // eslint-disable-line require-jsdoc
+{
+    this._texture = value;
+    this._updateID = -1;
+};
 
 /**
- * System plugin to the renderer to manage masks.
- *
- * @class
- * @extends PIXI.System
- * @memberof PIXI.systems
+ * Multiplies uvs array to transform
+ * @param {Float32Array} uvs mesh uvs
+ * @param {Float32Array} [out=uvs] output
+ * @returns {Float32Array} output
  */
-var MaskSystem = /** @class */ (function (_super) {
-    __extends(MaskSystem, _super);
-    /**
-     * @param {PIXI.Renderer} renderer - The renderer this System works for.
-     */
-    function MaskSystem(renderer) {
-        var _this = _super.call(this, renderer) || this;
-        /**
-         * Enable scissor
-         * @member {boolean}
-         * @readonly
-         */
-        _this.enableScissor = false;
-        /**
-         * Pool of used sprite mask filters
-         * @member {PIXI.SpriteMaskFilter[]}
-         * @readonly
-         */
-        _this.alphaMaskPool = [];
-        /**
-         * Pool of mask data
-         * @member {PIXI.MaskData[]}
-         * @readonly
-         */
-        _this.maskDataPool = [];
-        _this.maskStack = [];
-        /**
-         * Current index of alpha mask pool
-         * @member {number}
-         * @default 0
-         * @readonly
-         */
-        _this.alphaMaskIndex = 0;
-        return _this;
+TextureMatrix.prototype.multiplyUvs = function multiplyUvs (uvs, out)
+{
+    if (out === undefined)
+    {
+        out = uvs;
     }
-    /**
-     * Changes the mask stack that is used by this System.
-     *
-     * @param {PIXI.MaskData[]} maskStack - The mask stack
-     */
-    MaskSystem.prototype.setMaskStack = function (maskStack) {
-        this.maskStack = maskStack;
-        this.renderer.scissor.setMaskStack(maskStack);
-        this.renderer.stencil.setMaskStack(maskStack);
-    };
-    /**
-     * Applies the Mask and adds it to the current filter stack.
-     * Renderer batch must be flushed beforehand.
-     *
-     * @param {PIXI.DisplayObject} target - Display Object to push the mask to
-     * @param {PIXI.MaskData|PIXI.Sprite|PIXI.Graphics|PIXI.DisplayObject} maskData - The masking data.
-     */
-    MaskSystem.prototype.push = function (target, maskDataOrTarget) {
-        var maskData = maskDataOrTarget;
-        if (!maskData.isMaskData) {
-            var d = this.maskDataPool.pop() || new MaskData();
-            d.pooled = true;
-            d.maskObject = maskDataOrTarget;
-            maskData = d;
-        }
-        if (maskData.autoDetect) {
-            this.detect(maskData);
-        }
-        maskData.copyCountersOrReset(this.maskStack[this.maskStack.length - 1]);
-        maskData._target = target;
-        switch (maskData.type) {
-            case MASK_TYPES.SCISSOR:
-                this.maskStack.push(maskData);
-                this.renderer.scissor.push(maskData);
-                break;
-            case MASK_TYPES.STENCIL:
-                this.maskStack.push(maskData);
-                this.renderer.stencil.push(maskData);
-                break;
-            case MASK_TYPES.SPRITE:
-                maskData.copyCountersOrReset(null);
-                this.pushSpriteMask(maskData);
-                this.maskStack.push(maskData);
-                break;
-        }
-    };
-    /**
-     * Removes the last mask from the mask stack and doesn't return it.
-     * Renderer batch must be flushed beforehand.
-     *
-     * @param {PIXI.DisplayObject} target - Display Object to pop the mask from
-     */
-    MaskSystem.prototype.pop = function (target) {
-        var maskData = this.maskStack.pop();
-        if (!maskData || maskData._target !== target) {
-            // TODO: add an assert when we have it
-            return;
-        }
-        switch (maskData.type) {
-            case MASK_TYPES.SCISSOR:
-                this.renderer.scissor.pop();
-                break;
-            case MASK_TYPES.STENCIL:
-                this.renderer.stencil.pop(maskData.maskObject);
-                break;
-            case MASK_TYPES.SPRITE:
-                this.popSpriteMask();
-                break;
-        }
-        maskData.reset();
-        if (maskData.pooled) {
-            this.maskDataPool.push(maskData);
-        }
-    };
-    /**
-     * Sets type of MaskData based on its maskObject
-     * @param {PIXI.MaskData} maskData
-     */
-    MaskSystem.prototype.detect = function (maskData) {
-        var maskObject = maskData.maskObject;
-        if (maskObject.isSprite) {
-            maskData.type = MASK_TYPES.SPRITE;
-            return;
-        }
-        maskData.type = MASK_TYPES.STENCIL;
-        // detect scissor in graphics
-        if (this.enableScissor
-            && maskObject.isFastRect
-            && maskObject.isFastRect()) {
-            var matrix = maskObject.worldTransform;
-            // TODO: move the check to the matrix itself
-            // we are checking that its orthogonal and x rotation is 0 90 180 or 270
-            var rotX = Math.atan2(matrix.b, matrix.a);
-            var rotXY = Math.atan2(matrix.d, matrix.c);
-            // use the nearest degree to 0.01
-            rotX = Math.round(rotX * (180 / Math.PI) * 100);
-            rotXY = Math.round(rotXY * (180 / Math.PI) * 100) - rotX;
-            rotX = ((rotX % 9000) + 9000) % 9000;
-            rotXY = ((rotXY % 18000) + 18000) % 18000;
-            if (rotX === 0 && rotXY === 9000) {
-                maskData.type = MASK_TYPES.SCISSOR;
-            }
-        }
-    };
-    /**
-     * Applies the Mask and adds it to the current filter stack.
-     *
-     * @param {PIXI.MaskData} maskData - Sprite to be used as the mask
-     */
-    MaskSystem.prototype.pushSpriteMask = function (maskData) {
-        var maskObject = maskData.maskObject;
-        var target = maskData._target;
-        var alphaMaskFilter = this.alphaMaskPool[this.alphaMaskIndex];
-        if (!alphaMaskFilter) {
-            alphaMaskFilter = this.alphaMaskPool[this.alphaMaskIndex] = [new SpriteMaskFilter(maskObject)];
-        }
-        alphaMaskFilter[0].resolution = this.renderer.resolution;
-        alphaMaskFilter[0].maskSprite = maskObject;
-        var stashFilterArea = target.filterArea;
-        target.filterArea = maskObject.getBounds(true);
-        this.renderer.filter.push(target, alphaMaskFilter);
-        target.filterArea = stashFilterArea;
-        this.alphaMaskIndex++;
-    };
-    /**
-     * Removes the last filter from the filter stack and doesn't return it.
-     */
-    MaskSystem.prototype.popSpriteMask = function () {
-        this.renderer.filter.pop();
-        this.alphaMaskIndex--;
-    };
-    return MaskSystem;
-}(System));
+
+    var mat = this.mapCoord;
+
+    for (var i = 0; i < uvs.length; i += 2)
+    {
+        var x = uvs[i];
+        var y = uvs[i + 1];
+
+        out[i] = (x * mat.a) + (y * mat.c) + mat.tx;
+        out[i + 1] = (x * mat.b) + (y * mat.d) + mat.ty;
+    }
+
+    return out;
+};
 
 /**
- * System plugin to the renderer to manage masks of certain type
- *
- * @class
- * @extends PIXI.System
- * @memberof PIXI.systems
+ * updates matrices if texture was changed
+ * @param {boolean} [forceUpdate=false] if true, matrices will be updated any case
+ * @returns {boolean} whether or not it was updated
  */
-var AbstractMaskSystem = /** @class */ (function (_super) {
-    __extends(AbstractMaskSystem, _super);
-    /**
-     * @param {PIXI.Renderer} renderer - The renderer this System works for.
-     */
-    function AbstractMaskSystem(renderer) {
-        var _this = _super.call(this, renderer) || this;
-        /**
-         * The mask stack
-         * @member {PIXI.MaskData[]}
-         */
-        _this.maskStack = [];
-        /**
-         * Constant for gl.enable
-         * @member {number}
-         * @private
-         */
-        _this.glConst = 0;
-        return _this;
-    }
-    /**
-     * gets count of masks of certain type
-     * @returns {number}
-     */
-    AbstractMaskSystem.prototype.getStackLength = function () {
-        return this.maskStack.length;
-    };
-    /**
-     * Changes the mask stack that is used by this System.
-     *
-     * @param {PIXI.MaskData[]} maskStack - The mask stack
-     */
-    AbstractMaskSystem.prototype.setMaskStack = function (maskStack) {
-        var gl = this.renderer.gl;
-        var curStackLen = this.getStackLength();
-        this.maskStack = maskStack;
-        var newStackLen = this.getStackLength();
-        if (newStackLen !== curStackLen) {
-            if (newStackLen === 0) {
-                gl.disable(this.glConst);
-            }
-            else {
-                gl.enable(this.glConst);
-                this._useCurrent();
-            }
-        }
-    };
-    /**
-     * Setup renderer to use the current mask data.
-     * @private
-     */
-    AbstractMaskSystem.prototype._useCurrent = function () {
-        // OVERWRITE;
-    };
-    /**
-     * Destroys the mask stack.
-     *
-     */
-    AbstractMaskSystem.prototype.destroy = function () {
-        _super.prototype.destroy.call(this);
-        this.maskStack = null;
-    };
-    return AbstractMaskSystem;
-}(System));
+TextureMatrix.prototype.update = function update (forceUpdate)
+{
+    var tex = this._texture;
 
-/**
- * System plugin to the renderer to manage scissor rects (used for masks).
- *
- * @class
- * @extends PIXI.System
- * @memberof PIXI.systems
- */
-var ScissorSystem = /** @class */ (function (_super) {
-    __extends(ScissorSystem, _super);
-    /**
-     * @param {PIXI.Renderer} renderer - The renderer this System works for.
-     */
-    function ScissorSystem(renderer) {
-        var _this = _super.call(this, renderer) || this;
-        _this.glConst = WebGLRenderingContext.SCISSOR_TEST;
-        return _this;
+    if (!tex || !tex.valid)
+    {
+        return false;
     }
-    ScissorSystem.prototype.getStackLength = function () {
-        var maskData = this.maskStack[this.maskStack.length - 1];
-        if (maskData) {
-            return maskData._scissorCounter;
-        }
-        return 0;
-    };
-    /**
-     * Applies the Mask and adds it to the current stencil stack. @alvin
-     *
-     * @param {PIXI.MaskData} maskData - The mask data
-     */
-    ScissorSystem.prototype.push = function (maskData) {
-        var maskObject = maskData.maskObject;
-        maskObject.renderable = true;
-        var prevData = maskData._scissorRect;
-        var bounds = maskObject.getBounds(true);
-        var gl = this.renderer.gl;
-        maskObject.renderable = false;
-        if (prevData) {
-            bounds.fit(prevData);
-        }
-        else {
-            gl.enable(gl.SCISSOR_TEST);
-        }
-        maskData._scissorCounter++;
-        maskData._scissorRect = bounds;
-        this._useCurrent();
-    };
-    /**
-     * Pops scissor mask. MaskData is already removed from stack
-     */
-    ScissorSystem.prototype.pop = function () {
-        var gl = this.renderer.gl;
-        if (this.getStackLength() > 0) {
-            this._useCurrent();
-        }
-        else {
-            gl.disable(gl.SCISSOR_TEST);
-        }
-    };
-    /**
-     * Setup renderer to use the current scissor data.
-     * @private
-     */
-    ScissorSystem.prototype._useCurrent = function () {
-        var rect = this.maskStack[this.maskStack.length - 1]._scissorRect;
-        var rt = this.renderer.renderTexture.current;
-        var _a = this.renderer.projection, transform = _a.transform, sourceFrame = _a.sourceFrame, destinationFrame = _a.destinationFrame;
-        var resolution = rt ? rt.resolution : this.renderer.resolution;
-        var x = ((rect.x - sourceFrame.x) * resolution) + destinationFrame.x;
-        var y = ((rect.y - sourceFrame.y) * resolution) + destinationFrame.y;
-        var width = rect.width * resolution;
-        var height = rect.height * resolution;
-        if (transform) {
-            x += transform.tx * resolution;
-            y += transform.ty * resolution;
-        }
-        if (!rt) {
-            // flipY. In future we'll have it over renderTextures as an option
-            y = this.renderer.height - height - y;
-        }
-        this.renderer.gl.scissor(x, y, width, height);
-    };
-    return ScissorSystem;
-}(AbstractMaskSystem));
 
-/**
- * System plugin to the renderer to manage stencils (used for masks).
- *
- * @class
- * @extends PIXI.System
- * @memberof PIXI.systems
- */
-var StencilSystem = /** @class */ (function (_super) {
-    __extends(StencilSystem, _super);
-    /**
-     * @param {PIXI.Renderer} renderer - The renderer this System works for.
-     */
-    function StencilSystem(renderer) {
-        var _this = _super.call(this, renderer) || this;
-        _this.glConst = WebGLRenderingContext.STENCIL_TEST;
-        return _this;
+    if (!forceUpdate
+        && this._updateID === tex._updateID)
+    {
+        return false;
     }
-    StencilSystem.prototype.getStackLength = function () {
-        var maskData = this.maskStack[this.maskStack.length - 1];
-        if (maskData) {
-            return maskData._stencilCounter;
-        }
-        return 0;
-    };
-    /**
-     * Applies the Mask and adds it to the current stencil stack.
-     *
-     * @param {PIXI.MaskData} maskData - The mask data
-     */
-    StencilSystem.prototype.push = function (maskData) {
-        var maskObject = maskData.maskObject;
-        var gl = this.renderer.gl;
-        var prevMaskCount = maskData._stencilCounter;
-        if (prevMaskCount === 0) {
-            // force use stencil texture in current framebuffer
-            this.renderer.framebuffer.forceStencil();
-            gl.enable(gl.STENCIL_TEST);
-        }
-        maskData._stencilCounter++;
-        // Increment the reference stencil value where the new mask overlaps with the old ones.
-        gl.colorMask(false, false, false, false);
-        gl.stencilFunc(gl.EQUAL, prevMaskCount, this._getBitwiseMask());
-        gl.stencilOp(gl.KEEP, gl.KEEP, gl.INCR);
-        maskObject.renderable = true;
-        maskObject.render(this.renderer);
-        this.renderer.batch.flush();
-        maskObject.renderable = false;
-        this._useCurrent();
-    };
-    /**
-     * Pops stencil mask. MaskData is already removed from stack
-     *
-     * @param {PIXI.DisplayObject} maskObject - object of popped mask data
-     */
-    StencilSystem.prototype.pop = function (maskObject) {
-        var gl = this.renderer.gl;
-        if (this.getStackLength() === 0) {
-            // the stack is empty!
-            gl.disable(gl.STENCIL_TEST);
-            gl.clear(gl.STENCIL_BUFFER_BIT);
-            gl.clearStencil(0);
-        }
-        else {
-            // Decrement the reference stencil value where the popped mask overlaps with the other ones
-            gl.colorMask(false, false, false, false);
-            gl.stencilOp(gl.KEEP, gl.KEEP, gl.DECR);
-            maskObject.renderable = true;
-            maskObject.render(this.renderer);
-            this.renderer.batch.flush();
-            maskObject.renderable = false;
-            this._useCurrent();
-        }
-    };
-    /**
-     * Setup renderer to use the current stencil data.
-     * @private
-     */
-    StencilSystem.prototype._useCurrent = function () {
-        var gl = this.renderer.gl;
-        gl.colorMask(true, true, true, true);
-        gl.stencilFunc(gl.EQUAL, this.getStackLength(), this._getBitwiseMask());
-        gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP);
-    };
-    /**
-     * Fill 1s equal to the number of acitve stencil masks.
-     * @private
-     * @return {number} The bitwise mask.
-     */
-    StencilSystem.prototype._getBitwiseMask = function () {
-        return (1 << this.getStackLength()) - 1;
-    };
-    return StencilSystem;
-}(AbstractMaskSystem));
 
-/**
- * System plugin to the renderer to manage the projection matrix.
- *
- * @class
- * @extends PIXI.System
- * @memberof PIXI.systems
- */
-var ProjectionSystem = /** @class */ (function (_super) {
-    __extends(ProjectionSystem, _super);
-    /**
-     * @param {PIXI.Renderer} renderer - The renderer this System works for.
-     */
-    function ProjectionSystem(renderer) {
-        var _this = _super.call(this, renderer) || this;
-        /**
-         * Destination frame
-         * @member {PIXI.Rectangle}
-         * @readonly
-         */
-        _this.destinationFrame = null;
-        /**
-         * Source frame
-         * @member {PIXI.Rectangle}
-         * @readonly
-         */
-        _this.sourceFrame = null;
-        /**
-         * Default destination frame
-         * @member {PIXI.Rectangle}
-         * @readonly
-         */
-        _this.defaultFrame = null;
-        /**
-         * Project matrix
-         * @member {PIXI.Matrix}
-         * @readonly
-         */
-        _this.projectionMatrix = new Matrix();
-        /**
-         * A transform that will be appended to the projection matrix
-         * if null, nothing will be applied
-         * @member {PIXI.Matrix}
-         */
-        _this.transform = null;
-        return _this;
+    this._updateID = tex._updateID;
+
+    var uvs = tex._uvs;
+
+    this.mapCoord.set(uvs.x1 - uvs.x0, uvs.y1 - uvs.y0, uvs.x3 - uvs.x0, uvs.y3 - uvs.y0, uvs.x0, uvs.y0);
+
+    var orig = tex.orig;
+    var trim = tex.trim;
+
+    if (trim)
+    {
+        tempMat.set(orig.width / trim.width, 0, 0, orig.height / trim.height,
+            -trim.x / trim.width, -trim.y / trim.height);
+        this.mapCoord.append(tempMat);
     }
-    /**
-     * Updates the projection matrix based on a projection frame (which is a rectangle).
-     *
-     * Make sure to run `renderer.framebuffer.setViewport(destinationFrame)` after calling this.
-     *
-     * @param {PIXI.Rectangle} destinationFrame - The destination frame.
-     * @param {PIXI.Rectangle} sourceFrame - The source frame.
-     * @param {Number} resolution - Resolution
-     * @param {boolean} root - If is root
-     */
-    ProjectionSystem.prototype.update = function (destinationFrame, sourceFrame, resolution, root) {
-        this.destinationFrame = destinationFrame || this.destinationFrame || this.defaultFrame;
-        this.sourceFrame = sourceFrame || this.sourceFrame || destinationFrame;
-        // Calculate object-space to clip-space projection
-        this.calculateProjection(this.destinationFrame, this.sourceFrame, resolution, root);
-        if (this.transform) {
-            this.projectionMatrix.append(this.transform);
-        }
-        var renderer = this.renderer;
-        renderer.globalUniforms.uniforms.projectionMatrix = this.projectionMatrix;
-        renderer.globalUniforms.update();
-        // this will work for now
-        // but would be sweet to stick and even on the global uniforms..
-        if (renderer.shader.shader) {
-            renderer.shader.syncUniformGroup(renderer.shader.shader.uniforms.globals);
-        }
-    };
-    /**
-     * Updates the projection matrix based on a projection frame (which is a rectangle)
-     *
-     * @param {PIXI.Rectangle}[destinationFrame] - The destination frame.
-     * @param {PIXI.Rectangle} sourceFrame - The source frame.
-     * @param {Number} resolution - Resolution
-     * @param {boolean} root - If is root
-     */
-    ProjectionSystem.prototype.calculateProjection = function (_destinationFrame, sourceFrame, _resolution, root) {
-        var pm = this.projectionMatrix;
-        var sign = !root ? 1 : -1;
-        pm.identity();
-        pm.a = (1 / sourceFrame.width * 2);
-        pm.d = sign * (1 / sourceFrame.height * 2);
-        pm.tx = -1 - (sourceFrame.x * pm.a);
-        pm.ty = -sign - (sourceFrame.y * pm.d);
-    };
-    /**
-     * Sets the transform of the active render target to the given matrix
-     *
-     * @param {PIXI.Matrix} matrix - The transformation matrix
-     */
-    ProjectionSystem.prototype.setTransform = function (_matrix) {
-        // this._activeRenderTarget.transform = matrix;
-    };
-    return ProjectionSystem;
-}(System));
 
-// Temporary rectangle for assigned sourceFrame or destinationFrame
+    var texBase = tex.baseTexture;
+    var frame = this.uClampFrame;
+    var margin = this.clampMargin / texBase.resolution;
+    var offset = this.clampOffset;
+
+    frame[0] = (tex._frame.x + margin + offset) / texBase.width;
+    frame[1] = (tex._frame.y + margin + offset) / texBase.height;
+    frame[2] = (tex._frame.x + tex._frame.width - margin + offset) / texBase.width;
+    frame[3] = (tex._frame.y + tex._frame.height - margin + offset) / texBase.height;
+    this.uClampOffset[0] = offset / texBase.realWidth;
+    this.uClampOffset[1] = offset / texBase.realHeight;
+
+    this.isSimple = tex._frame.width === texBase.width
+        && tex._frame.height === texBase.height
+        && tex.rotate === 0;
+
+    return true;
+};
+
+Object.defineProperties( TextureMatrix.prototype, prototypeAccessors$4 );
+
 var tempRect = new Rectangle();
-// Temporary rectangle for renderTexture destinationFrame
-var tempRect2 = new Rectangle();
-// Temporary rectangle for passing the framebuffer viewport
-var viewportFrame = new Rectangle();
-/**
- * System plugin to the renderer to manage render textures.
- *
- * Should be added after FramebufferSystem
- *
- * @class
- * @extends PIXI.System
- * @memberof PIXI.systems
- */
-var RenderTextureSystem = /** @class */ (function (_super) {
-    __extends(RenderTextureSystem, _super);
-    /**
-     * @param {PIXI.Renderer} renderer - The renderer this System works for.
-     */
-    function RenderTextureSystem(renderer) {
-        var _this = _super.call(this, renderer) || this;
-        /**
-         * The clear background color as rgba
-         * @member {number[]}
-         */
-        _this.clearColor = renderer._backgroundColorRgba;
-        // TODO move this property somewhere else!
-        /**
-         * List of masks for the StencilSystem
-         * @member {PIXI.Graphics[]}
-         * @readonly
-         */
-        _this.defaultMaskStack = [];
-        // empty render texture?
-        /**
-         * Render texture
-         * @member {PIXI.RenderTexture}
-         * @readonly
-         */
-        _this.current = null;
-        /**
-         * Source frame
-         * @member {PIXI.Rectangle}
-         * @readonly
-         */
-        _this.sourceFrame = new Rectangle();
-        /**
-         * Destination frame
-         * @member {PIXI.Rectangle}
-         * @readonly
-         */
-        _this.destinationFrame = new Rectangle();
-        return _this;
-    }
-    /**
-     * Bind the current render texture
-     *
-     * @param {PIXI.RenderTexture} [renderTexture] - RenderTexture to bind, by default its `null`, the screen
-     * @param {PIXI.Rectangle} [sourceFrame] - part of screen that is mapped to the renderTexture
-     * @param {PIXI.Rectangle} [destinationFrame] - part of renderTexture, by default it has the same size as sourceFrame
-     */
-    RenderTextureSystem.prototype.bind = function (renderTexture, sourceFrame, destinationFrame) {
-        if (renderTexture === void 0) { renderTexture = null; }
-        var renderer = this.renderer;
-        this.current = renderTexture;
-        var baseTexture;
-        var framebuffer;
-        var resolution;
-        if (renderTexture) {
-            baseTexture = renderTexture.baseTexture;
-            resolution = baseTexture.resolution;
-            if (!sourceFrame) {
-                tempRect.width = renderTexture.frame.width;
-                tempRect.height = renderTexture.frame.height;
-                sourceFrame = tempRect;
-            }
-            if (!destinationFrame) {
-                tempRect2.x = renderTexture.frame.x;
-                tempRect2.y = renderTexture.frame.y;
-                tempRect2.width = sourceFrame.width;
-                tempRect2.height = sourceFrame.height;
-                destinationFrame = tempRect2;
-            }
-            framebuffer = baseTexture.framebuffer;
-        }
-        else {
-            resolution = renderer.resolution;
-            if (!sourceFrame) {
-                tempRect.width = renderer.screen.width;
-                tempRect.height = renderer.screen.height;
-                sourceFrame = tempRect;
-            }
-            if (!destinationFrame) {
-                destinationFrame = tempRect;
-                destinationFrame.width = sourceFrame.width;
-                destinationFrame.height = sourceFrame.height;
-            }
-        }
-        viewportFrame.x = destinationFrame.x * resolution;
-        viewportFrame.y = destinationFrame.y * resolution;
-        viewportFrame.width = destinationFrame.width * resolution;
-        viewportFrame.height = destinationFrame.height * resolution;
-        this.renderer.framebuffer.bind(framebuffer, viewportFrame);
-        this.renderer.projection.update(destinationFrame, sourceFrame, resolution, !framebuffer);
-        if (renderTexture) {
-            this.renderer.mask.setMaskStack(baseTexture.maskStack);
-        }
-        else {
-            this.renderer.mask.setMaskStack(this.defaultMaskStack);
-        }
-        this.sourceFrame.copyFrom(sourceFrame);
-        this.destinationFrame.copyFrom(destinationFrame);
-    };
-    /**
-     * Erases the render texture and fills the drawing area with a colour
-     *
-     * @param {number[]} [clearColor] - The color as rgba, default to use the renderer backgroundColor
-     * @param {PIXI.BUFFER_BITS} [mask=BUFFER_BITS.COLOR | BUFFER_BITS.DEPTH] - Bitwise OR of masks
-     *  that indicate the buffers to be cleared, by default COLOR and DEPTH buffers.
-     * @return {PIXI.Renderer} Returns itself.
-     */
-    RenderTextureSystem.prototype.clear = function (clearColor, mask) {
-        if (this.current) {
-            clearColor = clearColor || this.current.baseTexture.clearColor;
-        }
-        else {
-            clearColor = clearColor || this.clearColor;
-        }
-        this.renderer.framebuffer.clear(clearColor[0], clearColor[1], clearColor[2], clearColor[3], mask);
-    };
-    RenderTextureSystem.prototype.resize = function () {
-        // resize the root only!
-        this.bind(null);
-    };
-    /**
-     * Resets renderTexture state
-     */
-    RenderTextureSystem.prototype.reset = function () {
-        this.bind(null);
-    };
-    return RenderTextureSystem;
-}(System));
-/**
- * Helper class to create a WebGL Program
- *
- * @class
- * @memberof PIXI
- */
-var GLProgram = /** @class */ (function () {
-    /**
-     * Makes a new Pixi program
-     *
-     * @param program {WebGLProgram} webgl program
-     * @param uniformData {Object} uniforms
-     */
-    function GLProgram(program, uniformData) {
-        /**
-         * The shader program
-         *
-         * @member {WebGLProgram}
-         */
-        this.program = program;
-        /**
-         * holds the uniform data which contains uniform locations
-         * and current uniform values used for caching and preventing unneeded GPU commands
-         * @member {Object}
-         */
-        this.uniformData = uniformData;
-        /**
-         * uniformGroups holds the various upload functions for the shader. Each uniform group
-         * and program have a unique upload function generated.
-         * @member {Object}
-         */
-        this.uniformGroups = {};
-    }
-    /**
-     * Destroys this program
-     */
-    GLProgram.prototype.destroy = function () {
-        this.uniformData = null;
-        this.uniformGroups = null;
-        this.program = null;
-    };
-    return GLProgram;
-}());
-
-var UID$4 = 0;
-// defualt sync data so we don't create a new one each time!
-var defaultSyncData = { textureCount: 0 };
-/**
- * System plugin to the renderer to manage shaders.
- *
- * @class
- * @memberof PIXI.systems
- * @extends PIXI.System
- */
-var ShaderSystem = /** @class */ (function (_super) {
-    __extends(ShaderSystem, _super);
-    /**
-     * @param {PIXI.Renderer} renderer - The renderer this System works for.
-     */
-    function ShaderSystem(renderer) {
-        var _this = _super.call(this, renderer) || this;
-        _this.destroyed = false;
-        // Validation check that this environment support `new Function`
-        _this.systemCheck();
-        /**
-         * The current WebGL rendering context
-         *
-         * @member {WebGLRenderingContext}
-         */
-        _this.gl = null;
-        _this.shader = null;
-        _this.program = null;
-        /**
-         * Cache to holds the generated functions. Stored against UniformObjects unique signature
-         * @type {Object}
-         * @private
-         */
-        _this.cache = {};
-        _this.id = UID$4++;
-        return _this;
-    }
-    /**
-     * Overrideable function by `@pixi/unsafe-eval` to silence
-     * throwing an error if platform doesn't support unsafe-evals.
-     *
-     * @private
-     */
-    ShaderSystem.prototype.systemCheck = function () {
-        if (!unsafeEvalSupported()) {
-            throw new Error('Current environment does not allow unsafe-eval, '
-                + 'please use @pixi/unsafe-eval module to enable support.');
-        }
-    };
-    ShaderSystem.prototype.contextChange = function (gl) {
-        this.gl = gl;
-        this.reset();
-    };
-    /**
-     * Changes the current shader to the one given in parameter
-     *
-     * @param {PIXI.Shader} shader - the new shader
-     * @param {boolean} [dontSync] - false if the shader should automatically sync its uniforms.
-     * @returns {PIXI.GLProgram} the glProgram that belongs to the shader.
-     */
-    ShaderSystem.prototype.bind = function (shader, dontSync) {
-        shader.uniforms.globals = this.renderer.globalUniforms;
-        var program = shader.program;
-        var glProgram = program.glPrograms[this.renderer.CONTEXT_UID] || this.generateShader(shader);
-        this.shader = shader;
-        // TODO - some current Pixi plugins bypass this.. so it not safe to use yet..
-        if (this.program !== program) {
-            this.program = program;
-            this.gl.useProgram(glProgram.program);
-        }
-        if (!dontSync) {
-            defaultSyncData.textureCount = 0;
-            this.syncUniformGroup(shader.uniformGroup, defaultSyncData);
-        }
-        return glProgram;
-    };
-    /**
-     * Uploads the uniforms values to the currently bound shader.
-     *
-     * @param {object} uniforms - the uniforms values that be applied to the current shader
-     */
-    ShaderSystem.prototype.setUniforms = function (uniforms) {
-        var shader = this.shader.program;
-        var glProgram = shader.glPrograms[this.renderer.CONTEXT_UID];
-        shader.syncUniforms(glProgram.uniformData, uniforms, this.renderer);
-    };
-    /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-    /**
-     *
-     * syncs uniforms on the group
-     * @param {*} group - the uniform group to sync
-     * @param {*} [syncData] - this is data that is passed to the sync function and any nested sync functions
-     */
-    ShaderSystem.prototype.syncUniformGroup = function (group, syncData) {
-        var glProgram = this.getglProgram();
-        if (!group.static || group.dirtyId !== glProgram.uniformGroups[group.id]) {
-            glProgram.uniformGroups[group.id] = group.dirtyId;
-            this.syncUniforms(group, glProgram, syncData);
-        }
-    };
-    /**
-     * Overrideable by the @pixi/unsafe-eval package to use static
-     * syncUnforms instead.
-     *
-     * @private
-     */
-    ShaderSystem.prototype.syncUniforms = function (group, glProgram, syncData) {
-        var syncFunc = group.syncUniforms[this.shader.program.id] || this.createSyncGroups(group);
-        syncFunc(glProgram.uniformData, group.uniforms, this.renderer, syncData);
-    };
-    /* eslint-enable @typescript-eslint/explicit-module-boundary-types */
-    ShaderSystem.prototype.createSyncGroups = function (group) {
-        var id = this.getSignature(group, this.shader.program.uniformData);
-        if (!this.cache[id]) {
-            this.cache[id] = generateUniformsSync(group, this.shader.program.uniformData);
-        }
-        group.syncUniforms[this.shader.program.id] = this.cache[id];
-        return group.syncUniforms[this.shader.program.id];
-    };
-    /**
-     * Takes a uniform group and data and generates a unique signature for them.
-     *
-     * @param {PIXI.UniformGroup} group - the uniform group to get signature of
-     * @param {Object} uniformData - uniform information generated by the shader
-     * @returns {String} Unique signature of the uniform group
-     * @private
-     */
-    ShaderSystem.prototype.getSignature = function (group, uniformData) {
-        var uniforms = group.uniforms;
-        var strings = [];
-        for (var i in uniforms) {
-            strings.push(i);
-            if (uniformData[i]) {
-                strings.push(uniformData[i].type);
-            }
-        }
-        return strings.join('-');
-    };
-    /**
-     * Returns the underlying GLShade rof the currently bound shader.
-     * This can be handy for when you to have a little more control over the setting of your uniforms.
-     *
-     * @return {PIXI.GLProgram} the glProgram for the currently bound Shader for this context
-     */
-    ShaderSystem.prototype.getglProgram = function () {
-        if (this.shader) {
-            return this.shader.program.glPrograms[this.renderer.CONTEXT_UID];
-        }
-        return null;
-    };
-    /**
-     * Generates a glProgram version of the Shader provided.
-     *
-     * @private
-     * @param {PIXI.Shader} shader - the shader that the glProgram will be based on.
-     * @return {PIXI.GLProgram} A shiny new glProgram!
-     */
-    ShaderSystem.prototype.generateShader = function (shader) {
-        var gl = this.gl;
-        var program = shader.program;
-        var attribMap = {};
-        for (var i in program.attributeData) {
-            attribMap[i] = program.attributeData[i].location;
-        }
-        var shaderProgram = compileProgram(gl, program.vertexSrc, program.fragmentSrc, attribMap);
-        var uniformData = {};
-        for (var i in program.uniformData) {
-            var data = program.uniformData[i];
-            uniformData[i] = {
-                location: gl.getUniformLocation(shaderProgram, i),
-                value: defaultValue(data.type, data.size),
-            };
-        }
-        var glProgram = new GLProgram(shaderProgram, uniformData);
-        program.glPrograms[this.renderer.CONTEXT_UID] = glProgram;
-        return glProgram;
-    };
-    /**
-     * Resets ShaderSystem state, does not affect WebGL state
-     */
-    ShaderSystem.prototype.reset = function () {
-        this.program = null;
-        this.shader = null;
-    };
-    /**
-     * Destroys this System and removes all its textures
-     */
-    ShaderSystem.prototype.destroy = function () {
-        // TODO implement destroy method for ShaderSystem
-        this.destroyed = true;
-    };
-    return ShaderSystem;
-}(System));
-
-/**
- * Maps gl blend combinations to WebGL.
- *
- * @memberof PIXI
- * @function mapWebGLBlendModesToPixi
- * @private
- * @param {WebGLRenderingContext} gl - The rendering context.
- * @param {number[][]} [array=[]] - The array to output into.
- * @return {number[][]} Mapped modes.
- */
-function mapWebGLBlendModesToPixi(gl, array) {
-    if (array === void 0) { array = []; }
-    // TODO - premultiply alpha would be different.
-    // add a boolean for that!
-    array[BLEND_MODES.NORMAL] = [gl.ONE, gl.ONE_MINUS_SRC_ALPHA];
-    array[BLEND_MODES.ADD] = [gl.ONE, gl.ONE];
-    array[BLEND_MODES.MULTIPLY] = [gl.DST_COLOR, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA];
-    array[BLEND_MODES.SCREEN] = [gl.ONE, gl.ONE_MINUS_SRC_COLOR, gl.ONE, gl.ONE_MINUS_SRC_ALPHA];
-    array[BLEND_MODES.OVERLAY] = [gl.ONE, gl.ONE_MINUS_SRC_ALPHA];
-    array[BLEND_MODES.DARKEN] = [gl.ONE, gl.ONE_MINUS_SRC_ALPHA];
-    array[BLEND_MODES.LIGHTEN] = [gl.ONE, gl.ONE_MINUS_SRC_ALPHA];
-    array[BLEND_MODES.COLOR_DODGE] = [gl.ONE, gl.ONE_MINUS_SRC_ALPHA];
-    array[BLEND_MODES.COLOR_BURN] = [gl.ONE, gl.ONE_MINUS_SRC_ALPHA];
-    array[BLEND_MODES.HARD_LIGHT] = [gl.ONE, gl.ONE_MINUS_SRC_ALPHA];
-    array[BLEND_MODES.SOFT_LIGHT] = [gl.ONE, gl.ONE_MINUS_SRC_ALPHA];
-    array[BLEND_MODES.DIFFERENCE] = [gl.ONE, gl.ONE_MINUS_SRC_ALPHA];
-    array[BLEND_MODES.EXCLUSION] = [gl.ONE, gl.ONE_MINUS_SRC_ALPHA];
-    array[BLEND_MODES.HUE] = [gl.ONE, gl.ONE_MINUS_SRC_ALPHA];
-    array[BLEND_MODES.SATURATION] = [gl.ONE, gl.ONE_MINUS_SRC_ALPHA];
-    array[BLEND_MODES.COLOR] = [gl.ONE, gl.ONE_MINUS_SRC_ALPHA];
-    array[BLEND_MODES.LUMINOSITY] = [gl.ONE, gl.ONE_MINUS_SRC_ALPHA];
-    array[BLEND_MODES.NONE] = [0, 0];
-    // not-premultiplied blend modes
-    array[BLEND_MODES.NORMAL_NPM] = [gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA];
-    array[BLEND_MODES.ADD_NPM] = [gl.SRC_ALPHA, gl.ONE, gl.ONE, gl.ONE];
-    array[BLEND_MODES.SCREEN_NPM] = [gl.SRC_ALPHA, gl.ONE_MINUS_SRC_COLOR, gl.ONE, gl.ONE_MINUS_SRC_ALPHA];
-    // composite operations
-    array[BLEND_MODES.SRC_IN] = [gl.DST_ALPHA, gl.ZERO];
-    array[BLEND_MODES.SRC_OUT] = [gl.ONE_MINUS_DST_ALPHA, gl.ZERO];
-    array[BLEND_MODES.SRC_ATOP] = [gl.DST_ALPHA, gl.ONE_MINUS_SRC_ALPHA];
-    array[BLEND_MODES.DST_OVER] = [gl.ONE_MINUS_DST_ALPHA, gl.ONE];
-    array[BLEND_MODES.DST_IN] = [gl.ZERO, gl.SRC_ALPHA];
-    array[BLEND_MODES.DST_OUT] = [gl.ZERO, gl.ONE_MINUS_SRC_ALPHA];
-    array[BLEND_MODES.DST_ATOP] = [gl.ONE_MINUS_DST_ALPHA, gl.SRC_ALPHA];
-    array[BLEND_MODES.XOR] = [gl.ONE_MINUS_DST_ALPHA, gl.ONE_MINUS_SRC_ALPHA];
-    // SUBTRACT from flash
-    array[BLEND_MODES.SUBTRACT] = [gl.ONE, gl.ONE, gl.ONE, gl.ONE, gl.FUNC_REVERSE_SUBTRACT, gl.FUNC_ADD];
-    return array;
-}
-
-var BLEND$1 = 0;
-var OFFSET$1 = 1;
-var CULLING$1 = 2;
-var DEPTH_TEST$1 = 3;
-var WINDING$1 = 4;
-/**
- * System plugin to the renderer to manage WebGL state machines.
- *
- * @class
- * @extends PIXI.System
- * @memberof PIXI.systems
- */
-var StateSystem = /** @class */ (function (_super) {
-    __extends(StateSystem, _super);
-    /**
-     * @param {PIXI.Renderer} renderer - The renderer this System works for.
-     */
-    function StateSystem(renderer) {
-        var _this = _super.call(this, renderer) || this;
-        /**
-         * GL context
-         * @member {WebGLRenderingContext}
-         * @readonly
-         */
-        _this.gl = null;
-        /**
-         * State ID
-         * @member {number}
-         * @readonly
-         */
-        _this.stateId = 0;
-        /**
-         * Polygon offset
-         * @member {number}
-         * @readonly
-         */
-        _this.polygonOffset = 0;
-        /**
-         * Blend mode
-         * @member {number}
-         * @default PIXI.BLEND_MODES.NONE
-         * @readonly
-         */
-        _this.blendMode = BLEND_MODES.NONE;
-        /**
-         * Whether current blend equation is different
-         * @member {boolean}
-         * @protected
-         */
-        _this._blendEq = false;
-        /**
-         * Collection of calls
-         * @member {function[]}
-         * @readonly
-         */
-        _this.map = [];
-        // map functions for when we set state..
-        _this.map[BLEND$1] = _this.setBlend;
-        _this.map[OFFSET$1] = _this.setOffset;
-        _this.map[CULLING$1] = _this.setCullFace;
-        _this.map[DEPTH_TEST$1] = _this.setDepthTest;
-        _this.map[WINDING$1] = _this.setFrontFace;
-        /**
-         * Collection of check calls
-         * @member {function[]}
-         * @readonly
-         */
-        _this.checks = [];
-        /**
-         * Default WebGL State
-         * @member {PIXI.State}
-         * @readonly
-         */
-        _this.defaultState = new State();
-        _this.defaultState.blend = true;
-        return _this;
-    }
-    StateSystem.prototype.contextChange = function (gl) {
-        this.gl = gl;
-        this.blendModes = mapWebGLBlendModesToPixi(gl);
-        this.set(this.defaultState);
-        this.reset();
-    };
-    /**
-     * Sets the current state
-     *
-     * @param {*} state - The state to set.
-     */
-    StateSystem.prototype.set = function (state) {
-        state = state || this.defaultState;
-        // TODO maybe to an object check? ( this.state === state )?
-        if (this.stateId !== state.data) {
-            var diff = this.stateId ^ state.data;
-            var i = 0;
-            // order from least to most common
-            while (diff) {
-                if (diff & 1) {
-                    // state change!
-                    this.map[i].call(this, !!(state.data & (1 << i)));
-                }
-                diff = diff >> 1;
-                i++;
-            }
-            this.stateId = state.data;
-        }
-        // based on the above settings we check for specific modes..
-        // for example if blend is active we check and set the blend modes
-        // or of polygon offset is active we check the poly depth.
-        for (var i = 0; i < this.checks.length; i++) {
-            this.checks[i](this, state);
-        }
-    };
-    /**
-     * Sets the state, when previous state is unknown
-     *
-     * @param {*} state - The state to set
-     */
-    StateSystem.prototype.forceState = function (state) {
-        state = state || this.defaultState;
-        for (var i = 0; i < this.map.length; i++) {
-            this.map[i].call(this, !!(state.data & (1 << i)));
-        }
-        for (var i = 0; i < this.checks.length; i++) {
-            this.checks[i](this, state);
-        }
-        this.stateId = state.data;
-    };
-    /**
-     * Enables or disabled blending.
-     *
-     * @param {boolean} value - Turn on or off webgl blending.
-     */
-    StateSystem.prototype.setBlend = function (value) {
-        this.updateCheck(StateSystem.checkBlendMode, value);
-        this.gl[value ? 'enable' : 'disable'](this.gl.BLEND);
-    };
-    /**
-     * Enables or disable polygon offset fill
-     *
-     * @param {boolean} value - Turn on or off webgl polygon offset testing.
-     */
-    StateSystem.prototype.setOffset = function (value) {
-        this.updateCheck(StateSystem.checkPolygonOffset, value);
-        this.gl[value ? 'enable' : 'disable'](this.gl.POLYGON_OFFSET_FILL);
-    };
-    /**
-     * Sets whether to enable or disable depth test.
-     *
-     * @param {boolean} value - Turn on or off webgl depth testing.
-     */
-    StateSystem.prototype.setDepthTest = function (value) {
-        this.gl[value ? 'enable' : 'disable'](this.gl.DEPTH_TEST);
-    };
-    /**
-     * Sets whether to enable or disable cull face.
-     *
-     * @param {boolean} value - Turn on or off webgl cull face.
-     */
-    StateSystem.prototype.setCullFace = function (value) {
-        this.gl[value ? 'enable' : 'disable'](this.gl.CULL_FACE);
-    };
-    /**
-     * Sets the gl front face.
-     *
-     * @param {boolean} value - true is clockwise and false is counter-clockwise
-     */
-    StateSystem.prototype.setFrontFace = function (value) {
-        this.gl.frontFace(this.gl[value ? 'CW' : 'CCW']);
-    };
-    /**
-     * Sets the blend mode.
-     *
-     * @param {number} value - The blend mode to set to.
-     */
-    StateSystem.prototype.setBlendMode = function (value) {
-        if (value === this.blendMode) {
-            return;
-        }
-        this.blendMode = value;
-        var mode = this.blendModes[value];
-        var gl = this.gl;
-        if (mode.length === 2) {
-            gl.blendFunc(mode[0], mode[1]);
-        }
-        else {
-            gl.blendFuncSeparate(mode[0], mode[1], mode[2], mode[3]);
-        }
-        if (mode.length === 6) {
-            this._blendEq = true;
-            gl.blendEquationSeparate(mode[4], mode[5]);
-        }
-        else if (this._blendEq) {
-            this._blendEq = false;
-            gl.blendEquationSeparate(gl.FUNC_ADD, gl.FUNC_ADD);
-        }
-    };
-    /**
-     * Sets the polygon offset.
-     *
-     * @param {number} value - the polygon offset
-     * @param {number} scale - the polygon offset scale
-     */
-    StateSystem.prototype.setPolygonOffset = function (value, scale) {
-        this.gl.polygonOffset(value, scale);
-    };
-    // used
-    /**
-     * Resets all the logic and disables the vaos
-     */
-    StateSystem.prototype.reset = function () {
-        this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, false);
-        this.forceState(this.defaultState);
-        this._blendEq = true;
-        this.blendMode = -1;
-        this.setBlendMode(0);
-    };
-    /**
-     * checks to see which updates should be checked based on which settings have been activated.
-     * For example, if blend is enabled then we should check the blend modes each time the state is changed
-     * or if polygon fill is activated then we need to check if the polygon offset changes.
-     * The idea is that we only check what we have too.
-     *
-     * @param {Function} func - the checking function to add or remove
-     * @param {boolean} value - should the check function be added or removed.
-     */
-    StateSystem.prototype.updateCheck = function (func, value) {
-        var index = this.checks.indexOf(func);
-        if (value && index === -1) {
-            this.checks.push(func);
-        }
-        else if (!value && index !== -1) {
-            this.checks.splice(index, 1);
-        }
-    };
-    /**
-     * A private little wrapper function that we call to check the blend mode.
-     *
-     * @static
-     * @private
-     * @param {PIXI.StateSystem} System - the System to perform the state check on
-     * @param {PIXI.State} state - the state that the blendMode will pulled from
-     */
-    StateSystem.checkBlendMode = function (system, state) {
-        system.setBlendMode(state.blendMode);
-    };
-    /**
-     * A private little wrapper function that we call to check the polygon offset.
-     *
-     * @static
-     * @private
-     * @param {PIXI.StateSystem} System - the System to perform the state check on
-     * @param {PIXI.State} state - the state that the blendMode will pulled from
-     */
-    StateSystem.checkPolygonOffset = function (system, state) {
-        system.setPolygonOffset(1, state.polygonOffset);
-    };
-    return StateSystem;
-}(System));
-
-/**
- * System plugin to the renderer to manage texture garbage collection on the GPU,
- * ensuring that it does not get clogged up with textures that are no longer being used.
- *
- * @class
- * @memberof PIXI.systems
- * @extends PIXI.System
- */
-var TextureGCSystem = /** @class */ (function (_super) {
-    __extends(TextureGCSystem, _super);
-    /**
-     * @param {PIXI.Renderer} renderer - The renderer this System works for.
-     */
-    function TextureGCSystem(renderer) {
-        var _this = _super.call(this, renderer) || this;
-        /**
-         * Count
-         * @member {number}
-         * @readonly
-         */
-        _this.count = 0;
-        /**
-         * Check count
-         * @member {number}
-         * @readonly
-         */
-        _this.checkCount = 0;
-        /**
-         * Maximum idle time, in seconds
-         * @member {number}
-         * @see PIXI.settings.GC_MAX_IDLE
-         */
-        _this.maxIdle = settings.GC_MAX_IDLE;
-        /**
-         * Maximum number of item to check
-         * @member {number}
-         * @see PIXI.settings.GC_MAX_CHECK_COUNT
-         */
-        _this.checkCountMax = settings.GC_MAX_CHECK_COUNT;
-        /**
-         * Current garabage collection mode
-         * @member {PIXI.GC_MODES}
-         * @see PIXI.settings.GC_MODE
-         */
-        _this.mode = settings.GC_MODE;
-        return _this;
-    }
-    /**
-     * Checks to see when the last time a texture was used
-     * if the texture has not been used for a specified amount of time it will be removed from the GPU
-     */
-    TextureGCSystem.prototype.postrender = function () {
-        if (!this.renderer.renderingToScreen) {
-            return;
-        }
-        this.count++;
-        if (this.mode === GC_MODES.MANUAL) {
-            return;
-        }
-        this.checkCount++;
-        if (this.checkCount > this.checkCountMax) {
-            this.checkCount = 0;
-            this.run();
-        }
-    };
-    /**
-     * Checks to see when the last time a texture was used
-     * if the texture has not been used for a specified amount of time it will be removed from the GPU
-     */
-    TextureGCSystem.prototype.run = function () {
-        var tm = this.renderer.texture;
-        var managedTextures = tm.managedTextures;
-        var wasRemoved = false;
-        for (var i = 0; i < managedTextures.length; i++) {
-            var texture = managedTextures[i];
-            // only supports non generated textures at the moment!
-            if (!texture.framebuffer && this.count - texture.touched > this.maxIdle) {
-                tm.destroyTexture(texture, true);
-                managedTextures[i] = null;
-                wasRemoved = true;
-            }
-        }
-        if (wasRemoved) {
-            var j = 0;
-            for (var i = 0; i < managedTextures.length; i++) {
-                if (managedTextures[i] !== null) {
-                    managedTextures[j++] = managedTextures[i];
-                }
-            }
-            managedTextures.length = j;
-        }
-    };
-    /**
-     * Removes all the textures within the specified displayObject and its children from the GPU
-     *
-     * @param {PIXI.DisplayObject} displayObject - the displayObject to remove the textures from.
-     */
-    TextureGCSystem.prototype.unload = function (displayObject) {
-        var _a;
-        var tm = this.renderer.texture;
-        // only destroy non generated textures
-        if ((_a = displayObject._texture) === null || _a === void 0 ? void 0 : _a.framebuffer) {
-            tm.destroyTexture(displayObject._texture);
-        }
-        for (var i = displayObject.children.length - 1; i >= 0; i--) {
-            this.unload(displayObject.children[i]);
-        }
-    };
-    return TextureGCSystem;
-}(System));
-
-/**
- * Internal texture for WebGL context
- * @class
- * @memberof PIXI
- */
-var GLTexture = /** @class */ (function () {
-    function GLTexture(texture) {
-        /**
-         * The WebGL texture
-         * @member {WebGLTexture}
-         */
-        this.texture = texture;
-        /**
-         * Width of texture that was used in texImage2D
-         * @member {number}
-         */
-        this.width = -1;
-        /**
-         * Height of texture that was used in texImage2D
-         * @member {number}
-         */
-        this.height = -1;
-        /**
-         * Texture contents dirty flag
-         * @member {number}
-         */
-        this.dirtyId = -1;
-        /**
-         * Texture style dirty flag
-         * @member {number}
-         */
-        this.dirtyStyleId = -1;
-        /**
-         * Whether mip levels has to be generated
-         * @member {boolean}
-         */
-        this.mipmap = false;
-        /**
-         * WrapMode copied from baseTexture
-         * @member {number}
-         */
-        this.wrapMode = 33071;
-        /**
-         * Type copied from baseTexture
-         * @member {number}
-         */
-        this.type = 6408;
-        /**
-         * Type copied from baseTexture
-         * @member {number}
-         */
-        this.internalFormat = 5121;
-    }
-    return GLTexture;
-}());
-
-/**
- * System plugin to the renderer to manage textures.
- *
- * @class
- * @extends PIXI.System
- * @memberof PIXI.systems
- */
-var TextureSystem = /** @class */ (function (_super) {
-    __extends(TextureSystem, _super);
-    /**
-     * @param {PIXI.Renderer} renderer - The renderer this System works for.
-     */
-    function TextureSystem(renderer) {
-        var _this = _super.call(this, renderer) || this;
-        // TODO set to max textures...
-        /**
-         * Bound textures
-         * @member {PIXI.BaseTexture[]}
-         * @readonly
-         */
-        _this.boundTextures = [];
-        /**
-         * Current location
-         * @member {number}
-         * @readonly
-         */
-        _this.currentLocation = -1;
-        /**
-         * List of managed textures
-         * @member {PIXI.BaseTexture[]}
-         * @readonly
-         */
-        _this.managedTextures = [];
-        /**
-         * Did someone temper with textures state? We'll overwrite them when we need to unbind something.
-         * @member {boolean}
-         * @private
-         */
-        _this._unknownBoundTextures = false;
-        /**
-         * BaseTexture value that shows that we don't know what is bound
-         * @member {PIXI.BaseTexture}
-         * @readonly
-         */
-        _this.unknownTexture = new BaseTexture();
-        return _this;
-    }
-    /**
-     * Sets up the renderer context and necessary buffers.
-     */
-    TextureSystem.prototype.contextChange = function () {
-        var gl = this.gl = this.renderer.gl;
-        this.CONTEXT_UID = this.renderer.CONTEXT_UID;
-        this.webGLVersion = this.renderer.context.webGLVersion;
-        var maxTextures = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS);
-        this.boundTextures.length = maxTextures;
-        for (var i = 0; i < maxTextures; i++) {
-            this.boundTextures[i] = null;
-        }
-        // TODO move this.. to a nice make empty textures class..
-        this.emptyTextures = {};
-        var emptyTexture2D = new GLTexture(gl.createTexture());
-        gl.bindTexture(gl.TEXTURE_2D, emptyTexture2D.texture);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(4));
-        this.emptyTextures[gl.TEXTURE_2D] = emptyTexture2D;
-        this.emptyTextures[gl.TEXTURE_CUBE_MAP] = new GLTexture(gl.createTexture());
-        gl.bindTexture(gl.TEXTURE_CUBE_MAP, this.emptyTextures[gl.TEXTURE_CUBE_MAP].texture);
-        for (var i = 0; i < 6; i++) {
-            gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-        }
-        gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-        for (var i = 0; i < this.boundTextures.length; i++) {
-            this.bind(null, i);
-        }
-    };
-    /**
-     * Bind a texture to a specific location
-     *
-     * If you want to unbind something, please use `unbind(texture)` instead of `bind(null, textureLocation)`
-     *
-     * @param {PIXI.Texture|PIXI.BaseTexture} texture_ - Texture to bind
-     * @param {number} [location=0] - Location to bind at
-     */
-    TextureSystem.prototype.bind = function (texture, location) {
-        if (location === void 0) { location = 0; }
-        var gl = this.gl;
-        if (texture) {
-            texture = texture.castToBaseTexture();
-            if (texture.parentTextureArray) {
-                // cannot bind partial texture
-                // TODO: report a warning
-                return;
-            }
-            if (texture.valid) {
-                texture.touched = this.renderer.textureGC.count;
-                var glTexture = texture._glTextures[this.CONTEXT_UID] || this.initTexture(texture);
-                if (this.boundTextures[location] !== texture) {
-                    if (this.currentLocation !== location) {
-                        this.currentLocation = location;
-                        gl.activeTexture(gl.TEXTURE0 + location);
-                    }
-                    gl.bindTexture(texture.target, glTexture.texture);
-                }
-                if (glTexture.dirtyId !== texture.dirtyId) {
-                    if (this.currentLocation !== location) {
-                        this.currentLocation = location;
-                        gl.activeTexture(gl.TEXTURE0 + location);
-                    }
-                    this.updateTexture(texture);
-                }
-                this.boundTextures[location] = texture;
-            }
-        }
-        else {
-            if (this.currentLocation !== location) {
-                this.currentLocation = location;
-                gl.activeTexture(gl.TEXTURE0 + location);
-            }
-            gl.bindTexture(gl.TEXTURE_2D, this.emptyTextures[gl.TEXTURE_2D].texture);
-            this.boundTextures[location] = null;
-        }
-    };
-    /**
-     * Resets texture location and bound textures
-     *
-     * Actual `bind(null, i)` calls will be performed at next `unbind()` call
-     */
-    TextureSystem.prototype.reset = function () {
-        this._unknownBoundTextures = true;
-        this.currentLocation = -1;
-        for (var i = 0; i < this.boundTextures.length; i++) {
-            this.boundTextures[i] = this.unknownTexture;
-        }
-    };
-    /**
-     * Unbind a texture
-     * @param {PIXI.BaseTexture} texture - Texture to bind
-     */
-    TextureSystem.prototype.unbind = function (texture) {
-        var _a = this, gl = _a.gl, boundTextures = _a.boundTextures;
-        if (this._unknownBoundTextures) {
-            this._unknownBoundTextures = false;
-            // someone changed webGL state,
-            // we have to be sure that our texture does not appear in multi-texture renderer samplers
-            for (var i = 0; i < boundTextures.length; i++) {
-                if (boundTextures[i] === this.unknownTexture) {
-                    this.bind(null, i);
-                }
-            }
-        }
-        for (var i = 0; i < boundTextures.length; i++) {
-            if (boundTextures[i] === texture) {
-                if (this.currentLocation !== i) {
-                    gl.activeTexture(gl.TEXTURE0 + i);
-                    this.currentLocation = i;
-                }
-                gl.bindTexture(gl.TEXTURE_2D, this.emptyTextures[texture.target].texture);
-                boundTextures[i] = null;
-            }
-        }
-    };
-    /**
-     * Initialize a texture
-     *
-     * @private
-     * @param {PIXI.BaseTexture} texture - Texture to initialize
-     */
-    TextureSystem.prototype.initTexture = function (texture) {
-        var glTexture = new GLTexture(this.gl.createTexture());
-        // guarantee an update..
-        glTexture.dirtyId = -1;
-        texture._glTextures[this.CONTEXT_UID] = glTexture;
-        this.managedTextures.push(texture);
-        texture.on('dispose', this.destroyTexture, this);
-        return glTexture;
-    };
-    TextureSystem.prototype.initTextureType = function (texture, glTexture) {
-        glTexture.internalFormat = texture.format;
-        glTexture.type = texture.type;
-        if (this.webGLVersion !== 2) {
-            return;
-        }
-        var gl = this.renderer.gl;
-        if (texture.type === gl.FLOAT
-            && texture.format === gl.RGBA) {
-            glTexture.internalFormat = gl.RGBA32F;
-        }
-        // that's WebGL1 HALF_FLOAT_OES
-        // we have to convert it to WebGL HALF_FLOAT
-        if (texture.type === TYPES.HALF_FLOAT) {
-            glTexture.type = gl.HALF_FLOAT;
-        }
-        if (glTexture.type === gl.HALF_FLOAT
-            && texture.format === gl.RGBA) {
-            glTexture.internalFormat = gl.RGBA16F;
-        }
-    };
-    /**
-     * Update a texture
-     *
-     * @private
-     * @param {PIXI.BaseTexture} texture - Texture to initialize
-     */
-    TextureSystem.prototype.updateTexture = function (texture) {
-        var glTexture = texture._glTextures[this.CONTEXT_UID];
-        if (!glTexture) {
-            return;
-        }
-        var renderer = this.renderer;
-        this.initTextureType(texture, glTexture);
-        if (texture.resource && texture.resource.upload(renderer, texture, glTexture)) ;
-        else {
-            // default, renderTexture-like logic
-            var width = texture.realWidth;
-            var height = texture.realHeight;
-            var gl = renderer.gl;
-            if (glTexture.width !== width
-                || glTexture.height !== height
-                || glTexture.dirtyId < 0) {
-                glTexture.width = width;
-                glTexture.height = height;
-                gl.texImage2D(texture.target, 0, glTexture.internalFormat, width, height, 0, texture.format, glTexture.type, null);
-            }
-        }
-        // lets only update what changes..
-        if (texture.dirtyStyleId !== glTexture.dirtyStyleId) {
-            this.updateTextureStyle(texture);
-        }
-        glTexture.dirtyId = texture.dirtyId;
-    };
-    /**
-     * Deletes the texture from WebGL
-     *
-     * @private
-     * @param {PIXI.BaseTexture|PIXI.Texture} texture_ - the texture to destroy
-     * @param {boolean} [skipRemove=false] - Whether to skip removing the texture from the TextureManager.
-     */
-    TextureSystem.prototype.destroyTexture = function (texture, skipRemove) {
-        var gl = this.gl;
-        texture = texture.castToBaseTexture();
-        if (texture._glTextures[this.CONTEXT_UID]) {
-            this.unbind(texture);
-            gl.deleteTexture(texture._glTextures[this.CONTEXT_UID].texture);
-            texture.off('dispose', this.destroyTexture, this);
-            delete texture._glTextures[this.CONTEXT_UID];
-            if (!skipRemove) {
-                var i = this.managedTextures.indexOf(texture);
-                if (i !== -1) {
-                    removeItems(this.managedTextures, i, 1);
-                }
-            }
-        }
-    };
-    /**
-     * Update texture style such as mipmap flag
-     *
-     * @private
-     * @param {PIXI.BaseTexture} texture - Texture to update
-     */
-    TextureSystem.prototype.updateTextureStyle = function (texture) {
-        var glTexture = texture._glTextures[this.CONTEXT_UID];
-        if (!glTexture) {
-            return;
-        }
-        if ((texture.mipmap === MIPMAP_MODES.POW2 || this.webGLVersion !== 2) && !texture.isPowerOfTwo) {
-            glTexture.mipmap = false;
-        }
-        else {
-            glTexture.mipmap = texture.mipmap >= 1;
-        }
-        if (this.webGLVersion !== 2 && !texture.isPowerOfTwo) {
-            glTexture.wrapMode = WRAP_MODES.CLAMP;
-        }
-        else {
-            glTexture.wrapMode = texture.wrapMode;
-        }
-        if (texture.resource && texture.resource.style(this.renderer, texture, glTexture)) ;
-        else {
-            this.setStyle(texture, glTexture);
-        }
-        glTexture.dirtyStyleId = texture.dirtyStyleId;
-    };
-    /**
-     * Set style for texture
-     *
-     * @private
-     * @param {PIXI.BaseTexture} texture - Texture to update
-     * @param {PIXI.GLTexture} glTexture
-     */
-    TextureSystem.prototype.setStyle = function (texture, glTexture) {
-        var gl = this.gl;
-        if (glTexture.mipmap) {
-            gl.generateMipmap(texture.target);
-        }
-        gl.texParameteri(texture.target, gl.TEXTURE_WRAP_S, glTexture.wrapMode);
-        gl.texParameteri(texture.target, gl.TEXTURE_WRAP_T, glTexture.wrapMode);
-        if (glTexture.mipmap) {
-            /* eslint-disable max-len */
-            gl.texParameteri(texture.target, gl.TEXTURE_MIN_FILTER, texture.scaleMode === SCALE_MODES.LINEAR ? gl.LINEAR_MIPMAP_LINEAR : gl.NEAREST_MIPMAP_NEAREST);
-            /* eslint-disable max-len */
-            var anisotropicExt = this.renderer.context.extensions.anisotropicFiltering;
-            if (anisotropicExt && texture.anisotropicLevel > 0 && texture.scaleMode === SCALE_MODES.LINEAR) {
-                var level = Math.min(texture.anisotropicLevel, gl.getParameter(anisotropicExt.MAX_TEXTURE_MAX_ANISOTROPY_EXT));
-                gl.texParameterf(texture.target, anisotropicExt.TEXTURE_MAX_ANISOTROPY_EXT, level);
-            }
-        }
-        else {
-            gl.texParameteri(texture.target, gl.TEXTURE_MIN_FILTER, texture.scaleMode === SCALE_MODES.LINEAR ? gl.LINEAR : gl.NEAREST);
-        }
-        gl.texParameteri(texture.target, gl.TEXTURE_MAG_FILTER, texture.scaleMode === SCALE_MODES.LINEAR ? gl.LINEAR : gl.NEAREST);
-    };
-    return TextureSystem;
-}(System));
 
 var tempMatrix = new Matrix();
-/**
- * The AbstractRenderer is the base for a PixiJS Renderer. It is extended by the {@link PIXI.CanvasRenderer}
- * and {@link PIXI.Renderer} which can be used for rendering a PixiJS scene.
- *
- * @abstract
- * @class
- * @extends PIXI.utils.EventEmitter
- * @memberof PIXI
- */
-var AbstractRenderer = /** @class */ (function (_super) {
-    __extends(AbstractRenderer, _super);
-    /**
-     * @param {string} system - The name of the system this renderer is for.
-     * @param {object} [options] - The optional renderer parameters.
-     * @param {number} [options.width=800] - The width of the screen.
-     * @param {number} [options.height=600] - The height of the screen.
-     * @param {HTMLCanvasElement} [options.view] - The canvas to use as a view, optional.
-     * @param {boolean} [options.transparent=false] - If the render view is transparent.
-     * @param {boolean} [options.autoDensity=false] - Resizes renderer view in CSS pixels to allow for
-     *   resolutions other than 1.
-     * @param {boolean} [options.antialias=false] - Sets antialias
-     * @param {number} [options.resolution=1] - The resolution / device pixel ratio of the renderer. The
-     *  resolution of the renderer retina would be 2.
-     * @param {boolean} [options.preserveDrawingBuffer=false] - Enables drawing buffer preservation,
-     *  enable this if you need to call toDataUrl on the WebGL context.
-     * @param {boolean} [options.clearBeforeRender=true] - This sets if the renderer will clear the canvas or
-     *      not before the new render pass.
-     * @param {number} [options.backgroundColor=0x000000] - The background color of the rendered area
-     *  (shown if not transparent).
-     */
-    function AbstractRenderer(type, options) {
-        if (type === void 0) { type = RENDERER_TYPE.UNKNOWN; }
-        var _this = _super.call(this) || this;
-        // Add the default render options
-        options = Object.assign({}, settings.RENDER_OPTIONS, options);
-        // Deprecation notice for renderer roundPixels option
-        if (options.roundPixels) {
-            settings.ROUND_PIXELS = options.roundPixels;
-            deprecation('5.0.0', 'Renderer roundPixels option is deprecated, please use PIXI.settings.ROUND_PIXELS', 2);
-        }
-        /**
-         * The supplied constructor options.
-         *
-         * @member {Object}
-         * @readOnly
-         */
-        _this.options = options;
-        /**
-         * The type of the renderer.
-         *
-         * @member {number}
-         * @default PIXI.RENDERER_TYPE.UNKNOWN
-         * @see PIXI.RENDERER_TYPE
-         */
-        _this.type = type;
-        /**
-         * Measurements of the screen. (0, 0, screenWidth, screenHeight).
-         *
-         * Its safe to use as filterArea or hitArea for the whole stage.
-         *
-         * @member {PIXI.Rectangle}
-         */
-        _this.screen = new Rectangle(0, 0, options.width, options.height);
-        /**
-         * The canvas element that everything is drawn to.
-         *
-         * @member {HTMLCanvasElement}
-         */
-        _this.view = options.view || document.createElement('canvas');
-        /**
-         * The resolution / device pixel ratio of the renderer.
-         *
-         * @member {number}
-         * @default 1
-         */
-        _this.resolution = options.resolution || settings.RESOLUTION;
-        /**
-         * Whether the render view is transparent.
-         *
-         * @member {boolean}
-         */
-        _this.transparent = options.transparent;
-        /**
-         * Whether CSS dimensions of canvas view should be resized to screen dimensions automatically.
-         *
-         * @member {boolean}
-         */
-        _this.autoDensity = options.autoDensity || options.autoResize || false;
-        // autoResize is deprecated, provides fallback support
-        /**
-         * The value of the preserveDrawingBuffer flag affects whether or not the contents of
-         * the stencil buffer is retained after rendering.
-         *
-         * @member {boolean}
-         */
-        _this.preserveDrawingBuffer = options.preserveDrawingBuffer;
-        /**
-         * This sets if the CanvasRenderer will clear the canvas or not before the new render pass.
-         * If the scene is NOT transparent PixiJS will use a canvas sized fillRect operation every
-         * frame to set the canvas background color. If the scene is transparent PixiJS will use clearRect
-         * to clear the canvas every frame. Disable this by setting this to false. For example, if
-         * your game has a canvas filling background image you often don't need this set.
-         *
-         * @member {boolean}
-         * @default
-         */
-        _this.clearBeforeRender = options.clearBeforeRender;
-        /**
-         * The background color as a number.
-         *
-         * @member {number}
-         * @protected
-         */
-        _this._backgroundColor = 0x000000;
-        /**
-         * The background color as an [R, G, B] array.
-         *
-         * @member {number[]}
-         * @protected
-         */
-        _this._backgroundColorRgba = [0, 0, 0, 0];
-        /**
-         * The background color as a string.
-         *
-         * @member {string}
-         * @protected
-         */
-        _this._backgroundColorString = '#000000';
-        _this.backgroundColor = options.backgroundColor || _this._backgroundColor; // run bg color setter
-        /**
-         * The last root object that the renderer tried to render.
-         *
-         * @member {PIXI.DisplayObject}
-         * @protected
-         */
-        _this._lastObjectRendered = null;
-        /**
-         * Collection of plugins.
-         * @readonly
-         * @member {object}
-         */
-        _this.plugins = {};
-        return _this;
-    }
-    /**
-     * Initialize the plugins.
-     *
-     * @protected
-     * @param {object} staticMap - The dictionary of statically saved plugins.
-     */
-    AbstractRenderer.prototype.initPlugins = function (staticMap) {
-        for (var o in staticMap) {
-            this.plugins[o] = new (staticMap[o])(this);
-        }
-    };
-    Object.defineProperty(AbstractRenderer.prototype, "width", {
-        /**
-         * Same as view.width, actual number of pixels in the canvas by horizontal.
-         *
-         * @member {number}
-         * @readonly
-         * @default 800
-         */
-        get: function () {
-            return this.view.width;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(AbstractRenderer.prototype, "height", {
-        /**
-         * Same as view.height, actual number of pixels in the canvas by vertical.
-         *
-         * @member {number}
-         * @readonly
-         * @default 600
-         */
-        get: function () {
-            return this.view.height;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    /**
-     * Resizes the screen and canvas to the specified width and height.
-     * Canvas dimensions are multiplied by resolution.
-     *
-     * @param {number} screenWidth - The new width of the screen.
-     * @param {number} screenHeight - The new height of the screen.
-     */
-    AbstractRenderer.prototype.resize = function (screenWidth, screenHeight) {
-        this.screen.width = screenWidth;
-        this.screen.height = screenHeight;
-        this.view.width = screenWidth * this.resolution;
-        this.view.height = screenHeight * this.resolution;
-        if (this.autoDensity) {
-            this.view.style.width = screenWidth + "px";
-            this.view.style.height = screenHeight + "px";
-        }
-        /**
-         * Fired after view has been resized.
-         *
-         * @event PIXI.Renderer#resize
-         * @param {number} screenWidth - The new width of the screen.
-         * @param {number} screenHeight - The new height of the screen.
-         */
-        this.emit('resize', screenWidth, screenHeight);
-    };
-    /**
-     * Useful function that returns a texture of the display object that can then be used to create sprites
-     * This can be quite useful if your displayObject is complicated and needs to be reused multiple times.
-     *
-     * @param {PIXI.DisplayObject} displayObject - The displayObject the object will be generated from.
-     * @param {PIXI.SCALE_MODES} scaleMode - The scale mode of the texture.
-     * @param {number} resolution - The resolution / device pixel ratio of the texture being generated.
-     * @param {PIXI.Rectangle} [region] - The region of the displayObject, that shall be rendered,
-     *        if no region is specified, defaults to the local bounds of the displayObject.
-     * @return {PIXI.RenderTexture} A texture of the graphics object.
-     */
-    AbstractRenderer.prototype.generateTexture = function (displayObject, scaleMode, resolution, region) {
-        region = region || displayObject.getLocalBounds(null, true);
-        // minimum texture size is 1x1, 0x0 will throw an error
-        if (region.width === 0)
-            { region.width = 1; }
-        if (region.height === 0)
-            { region.height = 1; }
-        var renderTexture = RenderTexture.create({
-            width: region.width | 0,
-            height: region.height | 0,
-            scaleMode: scaleMode,
-            resolution: resolution,
-        });
-        tempMatrix.tx = -region.x;
-        tempMatrix.ty = -region.y;
-        this.render(displayObject, renderTexture, false, tempMatrix, !!displayObject.parent);
-        return renderTexture;
-    };
-    /**
-     * Removes everything from the renderer and optionally removes the Canvas DOM element.
-     *
-     * @param {boolean} [removeView=false] - Removes the Canvas element from the DOM.
-     */
-    AbstractRenderer.prototype.destroy = function (removeView) {
-        for (var o in this.plugins) {
-            this.plugins[o].destroy();
-            this.plugins[o] = null;
-        }
-        if (removeView && this.view.parentNode) {
-            this.view.parentNode.removeChild(this.view);
-        }
-        var thisAny = this;
-        // null-ing all objects, that's a tradition!
-        thisAny.plugins = null;
-        thisAny.type = RENDERER_TYPE.UNKNOWN;
-        thisAny.view = null;
-        thisAny.screen = null;
-        thisAny._tempDisplayObjectParent = null;
-        thisAny.options = null;
-        this._backgroundColorRgba = null;
-        this._backgroundColorString = null;
-        this._lastObjectRendered = null;
-    };
-    Object.defineProperty(AbstractRenderer.prototype, "backgroundColor", {
-        /**
-         * The background color to fill if not transparent
-         *
-         * @member {number}
-         */
-        get: function () {
-            return this._backgroundColor;
-        },
-        set: function (value) {
-            this._backgroundColor = value;
-            this._backgroundColorString = hex2string(value);
-            hex2rgb(value, this._backgroundColorRgba);
-        },
-        enumerable: false,
-        configurable: true
-    });
-    return AbstractRenderer;
-}(eventemitter3));
-
-/**
- * The Renderer draws the scene and all its content onto a WebGL enabled canvas.
- *
- * This renderer should be used for browsers that support WebGL.
- *
- * This renderer works by automatically managing WebGLBatchesm, so no need for Sprite Batches or Sprite Clouds.
- * Don't forget to add the view to your DOM or you will not see anything!
- *
- * @class
- * @memberof PIXI
- * @extends PIXI.AbstractRenderer
- */
-var Renderer = /** @class */ (function (_super) {
-    __extends(Renderer, _super);
-    /**
-     * @param {object} [options] - The optional renderer parameters.
-     * @param {number} [options.width=800] - The width of the screen.
-     * @param {number} [options.height=600] - The height of the screen.
-     * @param {HTMLCanvasElement} [options.view] - The canvas to use as a view, optional.
-     * @param {boolean} [options.transparent=false] - If the render view is transparent.
-     * @param {boolean} [options.autoDensity=false] - Resizes renderer view in CSS pixels to allow for
-     *   resolutions other than 1.
-     * @param {boolean} [options.antialias=false] - Sets antialias. If not available natively then FXAA
-     *  antialiasing is used.
-     * @param {number} [options.resolution=1] - The resolution / device pixel ratio of the renderer.
-     *  The resolution of the renderer retina would be 2.
-     * @param {boolean} [options.clearBeforeRender=true] - This sets if the renderer will clear
-     *  the canvas or not before the new render pass. If you wish to set this to false, you *must* set
-     *  preserveDrawingBuffer to `true`.
-     * @param {boolean} [options.preserveDrawingBuffer=false] - Enables drawing buffer preservation,
-     *  enable this if you need to call toDataUrl on the WebGL context.
-     * @param {number} [options.backgroundColor=0x000000] - The background color of the rendered area
-     *  (shown if not transparent).
-     * @param {string} [options.powerPreference] - Parameter passed to WebGL context, set to "high-performance"
-     *  for devices with dual graphics card.
-     * @param {object} [options.context] - If WebGL context already exists, all parameters must be taken from it.
-     * @public
-     */
-    function Renderer(options) {
-        var _this = _super.call(this, RENDERER_TYPE.WEBGL, options) || this;
-        // the options will have been modified here in the super constructor with pixi's default settings..
-        options = _this.options;
-        /**
-         * WebGL context, set by the contextSystem (this.context)
-         *
-         * @readonly
-         * @member {WebGLRenderingContext}
-         */
-        _this.gl = null;
-        _this.CONTEXT_UID = 0;
-        // TODO legacy!
-        /**
-         * Internal signal instances of **runner**, these
-         * are assigned to each system created.
-         * @see PIXI.Runner
-         * @name PIXI.Renderer#runners
-         * @private
-         * @type {object}
-         * @readonly
-         * @property {PIXI.Runner} destroy - Destroy runner
-         * @property {PIXI.Runner} contextChange - Context change runner
-         * @property {PIXI.Runner} reset - Reset runner
-         * @property {PIXI.Runner} update - Update runner
-         * @property {PIXI.Runner} postrender - Post-render runner
-         * @property {PIXI.Runner} prerender - Pre-render runner
-         * @property {PIXI.Runner} resize - Resize runner
-         */
-        _this.runners = {
-            destroy: new Runner('destroy'),
-            contextChange: new Runner('contextChange'),
-            reset: new Runner('reset'),
-            update: new Runner('update'),
-            postrender: new Runner('postrender'),
-            prerender: new Runner('prerender'),
-            resize: new Runner('resize'),
-        };
-        /**
-         * Global uniforms
-         * @member {PIXI.UniformGroup}
-         */
-        _this.globalUniforms = new UniformGroup({
-            projectionMatrix: new Matrix(),
-        }, true);
-        /**
-         * Mask system instance
-         * @member {PIXI.systems.MaskSystem} mask
-         * @memberof PIXI.Renderer#
-         * @readonly
-         */
-        _this.addSystem(MaskSystem, 'mask')
-            /**
-             * Context system instance
-             * @member {PIXI.systems.ContextSystem} context
-             * @memberof PIXI.Renderer#
-             * @readonly
-             */
-            .addSystem(ContextSystem, 'context')
-            /**
-             * State system instance
-             * @member {PIXI.systems.StateSystem} state
-             * @memberof PIXI.Renderer#
-             * @readonly
-             */
-            .addSystem(StateSystem, 'state')
-            /**
-             * Shader system instance
-             * @member {PIXI.systems.ShaderSystem} shader
-             * @memberof PIXI.Renderer#
-             * @readonly
-             */
-            .addSystem(ShaderSystem, 'shader')
-            /**
-             * Texture system instance
-             * @member {PIXI.systems.TextureSystem} texture
-             * @memberof PIXI.Renderer#
-             * @readonly
-             */
-            .addSystem(TextureSystem, 'texture')
-            /**
-             * Geometry system instance
-             * @member {PIXI.systems.GeometrySystem} geometry
-             * @memberof PIXI.Renderer#
-             * @readonly
-             */
-            .addSystem(GeometrySystem, 'geometry')
-            /**
-             * Framebuffer system instance
-             * @member {PIXI.systems.FramebufferSystem} framebuffer
-             * @memberof PIXI.Renderer#
-             * @readonly
-             */
-            .addSystem(FramebufferSystem, 'framebuffer')
-            /**
-             * Scissor system instance
-             * @member {PIXI.systems.ScissorSystem} scissor
-             * @memberof PIXI.Renderer#
-             * @readonly
-             */
-            .addSystem(ScissorSystem, 'scissor')
-            /**
-             * Stencil system instance
-             * @member {PIXI.systems.StencilSystem} stencil
-             * @memberof PIXI.Renderer#
-             * @readonly
-             */
-            .addSystem(StencilSystem, 'stencil')
-            /**
-             * Projection system instance
-             * @member {PIXI.systems.ProjectionSystem} projection
-             * @memberof PIXI.Renderer#
-             * @readonly
-             */
-            .addSystem(ProjectionSystem, 'projection')
-            /**
-             * Texture garbage collector system instance
-             * @member {PIXI.systems.TextureGCSystem} textureGC
-             * @memberof PIXI.Renderer#
-             * @readonly
-             */
-            .addSystem(TextureGCSystem, 'textureGC')
-            /**
-             * Filter system instance
-             * @member {PIXI.systems.FilterSystem} filter
-             * @memberof PIXI.Renderer#
-             * @readonly
-             */
-            .addSystem(FilterSystem, 'filter')
-            /**
-             * RenderTexture system instance
-             * @member {PIXI.systems.RenderTextureSystem} renderTexture
-             * @memberof PIXI.Renderer#
-             * @readonly
-             */
-            .addSystem(RenderTextureSystem, 'renderTexture')
-            /**
-             * Batch system instance
-             * @member {PIXI.systems.BatchSystem} batch
-             * @memberof PIXI.Renderer#
-             * @readonly
-             */
-            .addSystem(BatchSystem, 'batch');
-        _this.initPlugins(Renderer.__plugins);
-        /**
-         * The options passed in to create a new WebGL context.
-         */
-        if (options.context) {
-            _this.context.initFromContext(options.context);
-        }
-        else {
-            _this.context.initFromOptions({
-                alpha: !!_this.transparent,
-                antialias: options.antialias,
-                premultipliedAlpha: _this.transparent && _this.transparent !== 'notMultiplied',
-                stencil: true,
-                preserveDrawingBuffer: options.preserveDrawingBuffer,
-                powerPreference: _this.options.powerPreference,
-            });
-        }
-        /**
-         * Flag if we are rendering to the screen vs renderTexture
-         * @member {boolean}
-         * @readonly
-         * @default true
-         */
-        _this.renderingToScreen = true;
-        sayHello(_this.context.webGLVersion === 2 ? 'WebGL 2' : 'WebGL 1');
-        _this.resize(_this.options.width, _this.options.height);
-        return _this;
-    }
-    /**
-     * Create renderer if WebGL is available. Overrideable
-     * by the **@pixi/canvas-renderer** package to allow fallback.
-     * throws error if WebGL is not available.
-     * @static
-     * @private
-     */
-    Renderer.create = function (options) {
-        if (isWebGLSupported()) {
-            return new Renderer(options);
-        }
-        throw new Error('WebGL unsupported in this browser, use "pixi.js-legacy" for fallback canvas2d support.');
-    };
-    /**
-     * Add a new system to the renderer.
-     * @param {Function} ClassRef - Class reference
-     * @param {string} [name] - Property name for system, if not specified
-     *        will use a static `name` property on the class itself. This
-     *        name will be assigned as s property on the Renderer so make
-     *        sure it doesn't collide with properties on Renderer.
-     * @return {PIXI.Renderer} Return instance of renderer
-     */
-    Renderer.prototype.addSystem = function (ClassRef, name) {
-        if (!name) {
-            name = ClassRef.name;
-        }
-        var system = new ClassRef(this);
-        if (this[name]) {
-            throw new Error("Whoops! The name \"" + name + "\" is already in use");
-        }
-        this[name] = system;
-        for (var i in this.runners) {
-            this.runners[i].add(system);
-        }
-        /**
-         * Fired after rendering finishes.
-         *
-         * @event PIXI.Renderer#postrender
-         */
-        /**
-         * Fired before rendering starts.
-         *
-         * @event PIXI.Renderer#prerender
-         */
-        /**
-         * Fired when the WebGL context is set.
-         *
-         * @event PIXI.Renderer#context
-         * @param {WebGLRenderingContext} gl - WebGL context.
-         */
-        return this;
-    };
-    /**
-     * Renders the object to its WebGL view
-     *
-     * @param {PIXI.DisplayObject} displayObject - The object to be rendered.
-     * @param {PIXI.RenderTexture} [renderTexture] - The render texture to render to.
-     * @param {boolean} [clear=true] - Should the canvas be cleared before the new render.
-     * @param {PIXI.Matrix} [transform] - A transform to apply to the render texture before rendering.
-     * @param {boolean} [skipUpdateTransform=false] - Should we skip the update transform pass?
-     */
-    Renderer.prototype.render = function (displayObject, renderTexture, clear, transform, skipUpdateTransform) {
-        // can be handy to know!
-        this.renderingToScreen = !renderTexture;
-        this.runners.prerender.emit();
-        this.emit('prerender');
-        // apply a transform at a GPU level
-        this.projection.transform = transform;
-        // no point rendering if our context has been blown up!
-        if (this.context.isLost) {
-            return;
-        }
-        if (!renderTexture) {
-            this._lastObjectRendered = displayObject;
-        }
-        if (!skipUpdateTransform) {
-            // update the scene graph
-            var cacheParent = displayObject.enableTempParent();
-            displayObject.updateTransform();
-            displayObject.disableTempParent(cacheParent);
-            // displayObject.hitArea = //TODO add a temp hit area
-        }
-        this.renderTexture.bind(renderTexture);
-        this.batch.currentRenderer.start();
-        if (clear !== undefined ? clear : this.clearBeforeRender) {
-            this.renderTexture.clear();
-        }
-        displayObject.render(this);
-        // apply transform..
-        this.batch.currentRenderer.flush();
-        if (renderTexture) {
-            renderTexture.baseTexture.update();
-        }
-        this.runners.postrender.emit();
-        // reset transform after render
-        this.projection.transform = null;
-        this.emit('postrender');
-    };
-    /**
-     * Resizes the WebGL view to the specified width and height.
-     *
-     * @param {number} screenWidth - The new width of the screen.
-     * @param {number} screenHeight - The new height of the screen.
-     */
-    Renderer.prototype.resize = function (screenWidth, screenHeight) {
-        _super.prototype.resize.call(this, screenWidth, screenHeight);
-        this.runners.resize.emit(screenWidth, screenHeight);
-    };
-    /**
-     * Resets the WebGL state so you can render things however you fancy!
-     *
-     * @return {PIXI.Renderer} Returns itself.
-     */
-    Renderer.prototype.reset = function () {
-        this.runners.reset.emit();
-        return this;
-    };
-    /**
-     * Clear the frame buffer
-     */
-    Renderer.prototype.clear = function () {
-        this.renderTexture.bind();
-        this.renderTexture.clear();
-    };
-    /**
-     * Removes everything from the renderer (event listeners, spritebatch, etc...)
-     *
-     * @param {boolean} [removeView=false] - Removes the Canvas element from the DOM.
-     *  See: https://github.com/pixijs/pixi.js/issues/2233
-     */
-    Renderer.prototype.destroy = function (removeView) {
-        this.runners.destroy.emit();
-        for (var r in this.runners) {
-            this.runners[r].destroy();
-        }
-        // call base destroy
-        _super.prototype.destroy.call(this, removeView);
-        // TODO nullify all the managers..
-        this.gl = null;
-    };
-    /**
-     * Adds a plugin to the renderer.
-     *
-     * @method
-     * @param {string} pluginName - The name of the plugin.
-     * @param {Function} ctor - The constructor function or class for the plugin.
-     */
-    Renderer.registerPlugin = function (pluginName, ctor) {
-        Renderer.__plugins = Renderer.__plugins || {};
-        Renderer.__plugins[pluginName] = ctor;
-    };
-    return Renderer;
-}(AbstractRenderer));
 
 /**
  * Used by the batcher to draw batches.
@@ -18115,21 +14761,21 @@ var Renderer = /** @class */ (function (_super) {
  * @class
  * @memberof PIXI
  */
-var BatchDrawCall = /** @class */ (function () {
-    function BatchDrawCall() {
-        this.texArray = null;
-        this.blend = 0;
-        this.type = DRAW_MODES.TRIANGLES;
-        this.start = 0;
-        this.size = 0;
-        /**
-         * data for uniforms or custom webgl state
-         * @member {object}
-         */
-        this.data = null;
-    }
-    return BatchDrawCall;
-}());
+var BatchDrawCall = function BatchDrawCall()
+{
+    this.texArray = null;
+    this.blend = 0;
+    this.type = DRAW_MODES.TRIANGLES;
+
+    this.start = 0;
+    this.size = 0;
+
+    /**
+     * data for uniforms or custom webgl state
+     * @member {object}
+     */
+    this.data = null;
+};
 
 /**
  * Used by the batcher to build texture batches.
@@ -18138,32 +14784,33 @@ var BatchDrawCall = /** @class */ (function () {
  * @class
  * @memberof PIXI
  */
-var BatchTextureArray = /** @class */ (function () {
-    function BatchTextureArray() {
-        /**
-         * inside textures array
-         * @member {PIXI.BaseTexture[]}
-         */
-        this.elements = [];
-        /**
-         * Respective locations for textures
-         * @member {number[]}
-         */
-        this.ids = [];
-        /**
-         * number of filled elements
-         * @member {number}
-         */
-        this.count = 0;
+var BatchTextureArray = function BatchTextureArray()
+{
+    /**
+     * inside textures array
+     * @member {PIXI.BaseTexture[]}
+     */
+    this.elements = [];
+    /**
+     * Respective locations for textures
+     * @member {number[]}
+     */
+    this.ids = [];
+    /**
+     * number of filled elements
+     * @member {number}
+     */
+    this.count = 0;
+};
+
+BatchTextureArray.prototype.clear = function clear ()
+{
+    for (var i = 0; i < this.count; i++)
+    {
+        this.elements[i] = null;
     }
-    BatchTextureArray.prototype.clear = function () {
-        for (var i = 0; i < this.count; i++) {
-            this.elements[i] = null;
-        }
-        this.count = 0;
-    };
-    return BatchTextureArray;
-}());
+    this.count = 0;
+};
 
 /**
  * Flexible wrapper around `ArrayBuffer` that also provides
@@ -18172,148 +14819,156 @@ var BatchTextureArray = /** @class */ (function () {
  * @class
  * @memberof PIXI
  */
-var ViewableBuffer = /** @class */ (function () {
+var ViewableBuffer = function ViewableBuffer(size)
+{
     /**
-     * @param {number} size - The size of the buffer in bytes.
-     */
-    function ViewableBuffer(size) {
-        /**
-         * Underlying `ArrayBuffer` that holds all the data
-         * and is of capacity `size`.
-         *
-         * @member {ArrayBuffer}
-         */
-        this.rawBinaryData = new ArrayBuffer(size);
-        /**
-         * View on the raw binary data as a `Uint32Array`.
-         *
-         * @member {Uint32Array}
-         */
-        this.uint32View = new Uint32Array(this.rawBinaryData);
-        /**
-         * View on the raw binary data as a `Float32Array`.
-         *
-         * @member {Float32Array}
-         */
-        this.float32View = new Float32Array(this.rawBinaryData);
-    }
-    Object.defineProperty(ViewableBuffer.prototype, "int8View", {
-        /**
-         * View on the raw binary data as a `Int8Array`.
-         *
-         * @member {Int8Array}
-         */
-        get: function () {
-            if (!this._int8View) {
-                this._int8View = new Int8Array(this.rawBinaryData);
-            }
-            return this._int8View;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(ViewableBuffer.prototype, "uint8View", {
-        /**
-         * View on the raw binary data as a `Uint8Array`.
-         *
-         * @member {Uint8Array}
-         */
-        get: function () {
-            if (!this._uint8View) {
-                this._uint8View = new Uint8Array(this.rawBinaryData);
-            }
-            return this._uint8View;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(ViewableBuffer.prototype, "int16View", {
-        /**
-         * View on the raw binary data as a `Int16Array`.
-         *
-         * @member {Int16Array}
-         */
-        get: function () {
-            if (!this._int16View) {
-                this._int16View = new Int16Array(this.rawBinaryData);
-            }
-            return this._int16View;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(ViewableBuffer.prototype, "uint16View", {
-        /**
-         * View on the raw binary data as a `Uint16Array`.
-         *
-         * @member {Uint16Array}
-         */
-        get: function () {
-            if (!this._uint16View) {
-                this._uint16View = new Uint16Array(this.rawBinaryData);
-            }
-            return this._uint16View;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(ViewableBuffer.prototype, "int32View", {
-        /**
-         * View on the raw binary data as a `Int32Array`.
-         *
-         * @member {Int32Array}
-         */
-        get: function () {
-            if (!this._int32View) {
-                this._int32View = new Int32Array(this.rawBinaryData);
-            }
-            return this._int32View;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    /**
-     * Returns the view of the given type.
+     * Underlying `ArrayBuffer` that holds all the data
+     * and is of capacity `size`.
      *
-     * @param {string} type - One of `int8`, `uint8`, `int16`,
-     *    `uint16`, `int32`, `uint32`, and `float32`.
-     * @return {object} typed array of given type
+     * @member {ArrayBuffer}
      */
-    ViewableBuffer.prototype.view = function (type) {
-        return this[type + "View"];
-    };
+    this.rawBinaryData = new ArrayBuffer(size);
+
     /**
-     * Destroys all buffer references. Do not use after calling
-     * this.
+     * View on the raw binary data as a `Uint32Array`.
+     *
+     * @member {Uint32Array}
      */
-    ViewableBuffer.prototype.destroy = function () {
-        this.rawBinaryData = null;
-        this._int8View = null;
-        this._uint8View = null;
-        this._int16View = null;
-        this._uint16View = null;
-        this._int32View = null;
-        this.uint32View = null;
-        this.float32View = null;
-    };
-    ViewableBuffer.sizeOf = function (type) {
-        switch (type) {
-            case 'int8':
-            case 'uint8':
-                return 1;
-            case 'int16':
-            case 'uint16':
-                return 2;
-            case 'int32':
-            case 'uint32':
-            case 'float32':
-                return 4;
-            default:
-                throw new Error(type + " isn't a valid view type");
-        }
-    };
-    return ViewableBuffer;
-}());
+    this.uint32View = new Uint32Array(this.rawBinaryData);
+
+    /**
+     * View on the raw binary data as a `Float32Array`.
+     *
+     * @member {Float32Array}
+     */
+    this.float32View = new Float32Array(this.rawBinaryData);
+};
+
+var prototypeAccessors$5 = { int8View: { configurable: true },uint8View: { configurable: true },int16View: { configurable: true },uint16View: { configurable: true },int32View: { configurable: true } };
+
+/**
+ * View on the raw binary data as a `Int8Array`.
+ *
+ * @member {Int8Array}
+ */
+prototypeAccessors$5.int8View.get = function ()
+{
+    if (!this._int8View)
+    {
+        this._int8View = new Int8Array(this.rawBinaryData);
+    }
+
+    return this._int8View;
+};
+
+/**
+ * View on the raw binary data as a `Uint8Array`.
+ *
+ * @member {Uint8Array}
+ */
+prototypeAccessors$5.uint8View.get = function ()
+{
+    if (!this._uint8View)
+    {
+        this._uint8View = new Uint8Array(this.rawBinaryData);
+    }
+
+    return this._uint8View;
+};
+
+/**
+ * View on the raw binary data as a `Int16Array`.
+ *
+ * @member {Int16Array}
+ */
+prototypeAccessors$5.int16View.get = function ()
+{
+    if (!this._int16View)
+    {
+        this._int16View = new Int16Array(this.rawBinaryData);
+    }
+
+    return this._int16View;
+};
+
+/**
+ * View on the raw binary data as a `Uint16Array`.
+ *
+ * @member {Uint16Array}
+ */
+prototypeAccessors$5.uint16View.get = function ()
+{
+    if (!this._uint16View)
+    {
+        this._uint16View = new Uint16Array(this.rawBinaryData);
+    }
+
+    return this._uint16View;
+};
+
+/**
+ * View on the raw binary data as a `Int32Array`.
+ *
+ * @member {Int32Array}
+ */
+prototypeAccessors$5.int32View.get = function ()
+{
+    if (!this._int32View)
+    {
+        this._int32View = new Int32Array(this.rawBinaryData);
+    }
+
+    return this._int32View;
+};
+
+/**
+ * Returns the view of the given type.
+ *
+ * @param {string} type - One of `int8`, `uint8`, `int16`,
+ *`uint16`, `int32`, `uint32`, and `float32`.
+ * @return {object} typed array of given type
+ */
+ViewableBuffer.prototype.view = function view (type)
+{
+    return this[(type + "View")];
+};
+
+/**
+ * Destroys all buffer references. Do not use after calling
+ * this.
+ */
+ViewableBuffer.prototype.destroy = function destroy ()
+{
+    this.rawBinaryData = null;
+    this._int8View = null;
+    this._uint8View = null;
+    this._int16View = null;
+    this._uint16View = null;
+    this._int32View = null;
+    this.uint32View = null;
+    this.float32View = null;
+};
+
+ViewableBuffer.sizeOf = function sizeOf (type)
+{
+    switch (type)
+    {
+        case 'int8':
+        case 'uint8':
+            return 1;
+        case 'int16':
+        case 'uint16':
+            return 2;
+        case 'int32':
+        case 'uint32':
+        case 'float32':
+            return 4;
+        default:
+            throw new Error((type + " isn't a valid view type"));
+    }
+};
+
+Object.defineProperties( ViewableBuffer.prototype, prototypeAccessors$5 );
 
 /**
  * Renderer dedicated to drawing and batching sprites.
@@ -18328,16 +14983,11 @@ var ViewableBuffer = /** @class */ (function () {
  * @memberof PIXI
  * @extends PIXI.ObjectRenderer
  */
-var AbstractBatchRenderer = /** @class */ (function (_super) {
-    __extends(AbstractBatchRenderer, _super);
-    /**
-     * This will hook onto the renderer's `contextChange`
-     * and `prerender` signals.
-     *
-     * @param {PIXI.Renderer} renderer - The renderer this works for.
-     */
-    function AbstractBatchRenderer(renderer) {
-        var _this = _super.call(this, renderer) || this;
+var AbstractBatchRenderer = /*@__PURE__*/(function (ObjectRenderer) {
+    function AbstractBatchRenderer(renderer)
+    {
+        ObjectRenderer.call(this, renderer);
+
         /**
          * This is used to generate a shader that can
          * color each vertex based on a `aTextureId`
@@ -18352,7 +15002,8 @@ var AbstractBatchRenderer = /** @class */ (function (_super) {
          * @member {PIXI.BatchShaderGenerator}
          * @protected
          */
-        _this.shaderGenerator = null;
+        this.shaderGenerator = null;
+
         /**
          * The class that represents the geometry of objects
          * that are going to be batched with this.
@@ -18361,7 +15012,8 @@ var AbstractBatchRenderer = /** @class */ (function (_super) {
          * @default PIXI.BatchGeometry
          * @protected
          */
-        _this.geometryClass = null;
+        this.geometryClass = null;
+
         /**
          * Size of data being buffered per vertex in the
          * attribute buffers (in floats). By default, the
@@ -18376,14 +15028,16 @@ var AbstractBatchRenderer = /** @class */ (function (_super) {
          * @member {number}
          * @readonly
          */
-        _this.vertexSize = null;
+        this.vertexSize = null;
+
         /**
          * The WebGL state in which this renderer will work.
          *
          * @member {PIXI.State}
          * @readonly
          */
-        _this.state = State.for2d();
+        this.state = State.for2d();
+
         /**
          * The number of bufferable objects before a flush
          * occurs automatically.
@@ -18391,7 +15045,8 @@ var AbstractBatchRenderer = /** @class */ (function (_super) {
          * @member {number}
          * @default settings.SPRITE_BATCH_SIZE * 4
          */
-        _this.size = settings.SPRITE_BATCH_SIZE * 4;
+        this.size = settings.SPRITE_BATCH_SIZE * 4;
+
         /**
          * Total count of all vertices used by the currently
          * buffered objects.
@@ -18399,7 +15054,8 @@ var AbstractBatchRenderer = /** @class */ (function (_super) {
          * @member {number}
          * @private
          */
-        _this._vertexCount = 0;
+        this._vertexCount = 0;
+
         /**
          * Total count of all indices used by the currently
          * buffered objects.
@@ -18407,20 +15063,23 @@ var AbstractBatchRenderer = /** @class */ (function (_super) {
          * @member {number}
          * @private
          */
-        _this._indexCount = 0;
+        this._indexCount = 0;
+
         /**
          * Buffer of objects that are yet to be rendered.
          *
          * @member {PIXI.DisplayObject[]}
          * @private
          */
-        _this._bufferedElements = [];
+        this._bufferedElements = [];
+
         /**
-         * Data for texture batch builder, helps to save a bit of CPU on a pass.
+         * Data for texture batch builder, helps to save a bit of CPU on a pass
          * @type {PIXI.BaseTexture[]}
          * @private
          */
-        _this._bufferedTextures = [];
+        this._bufferedTextures = [];
+
         /**
          * Number of elements that are buffered and are
          * waiting to be flushed.
@@ -18428,7 +15087,8 @@ var AbstractBatchRenderer = /** @class */ (function (_super) {
          * @member {number}
          * @private
          */
-        _this._bufferSize = 0;
+        this._bufferSize = 0;
+
         /**
          * This shader is generated by `this.shaderGenerator`.
          *
@@ -18438,7 +15098,8 @@ var AbstractBatchRenderer = /** @class */ (function (_super) {
          * @member {PIXI.Shader}
          * @protected
          */
-        _this._shader = null;
+        this._shader = null;
+
         /**
          * Pool of `this.geometryClass` geometry objects
          * that store buffers. They are used to pass data
@@ -18452,7 +15113,8 @@ var AbstractBatchRenderer = /** @class */ (function (_super) {
          * @private
          * @see PIXI.AbstractBatchRenderer.contextChange
          */
-        _this._packedGeometries = [];
+        this._packedGeometries = [];
+
         /**
          * Size of `this._packedGeometries`. It can be expanded
          * if more than `this._packedGeometryPoolSize` flushes
@@ -18461,7 +15123,8 @@ var AbstractBatchRenderer = /** @class */ (function (_super) {
          * @member {number}
          * @private
          */
-        _this._packedGeometryPoolSize = 2;
+        this._packedGeometryPoolSize = 2;
+
         /**
          * A flush may occur multiple times in a single
          * frame. On iOS devices or when
@@ -18475,7 +15138,8 @@ var AbstractBatchRenderer = /** @class */ (function (_super) {
          * @member {number}
          * @private
          */
-        _this._flushId = 0;
+        this._flushId = 0;
+
         /**
          * Pool of `ViewableBuffer` objects that are sorted in
          * order of increasing size. The flush method uses
@@ -18489,7 +15153,8 @@ var AbstractBatchRenderer = /** @class */ (function (_super) {
          * @private
          * @see PIXI.AbstractBatchRenderer#getAttributeBuffer
          */
-        _this._aBuffers = {};
+        this._aBuffers = {};
+
         /**
          * Pool of `Uint16Array` objects that are sorted in
          * order of increasing size. The flush method uses
@@ -18503,7 +15168,8 @@ var AbstractBatchRenderer = /** @class */ (function (_super) {
          * @private
          * @see PIXI.AbstractBatchRenderer#getIndexBuffer
          */
-        _this._iBuffers = {};
+        this._iBuffers = {};
+
         /**
          * Maximum number of textures that can be uploaded to
          * the GPU under the current context. It is initialized
@@ -18513,71 +15179,99 @@ var AbstractBatchRenderer = /** @class */ (function (_super) {
          * @see PIXI.AbstractBatchRenderer#contextChange
          * @readonly
          */
-        _this.MAX_TEXTURES = 1;
-        _this.renderer.on('prerender', _this.onPrerender, _this);
-        renderer.runners.contextChange.add(_this);
-        _this._dcIndex = 0;
-        _this._aIndex = 0;
-        _this._iIndex = 0;
-        _this._attributeBuffer = null;
-        _this._indexBuffer = null;
-        _this._tempBoundTextures = [];
-        return _this;
+        this.MAX_TEXTURES = 1;
+
+        this.renderer.on('prerender', this.onPrerender, this);
+        renderer.runners.contextChange.add(this);
+
+        this._dcIndex = 0;
+        this._aIndex = 0;
+        this._iIndex = 0;
+        this._attributeBuffer = null;
+        this._indexBuffer = null;
+        this._tempBoundTextures = [];
     }
+
+    if ( ObjectRenderer ) AbstractBatchRenderer.__proto__ = ObjectRenderer;
+    AbstractBatchRenderer.prototype = Object.create( ObjectRenderer && ObjectRenderer.prototype );
+    AbstractBatchRenderer.prototype.constructor = AbstractBatchRenderer;
+
     /**
      * Handles the `contextChange` signal.
      *
      * It calculates `this.MAX_TEXTURES` and allocating the
      * packed-geometry object pool.
      */
-    AbstractBatchRenderer.prototype.contextChange = function () {
+    AbstractBatchRenderer.prototype.contextChange = function contextChange ()
+    {
         var gl = this.renderer.gl;
-        if (settings.PREFER_ENV === ENV.WEBGL_LEGACY) {
+
+        if (settings.PREFER_ENV === ENV.WEBGL_LEGACY)
+        {
             this.MAX_TEXTURES = 1;
         }
-        else {
+        else
+        {
             // step 1: first check max textures the GPU can handle.
-            this.MAX_TEXTURES = Math.min(gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS), settings.SPRITE_MAX_TEXTURES);
+            this.MAX_TEXTURES = Math.min(
+                gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS),
+                settings.SPRITE_MAX_TEXTURES);
+
             // step 2: check the maximum number of if statements the shader can have too..
-            this.MAX_TEXTURES = checkMaxIfStatementsInShader(this.MAX_TEXTURES, gl);
+            this.MAX_TEXTURES = checkMaxIfStatementsInShader(
+                this.MAX_TEXTURES, gl);
         }
+
         this._shader = this.shaderGenerator.generateShader(this.MAX_TEXTURES);
+
         // we use the second shader as the first one depending on your browser
         // may omit aTextureId as it is not used by the shader so is optimized out.
-        for (var i = 0; i < this._packedGeometryPoolSize; i++) {
+        for (var i = 0; i < this._packedGeometryPoolSize; i++)
+        {
             /* eslint-disable max-len */
             this._packedGeometries[i] = new (this.geometryClass)();
         }
+
         this.initFlushBuffers();
     };
+
     /**
      * Makes sure that static and dynamic flush pooled objects have correct dimensions
      */
-    AbstractBatchRenderer.prototype.initFlushBuffers = function () {
-        var _drawCallPool = AbstractBatchRenderer._drawCallPool, _textureArrayPool = AbstractBatchRenderer._textureArrayPool;
+    AbstractBatchRenderer.prototype.initFlushBuffers = function initFlushBuffers ()
+    {
+        var _drawCallPool = AbstractBatchRenderer._drawCallPool;
+        var _textureArrayPool = AbstractBatchRenderer._textureArrayPool;
         // max draw calls
         var MAX_SPRITES = this.size / 4;
         // max texture arrays
         var MAX_TA = Math.floor(MAX_SPRITES / this.MAX_TEXTURES) + 1;
-        while (_drawCallPool.length < MAX_SPRITES) {
+
+        while (_drawCallPool.length < MAX_SPRITES)
+        {
             _drawCallPool.push(new BatchDrawCall());
         }
-        while (_textureArrayPool.length < MAX_TA) {
+        while (_textureArrayPool.length < MAX_TA)
+        {
             _textureArrayPool.push(new BatchTextureArray());
         }
-        for (var i = 0; i < this.MAX_TEXTURES; i++) {
+        for (var i = 0; i < this.MAX_TEXTURES; i++)
+        {
             this._tempBoundTextures[i] = null;
         }
     };
+
     /**
      * Handles the `prerender` signal.
      *
      * It ensures that flushes start from the first geometry
      * object again.
      */
-    AbstractBatchRenderer.prototype.onPrerender = function () {
+    AbstractBatchRenderer.prototype.onPrerender = function onPrerender ()
+    {
         this._flushId = 0;
     };
+
     /**
      * Buffers the "batchable" object. It need not be rendered
      * immediately.
@@ -18585,58 +15279,82 @@ var AbstractBatchRenderer = /** @class */ (function (_super) {
      * @param {PIXI.DisplayObject} element - the element to render when
      *    using this renderer
      */
-    AbstractBatchRenderer.prototype.render = function (element) {
-        if (!element._texture.valid) {
+    AbstractBatchRenderer.prototype.render = function render (element)
+    {
+        if (!element._texture.valid)
+        {
             return;
         }
-        if (this._vertexCount + (element.vertexData.length / 2) > this.size) {
+
+        if (this._vertexCount + (element.vertexData.length / 2) > this.size)
+        {
             this.flush();
         }
+
         this._vertexCount += element.vertexData.length / 2;
         this._indexCount += element.indices.length;
         this._bufferedTextures[this._bufferSize] = element._texture.baseTexture;
         this._bufferedElements[this._bufferSize++] = element;
     };
-    AbstractBatchRenderer.prototype.buildTexturesAndDrawCalls = function () {
-        var _a = this, textures = _a._bufferedTextures, MAX_TEXTURES = _a.MAX_TEXTURES;
+
+    AbstractBatchRenderer.prototype.buildTexturesAndDrawCalls = function buildTexturesAndDrawCalls ()
+    {
+        var ref = this;
+        var textures = ref._bufferedTextures;
+        var MAX_TEXTURES = ref.MAX_TEXTURES;
         var textureArrays = AbstractBatchRenderer._textureArrayPool;
         var batch = this.renderer.batch;
         var boundTextures = this._tempBoundTextures;
         var touch = this.renderer.textureGC.count;
+
         var TICK = ++BaseTexture._globalBatch;
         var countTexArrays = 0;
         var texArray = textureArrays[0];
         var start = 0;
+
         batch.copyBoundTextures(boundTextures, MAX_TEXTURES);
-        for (var i = 0; i < this._bufferSize; ++i) {
+
+        for (var i = 0; i < this._bufferSize; ++i)
+        {
             var tex = textures[i];
+
             textures[i] = null;
-            if (tex._batchEnabled === TICK) {
+            if (tex._batchEnabled === TICK)
+            {
                 continue;
             }
-            if (texArray.count >= MAX_TEXTURES) {
+
+            if (texArray.count >= MAX_TEXTURES)
+            {
                 batch.boundArray(texArray, boundTextures, TICK, MAX_TEXTURES);
                 this.buildDrawCalls(texArray, start, i);
                 start = i;
                 texArray = textureArrays[++countTexArrays];
                 ++TICK;
             }
+
             tex._batchEnabled = TICK;
             tex.touched = touch;
             texArray.elements[texArray.count++] = tex;
         }
-        if (texArray.count > 0) {
+
+        if (texArray.count > 0)
+        {
             batch.boundArray(texArray, boundTextures, TICK, MAX_TEXTURES);
             this.buildDrawCalls(texArray, start, this._bufferSize);
             ++countTexArrays;
             ++TICK;
         }
+
         // Clean-up
-        for (var i = 0; i < boundTextures.length; i++) {
-            boundTextures[i] = null;
+
+        for (var i$1 = 0; i$1 < boundTextures.length; i$1++)
+        {
+            boundTextures[i$1] = null;
         }
         BaseTexture._globalBatch = TICK;
     };
+
     /**
      * Populating drawcalls for rendering
      *
@@ -18644,149 +15362,222 @@ var AbstractBatchRenderer = /** @class */ (function (_super) {
      * @param {number} start
      * @param {number} finish
      */
-    AbstractBatchRenderer.prototype.buildDrawCalls = function (texArray, start, finish) {
-        var _a = this, elements = _a._bufferedElements, _attributeBuffer = _a._attributeBuffer, _indexBuffer = _a._indexBuffer, vertexSize = _a.vertexSize;
+    AbstractBatchRenderer.prototype.buildDrawCalls = function buildDrawCalls (texArray, start, finish)
+    {
+        var ref = this;
+        var elements = ref._bufferedElements;
+        var _attributeBuffer = ref._attributeBuffer;
+        var _indexBuffer = ref._indexBuffer;
+        var vertexSize = ref.vertexSize;
         var drawCalls = AbstractBatchRenderer._drawCallPool;
+
         var dcIndex = this._dcIndex;
         var aIndex = this._aIndex;
         var iIndex = this._iIndex;
+
         var drawCall = drawCalls[dcIndex];
+
         drawCall.start = this._iIndex;
         drawCall.texArray = texArray;
-        for (var i = start; i < finish; ++i) {
+
+        for (var i = start; i < finish; ++i)
+        {
             var sprite = elements[i];
             var tex = sprite._texture.baseTexture;
-            var spriteBlendMode = premultiplyBlendMode[tex.alphaMode ? 1 : 0][sprite.blendMode];
+            var spriteBlendMode = premultiplyBlendMode[
+                tex.alphaMode ? 1 : 0][sprite.blendMode];
+
             elements[i] = null;
-            if (start < i && drawCall.blend !== spriteBlendMode) {
+
+            if (start < i && drawCall.blend !== spriteBlendMode)
+            {
                 drawCall.size = iIndex - drawCall.start;
                 start = i;
                 drawCall = drawCalls[++dcIndex];
                 drawCall.texArray = texArray;
                 drawCall.start = iIndex;
             }
+
             this.packInterleavedGeometry(sprite, _attributeBuffer, _indexBuffer, aIndex, iIndex);
             aIndex += sprite.vertexData.length / 2 * vertexSize;
             iIndex += sprite.indices.length;
+
             drawCall.blend = spriteBlendMode;
         }
-        if (start < finish) {
+
+        if (start < finish)
+        {
             drawCall.size = iIndex - drawCall.start;
             ++dcIndex;
         }
+
         this._dcIndex = dcIndex;
         this._aIndex = aIndex;
         this._iIndex = iIndex;
     };
+
     /**
      * Bind textures for current rendering
      *
      * @param {PIXI.BatchTextureArray} texArray
      */
-    AbstractBatchRenderer.prototype.bindAndClearTexArray = function (texArray) {
+    AbstractBatchRenderer.prototype.bindAndClearTexArray = function bindAndClearTexArray (texArray)
+    {
         var textureSystem = this.renderer.texture;
-        for (var j = 0; j < texArray.count; j++) {
+
+        for (var j = 0; j < texArray.count; j++)
+        {
             textureSystem.bind(texArray.elements[j], texArray.ids[j]);
             texArray.elements[j] = null;
         }
         texArray.count = 0;
     };
-    AbstractBatchRenderer.prototype.updateGeometry = function () {
-        var _a = this, packedGeometries = _a._packedGeometries, attributeBuffer = _a._attributeBuffer, indexBuffer = _a._indexBuffer;
-        if (!settings.CAN_UPLOAD_SAME_BUFFER) { /* Usually on iOS devices, where the browser doesn't
+
+    AbstractBatchRenderer.prototype.updateGeometry = function updateGeometry ()
+    {
+        var ref = this;
+        var packedGeometries = ref._packedGeometries;
+        var attributeBuffer = ref._attributeBuffer;
+        var indexBuffer = ref._indexBuffer;
+
+        if (!settings.CAN_UPLOAD_SAME_BUFFER)
+        { /* Usually on iOS devices, where the browser doesn't
             like uploads to the same buffer in a single frame. */
-            if (this._packedGeometryPoolSize <= this._flushId) {
+            if (this._packedGeometryPoolSize <= this._flushId)
+            {
                 this._packedGeometryPoolSize++;
                 packedGeometries[this._flushId] = new (this.geometryClass)();
             }
+
             packedGeometries[this._flushId]._buffer.update(attributeBuffer.rawBinaryData);
             packedGeometries[this._flushId]._indexBuffer.update(indexBuffer);
+
             this.renderer.geometry.bind(packedGeometries[this._flushId]);
             this.renderer.geometry.updateBuffers();
             this._flushId++;
         }
-        else {
+        else
+        {
             // lets use the faster option, always use buffer number 0
             packedGeometries[this._flushId]._buffer.update(attributeBuffer.rawBinaryData);
             packedGeometries[this._flushId]._indexBuffer.update(indexBuffer);
+
             this.renderer.geometry.updateBuffers();
         }
     };
-    AbstractBatchRenderer.prototype.drawBatches = function () {
+
+    AbstractBatchRenderer.prototype.drawBatches = function drawBatches ()
+    {
         var dcCount = this._dcIndex;
-        var _a = this.renderer, gl = _a.gl, stateSystem = _a.state;
+        var ref = this.renderer;
+        var gl = ref.gl;
+        var stateSystem = ref.state;
         var drawCalls = AbstractBatchRenderer._drawCallPool;
+
         var curTexArray = null;
+
         // Upload textures and do the draw calls
-        for (var i = 0; i < dcCount; i++) {
-            var _b = drawCalls[i], texArray = _b.texArray, type = _b.type, size = _b.size, start = _b.start, blend = _b.blend;
-            if (curTexArray !== texArray) {
+        for (var i = 0; i < dcCount; i++)
+        {
+            var ref$1 = drawCalls[i];
+            var texArray = ref$1.texArray;
+            var type = ref$1.type;
+            var size = ref$1.size;
+            var start = ref$1.start;
+            var blend = ref$1.blend;
+
+            if (curTexArray !== texArray)
+            {
                 curTexArray = texArray;
                 this.bindAndClearTexArray(texArray);
             }
+
             this.state.blendMode = blend;
             stateSystem.set(this.state);
             gl.drawElements(type, size, gl.UNSIGNED_SHORT, start * 2);
         }
     };
+
     /**
      * Renders the content _now_ and empties the current batch.
      */
-    AbstractBatchRenderer.prototype.flush = function () {
-        if (this._vertexCount === 0) {
+    AbstractBatchRenderer.prototype.flush = function flush ()
+    {
+        if (this._vertexCount === 0)
+        {
             return;
         }
+
         this._attributeBuffer = this.getAttributeBuffer(this._vertexCount);
         this._indexBuffer = this.getIndexBuffer(this._indexCount);
         this._aIndex = 0;
         this._iIndex = 0;
         this._dcIndex = 0;
+
         this.buildTexturesAndDrawCalls();
         this.updateGeometry();
         this.drawBatches();
+
         // reset elements buffer for the next flush
         this._bufferSize = 0;
         this._vertexCount = 0;
         this._indexCount = 0;
     };
+
     /**
      * Starts a new sprite batch.
      */
-    AbstractBatchRenderer.prototype.start = function () {
+    AbstractBatchRenderer.prototype.start = function start ()
+    {
         this.renderer.state.set(this.state);
+
         this.renderer.shader.bind(this._shader);
-        if (settings.CAN_UPLOAD_SAME_BUFFER) {
+
+        if (settings.CAN_UPLOAD_SAME_BUFFER)
+        {
             // bind buffer #0, we don't need others
             this.renderer.geometry.bind(this._packedGeometries[this._flushId]);
         }
     };
+
     /**
      * Stops and flushes the current batch.
      */
-    AbstractBatchRenderer.prototype.stop = function () {
+    AbstractBatchRenderer.prototype.stop = function stop ()
+    {
         this.flush();
     };
+
     /**
      * Destroys this `AbstractBatchRenderer`. It cannot be used again.
      */
-    AbstractBatchRenderer.prototype.destroy = function () {
-        for (var i = 0; i < this._packedGeometryPoolSize; i++) {
-            if (this._packedGeometries[i]) {
+    AbstractBatchRenderer.prototype.destroy = function destroy ()
+    {
+        for (var i = 0; i < this._packedGeometryPoolSize; i++)
+        {
+            if (this._packedGeometries[i])
+            {
                 this._packedGeometries[i].destroy();
             }
         }
+
         this.renderer.off('prerender', this.onPrerender, this);
+
         this._aBuffers = null;
         this._iBuffers = null;
         this._packedGeometries = null;
         this._attributeBuffer = null;
         this._indexBuffer = null;
-        if (this._shader) {
+
+        if (this._shader)
+        {
             this._shader.destroy();
             this._shader = null;
         }
-        _super.prototype.destroy.call(this);
+
+        ObjectRenderer.prototype.destroy.call(this);
     };
+
     /**
      * Fetches an attribute buffer from `this._aBuffers` that
      * can hold atleast `size` floats.
@@ -18795,43 +15586,59 @@ var AbstractBatchRenderer = /** @class */ (function (_super) {
      * @return {ViewableBuffer} - buffer than can hold atleast `size` floats
      * @private
      */
-    AbstractBatchRenderer.prototype.getAttributeBuffer = function (size) {
+    AbstractBatchRenderer.prototype.getAttributeBuffer = function getAttributeBuffer (size)
+    {
         // 8 vertices is enough for 2 quads
         var roundedP2 = nextPow2(Math.ceil(size / 8));
         var roundedSizeIndex = log2(roundedP2);
         var roundedSize = roundedP2 * 8;
-        if (this._aBuffers.length <= roundedSizeIndex) {
+
+        if (this._aBuffers.length <= roundedSizeIndex)
+        {
             this._iBuffers.length = roundedSizeIndex + 1;
         }
+
         var buffer = this._aBuffers[roundedSize];
-        if (!buffer) {
+
+        if (!buffer)
+        {
             this._aBuffers[roundedSize] = buffer = new ViewableBuffer(roundedSize * this.vertexSize * 4);
         }
+
         return buffer;
     };
+
     /**
      * Fetches an index buffer from `this._iBuffers` that can
-     * have at least `size` capacity.
+     * has atleast `size` capacity.
      *
      * @param {number} size - minimum required capacity
      * @return {Uint16Array} - buffer that can fit `size`
      *    indices.
      * @private
      */
-    AbstractBatchRenderer.prototype.getIndexBuffer = function (size) {
+    AbstractBatchRenderer.prototype.getIndexBuffer = function getIndexBuffer (size)
+    {
         // 12 indices is enough for 2 quads
         var roundedP2 = nextPow2(Math.ceil(size / 12));
         var roundedSizeIndex = log2(roundedP2);
         var roundedSize = roundedP2 * 12;
-        if (this._iBuffers.length <= roundedSizeIndex) {
+
+        if (this._iBuffers.length <= roundedSizeIndex)
+        {
             this._iBuffers.length = roundedSizeIndex + 1;
         }
+
         var buffer = this._iBuffers[roundedSizeIndex];
-        if (!buffer) {
+
+        if (!buffer)
+        {
             this._iBuffers[roundedSizeIndex] = buffer = new Uint16Array(roundedSize);
         }
+
         return buffer;
     };
+
     /**
      * Takes the four batching parameters of `element`, interleaves
      * and pushes them into the batching attribute/index buffers given.
@@ -18846,20 +15653,26 @@ var AbstractBatchRenderer = /** @class */ (function (_super) {
      * @param {number} aIndex - number of floats already in the attribute buffer
      * @param {number} iIndex - number of indices already in `indexBuffer`
      */
-    AbstractBatchRenderer.prototype.packInterleavedGeometry = function (element, attributeBuffer, indexBuffer, aIndex, iIndex) {
-        var uint32View = attributeBuffer.uint32View, float32View = attributeBuffer.float32View;
+    AbstractBatchRenderer.prototype.packInterleavedGeometry = function packInterleavedGeometry (element, attributeBuffer, indexBuffer, aIndex, iIndex)
+    {
+        var uint32View = attributeBuffer.uint32View;
+        var float32View = attributeBuffer.float32View;
+
         var packedVertices = aIndex / this.vertexSize;
         var uvs = element.uvs;
         var indicies = element.indices;
         var vertexData = element.vertexData;
         var textureId = element._texture.baseTexture._batchLocation;
+
         var alpha = Math.min(element.worldAlpha, 1.0);
         var argb = (alpha < 1.0
             && element._texture.baseTexture.alphaMode)
             ? premultiplyTint(element._tintRGB, alpha)
             : element._tintRGB + (alpha * 255 << 24);
+
         // lets not worry about tint! for now..
-        for (var i = 0; i < vertexData.length; i += 2) {
+        for (var i = 0; i < vertexData.length; i += 2)
+        {
             float32View[aIndex++] = vertexData[i];
             float32View[aIndex++] = vertexData[i + 1];
             float32View[aIndex++] = uvs[i];
@@ -18867,34 +15680,39 @@ var AbstractBatchRenderer = /** @class */ (function (_super) {
             uint32View[aIndex++] = argb;
             float32View[aIndex++] = textureId;
         }
-        for (var i = 0; i < indicies.length; i++) {
-            indexBuffer[iIndex++] = packedVertices + indicies[i];
+
+        for (var i$1 = 0; i$1 < indicies.length; i$1++)
+        {
+            indexBuffer[iIndex++] = packedVertices + indicies[i$1];
         }
     };
-    /**
-     * Pool of `BatchDrawCall` objects that `flush` used
-     * to create "batches" of the objects being rendered.
-     *
-     * These are never re-allocated again.
-     * Shared between all batch renderers because it can be only one "flush" working at the moment.
-     *
-     * @static
-     * @member {PIXI.BatchDrawCall[]}
-     */
-    AbstractBatchRenderer._drawCallPool = [];
-    /**
-     * Pool of `BatchDrawCall` objects that `flush` used
-     * to create "batches" of the objects being rendered.
-     *
-     * These are never re-allocated again.
-     * Shared between all batch renderers because it can be only one "flush" working at the moment.
-     *
-     * @static
-     * @member {PIXI.BatchTextureArray[]}
-     */
-    AbstractBatchRenderer._textureArrayPool = [];
+
     return AbstractBatchRenderer;
 }(ObjectRenderer));
+
+/**
+ * Pool of `BatchDrawCall` objects that `flush` used
+ * to create "batches" of the objects being rendered.
+ *
+ * These are never re-allocated again.
+ * Shared between all batch renderers because it can be only one "flush" working at the moment.
+ *
+ * @static
+ * @member {PIXI.BatchDrawCall[]}
+ */
+AbstractBatchRenderer._drawCallPool = [];
+
+/**
+ * Pool of `BatchDrawCall` objects that `flush` used
+ * to create "batches" of the objects being rendered.
+ *
+ * These are never re-allocated again.
+ * Shared between all batch renderers because it can be only one "flush" working at the moment.
+ *
+ * @static
+ * @member {PIXI.BatchTextureArray[]}
+ */
+AbstractBatchRenderer._textureArrayPool = [];
 
 /**
  * Helper that generates batching multi-texture shader. Use it with your new BatchRenderer
@@ -18902,73 +15720,95 @@ var AbstractBatchRenderer = /** @class */ (function (_super) {
  * @class
  * @memberof PIXI
  */
-var BatchShaderGenerator = /** @class */ (function () {
+var BatchShaderGenerator = function BatchShaderGenerator(vertexSrc, fragTemplate)
+{
     /**
-     * @param {string} vertexSrc - Vertex shader
-     * @param {string} fragTemplate - Fragment shader template
+     * Reference to the vertex shader source.
+     *
+     * @member {string}
      */
-    function BatchShaderGenerator(vertexSrc, fragTemplate) {
-        /**
-         * Reference to the vertex shader source.
-         *
-         * @member {string}
-         */
-        this.vertexSrc = vertexSrc;
-        /**
-         * Reference to the fragement shader template. Must contain "%count%" and "%forloop%".
-         *
-         * @member {string}
-         */
-        this.fragTemplate = fragTemplate;
-        this.programCache = {};
-        this.defaultGroupCache = {};
-        if (fragTemplate.indexOf('%count%') < 0) {
-            throw new Error('Fragment template must contain "%count%".');
-        }
-        if (fragTemplate.indexOf('%forloop%') < 0) {
-            throw new Error('Fragment template must contain "%forloop%".');
-        }
+    this.vertexSrc = vertexSrc;
+
+    /**
+     * Reference to the fragement shader template. Must contain "%count%" and "%forloop%".
+     *
+     * @member {string}
+     */
+    this.fragTemplate = fragTemplate;
+
+    this.programCache = {};
+    this.defaultGroupCache = {};
+
+    if (fragTemplate.indexOf('%count%') < 0)
+    {
+        throw new Error('Fragment template must contain "%count%".');
     }
-    BatchShaderGenerator.prototype.generateShader = function (maxTextures) {
-        if (!this.programCache[maxTextures]) {
-            var sampleValues = new Int32Array(maxTextures);
-            for (var i = 0; i < maxTextures; i++) {
-                sampleValues[i] = i;
-            }
-            this.defaultGroupCache[maxTextures] = UniformGroup.from({ uSamplers: sampleValues }, true);
-            var fragmentSrc = this.fragTemplate;
-            fragmentSrc = fragmentSrc.replace(/%count%/gi, "" + maxTextures);
-            fragmentSrc = fragmentSrc.replace(/%forloop%/gi, this.generateSampleSrc(maxTextures));
-            this.programCache[maxTextures] = new Program(this.vertexSrc, fragmentSrc);
+
+    if (fragTemplate.indexOf('%forloop%') < 0)
+    {
+        throw new Error('Fragment template must contain "%forloop%".');
+    }
+};
+
+BatchShaderGenerator.prototype.generateShader = function generateShader (maxTextures)
+{
+    if (!this.programCache[maxTextures])
+    {
+        var sampleValues = new Int32Array(maxTextures);
+
+        for (var i = 0; i < maxTextures; i++)
+        {
+            sampleValues[i] = i;
         }
-        var uniforms = {
-            tint: new Float32Array([1, 1, 1, 1]),
-            translationMatrix: new Matrix(),
-            default: this.defaultGroupCache[maxTextures],
-        };
-        return new Shader(this.programCache[maxTextures], uniforms);
+
+        this.defaultGroupCache[maxTextures] = UniformGroup.from({ uSamplers: sampleValues }, true);
+
+        var fragmentSrc = this.fragTemplate;
+
+        fragmentSrc = fragmentSrc.replace(/%count%/gi, ("" + maxTextures));
+        fragmentSrc = fragmentSrc.replace(/%forloop%/gi, this.generateSampleSrc(maxTextures));
+
+        this.programCache[maxTextures] = new Program(this.vertexSrc, fragmentSrc);
+    }
+
+    var uniforms = {
+        tint: new Float32Array([1, 1, 1, 1]),
+        translationMatrix: new Matrix(),
+        default: this.defaultGroupCache[maxTextures],
     };
-    BatchShaderGenerator.prototype.generateSampleSrc = function (maxTextures) {
-        var src = '';
-        src += '\n';
-        src += '\n';
-        for (var i = 0; i < maxTextures; i++) {
-            if (i > 0) {
-                src += '\nelse ';
-            }
-            if (i < maxTextures - 1) {
-                src += "if(vTextureId < " + i + ".5)";
-            }
-            src += '\n{';
-            src += "\n\tcolor = texture2D(uSamplers[" + i + "], vTextureCoord);";
-            src += '\n}';
+
+    return new Shader(this.programCache[maxTextures], uniforms);
+};
+
+BatchShaderGenerator.prototype.generateSampleSrc = function generateSampleSrc (maxTextures)
+{
+    var src = '';
+
+    src += '\n';
+    src += '\n';
+
+    for (var i = 0; i < maxTextures; i++)
+    {
+        if (i > 0)
+        {
+            src += '\nelse ';
         }
-        src += '\n';
-        src += '\n';
-        return src;
-    };
-    return BatchShaderGenerator;
-}());
+
+        if (i < maxTextures - 1)
+        {
+            src += "if(vTextureId < " + i + ".5)";
+        }
+
+        src += '\n{';
+        src += "\n\tcolor = texture2D(uSamplers[" + i + "], vTextureCoord);";
+        src += '\n}';
+    }
+
+    src += '\n';
+    src += '\n';
+
+    return src;
+};
 
 /**
  * Geometry used to batch standard PIXI content (e.g. Mesh, Sprite, Graphics objects).
@@ -18976,36 +15816,40 @@ var BatchShaderGenerator = /** @class */ (function () {
  * @class
  * @memberof PIXI
  */
-var BatchGeometry = /** @class */ (function (_super) {
-    __extends(BatchGeometry, _super);
-    /**
-     * @param {boolean} [_static=false] - Optimization flag, where `false`
-     *        is updated every frame, `true` doesn't change frame-to-frame.
-     */
-    function BatchGeometry(_static) {
-        if (_static === void 0) { _static = false; }
-        var _this = _super.call(this) || this;
+var BatchGeometry = /*@__PURE__*/(function (Geometry) {
+    function BatchGeometry(_static)
+    {
+        if ( _static === void 0 ) _static = false;
+
+        Geometry.call(this);
+
         /**
          * Buffer used for position, color, texture IDs
          *
          * @member {PIXI.Buffer}
          * @protected
          */
-        _this._buffer = new Buffer(null, _static, false);
+        this._buffer = new Buffer(null, _static, false);
+
         /**
          * Index buffer data
          *
          * @member {PIXI.Buffer}
          * @protected
          */
-        _this._indexBuffer = new Buffer(null, _static, true);
-        _this.addAttribute('aVertexPosition', _this._buffer, 2, false, TYPES.FLOAT)
-            .addAttribute('aTextureCoord', _this._buffer, 2, false, TYPES.FLOAT)
-            .addAttribute('aColor', _this._buffer, 4, true, TYPES.UNSIGNED_BYTE)
-            .addAttribute('aTextureId', _this._buffer, 1, true, TYPES.FLOAT)
-            .addIndex(_this._indexBuffer);
-        return _this;
+        this._indexBuffer = new Buffer(null, _static, true);
+
+        this.addAttribute('aVertexPosition', this._buffer, 2, false, TYPES.FLOAT)
+            .addAttribute('aTextureCoord', this._buffer, 2, false, TYPES.FLOAT)
+            .addAttribute('aColor', this._buffer, 4, true, TYPES.UNSIGNED_BYTE)
+            .addAttribute('aTextureId', this._buffer, 1, true, TYPES.FLOAT)
+            .addIndex(this._indexBuffer);
     }
+
+    if ( Geometry ) BatchGeometry.__proto__ = Geometry;
+    BatchGeometry.prototype = Object.create( Geometry && Geometry.prototype );
+    BatchGeometry.prototype.constructor = BatchGeometry;
+
     return BatchGeometry;
 }(Geometry));
 
@@ -19018,87 +15862,67 @@ var defaultFragment$2 = "varying vec2 vTextureCoord;\nvarying vec4 vColor;\nvary
  * @memberof PIXI
  * @hideconstructor
  */
-var BatchPluginFactory = /** @class */ (function () {
-    function BatchPluginFactory() {
-    }
-    /**
-     * Create a new BatchRenderer plugin for Renderer. this convenience can provide an easy way
-     * to extend BatchRenderer with all the necessary pieces.
-     * @example
-     * const fragment = `
-     * varying vec2 vTextureCoord;
-     * varying vec4 vColor;
-     * varying float vTextureId;
-     * uniform sampler2D uSamplers[%count%];
-     *
-     * void main(void){
-     *     vec4 color;
-     *     %forloop%
-     *     gl_FragColor = vColor * vec4(color.a - color.rgb, color.a);
-     * }
-     * `;
-     * const InvertBatchRenderer = PIXI.BatchPluginFactory.create({ fragment });
-     * PIXI.Renderer.registerPlugin('invert', InvertBatchRenderer);
-     * const sprite = new PIXI.Sprite();
-     * sprite.pluginName = 'invert';
-     *
-     * @static
-     * @param {object} [options]
-     * @param {string} [options.vertex=PIXI.BatchPluginFactory.defaultVertexSrc] - Vertex shader source
-     * @param {string} [options.fragment=PIXI.BatchPluginFactory.defaultFragmentTemplate] - Fragment shader template
-     * @param {number} [options.vertexSize=6] - Vertex size
-     * @param {object} [options.geometryClass=PIXI.BatchGeometry]
-     * @return {*} New batch renderer plugin
-     */
-    BatchPluginFactory.create = function (options) {
-        var _a = Object.assign({
-            vertex: defaultVertex$2,
-            fragment: defaultFragment$2,
-            geometryClass: BatchGeometry,
-            vertexSize: 6,
-        }, options), vertex = _a.vertex, fragment = _a.fragment, vertexSize = _a.vertexSize, geometryClass = _a.geometryClass;
-        return /** @class */ (function (_super) {
-            __extends(BatchPlugin, _super);
-            function BatchPlugin(renderer) {
-                var _this = _super.call(this, renderer) || this;
-                _this.shaderGenerator = new BatchShaderGenerator(vertex, fragment);
-                _this.geometryClass = geometryClass;
-                _this.vertexSize = vertexSize;
-                return _this;
-            }
+var BatchPluginFactory = function BatchPluginFactory () {};
+
+var staticAccessors$1 = { defaultVertexSrc: { configurable: true },defaultFragmentTemplate: { configurable: true } };
+
+BatchPluginFactory.create = function create (options)
+{
+    var ref = Object.assign({
+        vertex: defaultVertex$2,
+        fragment: defaultFragment$2,
+        geometryClass: BatchGeometry,
+        vertexSize: 6,
+    }, options);
+        var vertex = ref.vertex;
+        var fragment = ref.fragment;
+        var vertexSize = ref.vertexSize;
+        var geometryClass = ref.geometryClass;
+
+    return /*@__PURE__*/(function (AbstractBatchRenderer) {
+            function BatchPlugin(renderer)
+        {
+            AbstractBatchRenderer.call(this, renderer);
+
+            this.shaderGenerator = new BatchShaderGenerator(vertex, fragment);
+            this.geometryClass = geometryClass;
+            this.vertexSize = vertexSize;
+        }
+
+            if ( AbstractBatchRenderer ) BatchPlugin.__proto__ = AbstractBatchRenderer;
+            BatchPlugin.prototype = Object.create( AbstractBatchRenderer && AbstractBatchRenderer.prototype );
+            BatchPlugin.prototype.constructor = BatchPlugin;
+
             return BatchPlugin;
         }(AbstractBatchRenderer));
-    };
-    Object.defineProperty(BatchPluginFactory, "defaultVertexSrc", {
-        /**
-         * The default vertex shader source
-         *
-         * @static
-         * @type {string}
-         * @constant
-         */
-        get: function () {
-            return defaultVertex$2;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(BatchPluginFactory, "defaultFragmentTemplate", {
-        /**
-         * The default fragment shader source
-         *
-         * @static
-         * @type {string}
-         * @constant
-         */
-        get: function () {
-            return defaultFragment$2;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    return BatchPluginFactory;
-}());
+};
+
+/**
+ * The default vertex shader source
+ *
+ * @static
+ * @type {string}
+ * @constant
+ */
+staticAccessors$1.defaultVertexSrc.get = function ()
+{
+    return defaultVertex$2;
+};
+
+/**
+ * The default fragment shader source
+ *
+ * @static
+ * @type {string}
+ * @constant
+ */
+staticAccessors$1.defaultFragmentTemplate.get = function ()
+{
+    return defaultFragment$2;
+};
+
+Object.defineProperties( BatchPluginFactory, staticAccessors$1 );
+
 // Setup the default BatchRenderer plugin, this is what
 // we'll actually export at the root level
 var BatchRenderer = BatchPluginFactory.create();
@@ -19137,18 +15961,18 @@ class AnchorLayout {
             let x = anchorLeft;
             let y = anchorTop;
             switch (layoutOptions.horizontalAlign) {
-                case exports.ALIGN.MIDDLE:
+                case ALIGN.MIDDLE:
                     x = (anchorRight + anchorLeft - childWidth) / 2;
                     break;
-                case exports.ALIGN.RIGHT:
+                case ALIGN.RIGHT:
                     x = anchorRight - childWidth;
                     break;
             }
             switch (layoutOptions.verticalAlign) {
-                case exports.ALIGN.MIDDLE:
+                case ALIGN.MIDDLE:
                     y = (anchorBottom + anchorTop - childHeight) / 2;
                     break;
-                case exports.ALIGN.BOTTOM:
+                case ALIGN.BOTTOM:
                     y = anchorBottom - childHeight;
                     break;
             }
@@ -19159,8 +15983,8 @@ class AnchorLayout {
         const children = this.host.widgetChildren;
         let naturalWidth = 0;
         let naturalHeight = 0;
-        const baseWidthMode = widthMode === exports.MeasureMode.EXACTLY ? exports.MeasureMode.AT_MOST : widthMode;
-        const baseHeightMode = heightMode === exports.MeasureMode.EXACTLY ? exports.MeasureMode.AT_MOST : heightMode;
+        const baseWidthMode = widthMode === MeasureMode.EXACTLY ? MeasureMode.AT_MOST : widthMode;
+        const baseHeightMode = heightMode === MeasureMode.EXACTLY ? MeasureMode.AT_MOST : heightMode;
         let hasFillers = false;
         // First pass: measure children and find our natural width/height. If we have a upper
         // limit, then pass that on.
@@ -19182,8 +16006,8 @@ class AnchorLayout {
             const heightConst = lopt.isHeightPredefined;
             const widgetWidthLimit = widthConst ? lopt.width : anchorRight - anchorLeft;
             const widgetHeightLimit = heightConst ? lopt.height : anchorBottom - anchorTop;
-            const widgetWidthMode = widthConst ? exports.MeasureMode.EXACTLY : baseWidthMode;
-            const widgetHeightMode = heightConst ? exports.MeasureMode.EXACTLY : baseHeightMode;
+            const widgetWidthMode = widthConst ? MeasureMode.EXACTLY : baseWidthMode;
+            const widgetHeightMode = heightConst ? MeasureMode.EXACTLY : baseHeightMode;
             // Fillers need to be remeasured using EXACTLY.
             hasFillers = hasFillers || lopt.width === 0 || lopt.height === 0;
             widget.measure(widgetWidthLimit, widgetHeightLimit, widgetWidthMode, widgetHeightMode);
@@ -19206,7 +16030,7 @@ class AnchorLayout {
                 const anchorTop = this.calculateAnchor(lopt.anchorTop || 0, this.measuredHeight, false);
                 const anchorRight = this.calculateAnchor(lopt.anchorRight || 0, this.measuredWidth, true);
                 const anchorBottom = this.calculateAnchor(lopt.anchorBottom || 0, this.measuredHeight, true);
-                widget.measure(lopt.isWidthPredefined ? lopt.width : anchorRight - anchorLeft, lopt.isHeightPredefined ? lopt.height : anchorBottom - anchorTop, lopt.width === 0 || lopt.isWidthPredefined ? exports.MeasureMode.EXACTLY : exports.MeasureMode.AT_MOST, lopt.height === 0 || lopt.isHeightPredefined ? exports.MeasureMode.EXACTLY : exports.MeasureMode.AT_MOST);
+                widget.measure(lopt.isWidthPredefined ? lopt.width : anchorRight - anchorLeft, lopt.isHeightPredefined ? lopt.height : anchorBottom - anchorTop, lopt.width === 0 || lopt.isWidthPredefined ? MeasureMode.EXACTLY : MeasureMode.AT_MOST, lopt.height === 0 || lopt.isHeightPredefined ? MeasureMode.EXACTLY : MeasureMode.AT_MOST);
             }
         }
     }
@@ -19251,7 +16075,7 @@ class AnchorLayout {
 
 const { REGION_LEFT, REGION_TOP, REGION_RIGHT, REGION_BOTTOM, REGION_CENTER, } = BorderLayoutOptions;
 const { FILL_PARENT, } = LayoutOptions;
-const { EXACTLY, AT_MOST, } = exports.MeasureMode;
+const { EXACTLY, AT_MOST, } = MeasureMode;
 /**
  * `PUXI.BorderLayout` is used in conjunction with `PUXI.BorderLayoutOptions`.
  *
@@ -19294,10 +16118,10 @@ class BorderLayout {
             let x = 0;
             let y = 0;
             switch ((_a = widget.layoutOptions) === null || _a === void 0 ? void 0 : _a.horizontalAlign) {
-                case exports.ALIGN.CENTER:
+                case ALIGN.CENTER:
                     x = (regionWidth - widget.getMeasuredWidth()) / 2;
                     break;
-                case exports.ALIGN.RIGHT:
+                case ALIGN.RIGHT:
                     x = regionWidth - widget.getMeasuredWidth();
                     break;
                 default:
@@ -19305,10 +16129,10 @@ class BorderLayout {
                     break;
             }
             switch ((_b = widget.layoutOptions) === null || _b === void 0 ? void 0 : _b.verticalAlign) {
-                case exports.ALIGN.CENTER:
+                case ALIGN.CENTER:
                     y = (regionHeight - widget.getMeasuredHeight()) / 2;
                     break;
-                case exports.ALIGN.BOTTOM:
+                case ALIGN.BOTTOM:
                     y = regionHeight - widget.getMeasuredHeight();
                     break;
                 default:
@@ -19331,8 +16155,8 @@ class BorderLayout {
         this.indexRegions();
         this.clearMeasureCache();
         // Children can be aligned inside region if smaller
-        const childWidthMode = widthMode === exports.MeasureMode.EXACTLY ? exports.MeasureMode.AT_MOST : widthMode;
-        const childHeightMode = heightMode === exports.MeasureMode.EXACTLY ? exports.MeasureMode.AT_MOST : widthMode;
+        const childWidthMode = widthMode === MeasureMode.EXACTLY ? MeasureMode.AT_MOST : widthMode;
+        const childHeightMode = heightMode === MeasureMode.EXACTLY ? MeasureMode.AT_MOST : widthMode;
         // Measure top, bottom, and center. The max. of each row's width will be our "reference".
         let [tw, th, , thmin] = this.measureChildren(// eslint-disable-line prefer-const
         this.topWidgets, maxWidth, maxHeight, childWidthMode, childHeightMode);
@@ -19342,28 +16166,28 @@ class BorderLayout {
         this.centerWidgets, maxWidth, maxHeight, childWidthMode, heightMode);
         // Measure left & right regions. Their heights will equal center's height.
         let [lw, , lwmin] = this.measureChildren(// eslint-disable-line prefer-const
-        this.leftWidgets, maxWidth, ch, childWidthMode, exports.MeasureMode.AT_MOST);
+        this.leftWidgets, maxWidth, ch, childWidthMode, MeasureMode.AT_MOST);
         let [rw, , rwmin] = this.measureChildren(// eslint-disable-line prefer-const
-        this.rightWidgets, maxWidth, ch, childWidthMode, exports.MeasureMode.AT_MOST);
+        this.rightWidgets, maxWidth, ch, childWidthMode, MeasureMode.AT_MOST);
         // Check if total width/height is greater than our limit. If so, then downscale
         // each row's height or each column's (in middle row) width.
         const middleRowWidth = lw + rw + cw;
         const netWidth = Math.max(tw, bw, middleRowWidth);
         const netHeight = th + bh + ch;
         // Resolve our limits.
-        if (widthMode === exports.MeasureMode.EXACTLY) {
+        if (widthMode === MeasureMode.EXACTLY) {
             this.measuredWidth = maxWidth;
         }
-        else if (widthMode === exports.MeasureMode.AT_MOST) {
+        else if (widthMode === MeasureMode.AT_MOST) {
             this.measuredWidth = Math.min(netWidth, maxWidth);
         }
         else {
             this.measuredWidth = netWidth;
         }
-        if (heightMode === exports.MeasureMode.EXACTLY) {
+        if (heightMode === MeasureMode.EXACTLY) {
             this.measuredHeight = maxHeight;
         }
-        else if (heightMode === exports.MeasureMode.AT_MOST) {
+        else if (heightMode === MeasureMode.AT_MOST) {
             this.measuredHeight = Math.min(netHeight, maxHeight);
         }
         else {
@@ -19594,8 +16418,8 @@ class LinearLayout {
     }
     onMeasure(widthLimit, heightLimit, widthMode, heightMode) {
         const children = this.host.widgetChildren;
-        const baseWidthMode = widthMode === exports.MeasureMode.EXACTLY ? exports.MeasureMode.AT_MOST : widthMode;
-        const baseHeightMode = heightMode === exports.MeasureMode.EXACTLY ? exports.MeasureMode.AT_MOST : heightMode;
+        const baseWidthMode = widthMode === MeasureMode.EXACTLY ? MeasureMode.AT_MOST : widthMode;
+        const baseHeightMode = heightMode === MeasureMode.EXACTLY ? MeasureMode.AT_MOST : heightMode;
         let length = 0;
         let breadth = 0;
         for (let i = 0, j = children.length; i < j; i++) {
@@ -19603,8 +16427,8 @@ class LinearLayout {
             const lopt = (widget.layoutOptions || LayoutOptions.DEFAULT);
             const widgetWidthLimit = lopt.isWidthPredefined ? lopt.width : widthLimit;
             const widgetHeightLimit = lopt.isHeightPredefined ? lopt.height : heightLimit;
-            const widgetWidthMode = lopt.isWidthPredefined ? exports.MeasureMode.EXACTLY : baseWidthMode;
-            const widgetHeightMode = lopt.isHeightPredefined ? exports.MeasureMode.EXACTLY : baseHeightMode;
+            const widgetWidthMode = lopt.isWidthPredefined ? MeasureMode.EXACTLY : baseWidthMode;
+            const widgetHeightMode = lopt.isHeightPredefined ? MeasureMode.EXACTLY : baseHeightMode;
             widget.measure(widgetWidthLimit, widgetHeightLimit, widgetWidthMode, widgetHeightMode);
             if (this.orientation === 'vertical') {
                 breadth = Math.max(breadth, widget.getMeasuredWidth());
@@ -19720,7 +16544,7 @@ class Slider extends Widget {
                 : Slider.DEFAULT_VERTICAL_TRACK.clone()));
         this.handle = Widget.fromContent(options.handle || Slider.DEFAULT_HANDLE.clone());
         this.addChild(this.track, this.handle); // initialize(), update() usage
-        this._localCursor = new PIXI.Point();
+        this._localCursor = new Point$1();
         this.handle.contentContainer.buttonMode = true;
     }
     initialize() {
@@ -19908,24 +16732,24 @@ class Slider extends Widget {
             : Math.max(this.handle.contentContainer.height, this.track.contentContainer.height))
             + this.paddingVertical;
         switch (widthMode) {
-            case exports.MeasureMode.EXACTLY:
+            case MeasureMode.EXACTLY:
                 this._measuredWidth = width;
                 break;
-            case exports.MeasureMode.UNBOUNDED:
+            case MeasureMode.UNBOUNDED:
                 this._measuredWidth = naturalWidth;
                 break;
-            case exports.MeasureMode.AT_MOST:
+            case MeasureMode.AT_MOST:
                 this._measuredWidth = Math.min(width, naturalWidth);
                 break;
         }
         switch (heightMode) {
-            case exports.MeasureMode.EXACTLY:
+            case MeasureMode.EXACTLY:
                 this._measuredHeight = height;
                 break;
-            case exports.MeasureMode.UNBOUNDED:
+            case MeasureMode.UNBOUNDED:
                 this._measuredHeight = naturalHeight;
                 break;
-            case exports.MeasureMode.AT_MOST:
+            case MeasureMode.AT_MOST:
                 this._measuredHeight = Math.min(height, naturalHeight);
                 break;
         }
@@ -19950,7 +16774,7 @@ class Slider extends Widget {
         // scale (and it looks ugly.)
         track.insetContainer.width = track.width;
         track.insetContainer.height = track.height;
-        handle.measure(this.width, this.height, exports.MeasureMode.AT_MOST, exports.MeasureMode.AT_MOST);
+        handle.measure(this.width, this.height, MeasureMode.AT_MOST, MeasureMode.AT_MOST);
         this.layoutHandle();
     }
 }
@@ -19958,7 +16782,7 @@ class Slider extends Widget {
  * The default track for horizontally oriented sliders.
  * @static
  */
-Slider.DEFAULT_HORIZONTAL_TRACK = new PIXI.Graphics()
+Slider.DEFAULT_HORIZONTAL_TRACK = new Graphics()
     .beginFill(0xffffff, 1)
     .drawRect(0, 0, 16, 16) // natural width & height = 16
     .endFill()
@@ -19969,7 +16793,7 @@ Slider.DEFAULT_HORIZONTAL_TRACK = new PIXI.Graphics()
  * The default track for vertically oriented sliders.
  * @static
  */
-Slider.DEFAULT_VERTICAL_TRACK = new PIXI.Graphics()
+Slider.DEFAULT_VERTICAL_TRACK = new Graphics()
     .beginFill(0xffffff, 1)
     .drawRect(0, 0, 16, 16) // natural width & height = 16
     .endFill()
@@ -19979,7 +16803,7 @@ Slider.DEFAULT_VERTICAL_TRACK = new PIXI.Graphics()
 /**
  * @static
  */
-Slider.DEFAULT_HANDLE = new PIXI.Graphics()
+Slider.DEFAULT_HANDLE = new Graphics()
     .beginFill(0x000000)
     .drawCircle(16, 16, 8)
     .endFill()
@@ -20393,14 +17217,14 @@ class ScrollBar extends Slider {
 /**
  * @static
  */
-ScrollBar.DEFAULT_TRACK = new PIXI.Graphics()
+ScrollBar.DEFAULT_TRACK = new Graphics()
     .beginFill(0xffffff)
     .drawRect(0, 0, 8, 8)
     .endFill();
 /**
  * @static
  */
-ScrollBar.DEFAULT_HANDLE = new PIXI.Graphics()
+ScrollBar.DEFAULT_HANDLE = new Graphics()
     .beginFill(0x000000)
     .drawCircle(8, 8, 4)
     .endFill()
@@ -20486,7 +17310,7 @@ class ScrollWidget extends InteractiveGroup {
                 this.animating = true;
                 this.lastPosition.copyFrom(container.position);
                 this.targetPosition.copyFrom(container.position);
-                PIXI.Ticker.shared.add(this.updateScrollPosition);
+                Ticker$2.shared.add(this.updateScrollPosition);
             }
         };
         /**
@@ -20502,7 +17326,7 @@ class ScrollWidget extends InteractiveGroup {
                 this.updateDirection('y', delta);
             }
             if (this.stop) {
-                PIXI.Ticker.shared.remove(this.updateScrollPosition);
+                Ticker$2.shared.remove(this.updateScrollPosition);
                 this.animating = false;
             }
             this.updateScrollBars();
@@ -20561,9 +17385,9 @@ class ScrollWidget extends InteractiveGroup {
             }
             container.position[direction] = Math.round(scrollPosition[direction]);
         };
-        this.mask = new PIXI.Graphics();
+        this.mask = new Graphics();
         this.innerContainer = new InteractiveGroup();
-        this.innerBounds = new PIXI.Rectangle();
+        this.innerBounds = new Rectangle$1();
         super.addChild(this.innerContainer);
         this.contentContainer.addChild(this.mask);
         this.contentContainer.mask = this.mask;
@@ -20575,20 +17399,20 @@ class ScrollWidget extends InteractiveGroup {
         this.expandMask = options.expandMask || 0;
         this.overflowY = options.overflowY || 0;
         this.overflowX = options.overflowX || 0;
-        this.scrollVelocity = new PIXI.Point();
+        this.scrollVelocity = new Point$1();
         /**
          * Widget's position in a scroll.
          * @member {PIXI.Point}
          * @private
          */
-        this.scrollPosition = new PIXI.Point();
+        this.scrollPosition = new Point$1();
         /**
          * Position that the cursor is at, i.e. our scroll "target".
          * @member {PIXI.Point}
          * @private
          */
-        this.targetPosition = new PIXI.Point();
-        this.lastPosition = new PIXI.Point();
+        this.targetPosition = new Point$1();
+        this.lastPosition = new Point$1();
         this.useLayout(new BorderLayout());
         this.animating = false;
         this.scrolling = false;
@@ -20604,8 +17428,8 @@ class ScrollWidget extends InteractiveGroup {
                 width: LayoutOptions.FILL_PARENT,
                 height: LayoutOptions.WRAP_CONTENT,
                 region: BorderLayoutOptions.REGION_BOTTOM,
-                horizontalAlign: exports.ALIGN.CENTER,
-                verticalAlign: exports.ALIGN.BOTTOM,
+                horizontalAlign: ALIGN.CENTER,
+                verticalAlign: ALIGN.BOTTOM,
             }))
                 .setBackground(0xff)
                 .setBackgroundAlpha(0.8);
@@ -20623,8 +17447,8 @@ class ScrollWidget extends InteractiveGroup {
                 width: LayoutOptions.WRAP_CONTENT,
                 height: LayoutOptions.FILL_PARENT,
                 region: BorderLayoutOptions.REGION_RIGHT,
-                horizontalAlign: exports.ALIGN.RIGHT,
-                verticalAlign: exports.ALIGN.CENTER,
+                horizontalAlign: ALIGN.RIGHT,
+                verticalAlign: ALIGN.CENTER,
             }))
                 .setBackground(0xff)
                 .setBackgroundAlpha(0.8);
@@ -20716,7 +17540,7 @@ class ScrollWidget extends InteractiveGroup {
     }
     initScrolling() {
         const container = this.innerContainer.insetContainer;
-        const realPosition = new PIXI.Point();
+        const realPosition = new Point$1();
         const { scrollPosition, targetPosition, } = this;
         // Drag scroll
         if (this.dragScrolling) {
@@ -20748,7 +17572,7 @@ class ScrollWidget extends InteractiveGroup {
             };
         }
         // Mouse scroll
-        const scrollSpeed = new PIXI.Point();
+        const scrollSpeed = new Point$1();
         const scroll = new ScrollManager(this, true);
         scroll.onMouseScroll = (e, delta) => {
             scrollSpeed.set(-delta.x * 0.2, -delta.y * 0.2);
@@ -20947,38 +17771,38 @@ class SliceSprite extends Widget {
         const { f, bw } = this;
         // get frames
         if (this.vs && this.hs) {
-            this.ftl = new PIXI.Rectangle(f.x, f.y, bw, bw);
-            this.ftr = new PIXI.Rectangle(f.x + f.width - bw, f.y, bw, bw);
-            this.fbl = new PIXI.Rectangle(f.x, f.y + f.height - bw, bw, bw);
-            this.fbr = new PIXI.Rectangle(f.x + f.width - bw, f.y + f.height - bw, bw, bw);
-            this.ft = new PIXI.Rectangle(f.x + bw, f.y, f.width - bw * 2, bw);
-            this.fb = new PIXI.Rectangle(f.x + bw, f.y + f.height - bw, f.width - bw * 2, bw);
-            this.fl = new PIXI.Rectangle(f.x, f.y + bw, bw, f.height - bw * 2);
-            this.fr = new PIXI.Rectangle(f.x + f.width - bw, f.y + bw, bw, f.height - bw * 2);
-            this.ff = new PIXI.Rectangle(f.x + bw, f.y + bw, f.width - bw * 2, f.height - bw * 2);
+            this.ftl = new Rectangle$1(f.x, f.y, bw, bw);
+            this.ftr = new Rectangle$1(f.x + f.width - bw, f.y, bw, bw);
+            this.fbl = new Rectangle$1(f.x, f.y + f.height - bw, bw, bw);
+            this.fbr = new Rectangle$1(f.x + f.width - bw, f.y + f.height - bw, bw, bw);
+            this.ft = new Rectangle$1(f.x + bw, f.y, f.width - bw * 2, bw);
+            this.fb = new Rectangle$1(f.x + bw, f.y + f.height - bw, f.width - bw * 2, bw);
+            this.fl = new Rectangle$1(f.x, f.y + bw, bw, f.height - bw * 2);
+            this.fr = new Rectangle$1(f.x + f.width - bw, f.y + bw, bw, f.height - bw * 2);
+            this.ff = new Rectangle$1(f.x + bw, f.y + bw, f.width - bw * 2, f.height - bw * 2);
         }
         else if (this.hs) {
-            this.fl = new PIXI.Rectangle(this.f.x, f.y, bw, f.height);
-            this.fr = new PIXI.Rectangle(f.x + f.width - bw, f.y, bw, f.height);
-            this.ff = new PIXI.Rectangle(f.x + bw, f.y, f.width - bw * 2, f.height);
+            this.fl = new Rectangle$1(this.f.x, f.y, bw, f.height);
+            this.fr = new Rectangle$1(f.x + f.width - bw, f.y, bw, f.height);
+            this.ff = new Rectangle$1(f.x + bw, f.y, f.width - bw * 2, f.height);
         }
         else { // vs
-            this.ft = new PIXI.Rectangle(f.x, f.y, f.width, bw);
-            this.fb = new PIXI.Rectangle(f.x, f.y + f.height - bw, f.width, bw);
-            this.ff = new PIXI.Rectangle(f.x, f.y + bw, f.width, f.height - bw * 2);
+            this.ft = new Rectangle$1(f.x, f.y, f.width, bw);
+            this.fb = new Rectangle$1(f.x, f.y + f.height - bw, f.width, bw);
+            this.ff = new Rectangle$1(f.x, f.y + bw, f.width, f.height - bw * 2);
         }
         // TODO: swap frames if rotation
         const { t, ff, fl, fr, ft, fb } = this;
         // make sprites
         this.sf = this.tile
-            ? new PIXI.extras.TilingSprite(new PIXI.Texture(t, ff))
-            : new PIXI.Sprite(new PIXI.Texture(t, ff));
+            ? new extras.TilingSprite(new Texture$1(t, ff))
+            : new Sprite$1(new Texture$1(t, ff));
         this.contentContainer.addChildAt(this.sf, 0);
         if (this.vs && this.hs) {
-            this.stl = new PIXI.Sprite(new PIXI.Texture(t, this.ftl));
-            this.str = new PIXI.Sprite(new PIXI.Texture(t, this.ftr));
-            this.sbl = new PIXI.Sprite(new PIXI.Texture(t, this.fbl));
-            this.sbr = new PIXI.Sprite(new PIXI.Texture(t, this.fbr));
+            this.stl = new Sprite$1(new Texture$1(t, this.ftl));
+            this.str = new Sprite$1(new Texture$1(t, this.ftr));
+            this.sbl = new Sprite$1(new Texture$1(t, this.fbl));
+            this.sbr = new Sprite$1(new Texture$1(t, this.fbr));
             this.contentContainer.addChildAt(this.stl, 0);
             this.contentContainer.addChildAt(this.str, 0);
             this.contentContainer.addChildAt(this.sbl, 0);
@@ -20986,21 +17810,21 @@ class SliceSprite extends Widget {
         }
         if (hs) {
             this.sl = this.tile
-                ? new PIXI.extras.TilingSprite(new PIXI.Texture(t, fl))
-                : new PIXI.Sprite(new PIXI.Texture(t, fl));
+                ? new extras.TilingSprite(new Texture$1(t, fl))
+                : new Sprite$1(new Texture$1(t, fl));
             this.sr = this.tile
-                ? new PIXI.extras.TilingSprite(new PIXI.Texture(t, fr))
-                : new PIXI.Sprite(new PIXI.Texture(t, fr));
+                ? new extras.TilingSprite(new Texture$1(t, fr))
+                : new Sprite$1(new Texture$1(t, fr));
             this.contentContainer.addChildAt(this.sl, 0);
             this.contentContainer.addChildAt(this.sr, 0);
         }
         if (this.vs) {
             this.st = this.tile
-                ? new PIXI.extras.TilingSprite(new PIXI.Texture(t, ft))
-                : new PIXI.Sprite(new PIXI.Texture(t, ft));
+                ? new extras.TilingSprite(new Texture$1(t, ft))
+                : new Sprite$1(new Texture$1(t, ft));
             this.sb = this.tile
-                ? new PIXI.extras.TilingSprite(new PIXI.Texture(t, fb))
-                : new PIXI.Sprite(new PIXI.Texture(t, fb));
+                ? new extras.TilingSprite(new Texture$1(t, fb))
+                : new Sprite$1(new Texture$1(t, fb));
             this.contentContainer.addChildAt(this.st, 0);
             this.contentContainer.addChildAt(this.sb, 0);
         }
@@ -21031,7 +17855,7 @@ class SliceSprite extends Widget {
     }
 }
 
-class Controller extends PIXI.utils.EventEmitter {
+class Controller extends utils.EventEmitter {
     constructor(stage) {
         super();
         this.stage = stage;
@@ -21325,7 +18149,7 @@ class FocusController extends Controller {
  * @class
  * @extends PIXI.Container
  */
-class Stage extends PIXI.Container {
+class Stage extends Container {
     /**
      * @param {number} width - width of the stage
      * @param {number} height - height of the stage
@@ -21339,7 +18163,7 @@ class Stage extends PIXI.Container {
         this.widgetChildren = [];
         this.interactive = true;
         this.stage = this;
-        this.hitArea = new PIXI.Rectangle(0, 0, 0, 0);
+        this.hitArea = new Rectangle$1(0, 0, 0, 0);
         this.initialized = true;
         this.resize(width, height);
         this._checkBoxGroupCtl = new Stage.CHECK_BOX_GROUP_CONTROLLER(this);
@@ -21354,14 +18178,14 @@ class Stage extends PIXI.Container {
             const widget = this.widgetChildren[i];
             const lopt = (widget.layoutOptions || LayoutOptions.DEFAULT);
             const widthMeasureMode = lopt.width < LayoutOptions.MAX_DIMEN
-                ? exports.MeasureMode.EXACTLY
-                : exports.MeasureMode.AT_MOST;
+                ? MeasureMode.EXACTLY
+                : MeasureMode.AT_MOST;
             const heightMeasureMode = lopt.height < LayoutOptions.MAX_DIMEN
-                ? exports.MeasureMode.EXACTLY
-                : exports.MeasureMode.AT_MOST;
+                ? MeasureMode.EXACTLY
+                : MeasureMode.AT_MOST;
             const loptWidth = (Math.abs(lopt.width) < 1) ? lopt.width * this.width : lopt.width;
             const loptHeight = (Math.abs(lopt.height) < 1) ? lopt.height * this.height : lopt.height;
-            widget.measure(widthMeasureMode === exports.MeasureMode.EXACTLY ? loptWidth : this.width, heightMeasureMode === exports.MeasureMode.EXACTLY ? loptHeight : this.height, widthMeasureMode, heightMeasureMode);
+            widget.measure(widthMeasureMode === MeasureMode.EXACTLY ? loptWidth : this.width, heightMeasureMode === MeasureMode.EXACTLY ? loptHeight : this.height, widthMeasureMode, heightMeasureMode);
             let x = lopt.x ? lopt.x : 0;
             let y = lopt.y ? lopt.y : 0;
             if (Math.abs(x) < 1) {
@@ -21505,7 +18329,7 @@ Stage.FOCUS_CONTROLLER = FocusController;
 /**
  * A StyleSheet provides a mechansim to style widgets in a shared fashion.
  */
-class Style extends PIXI.utils.EventEmitter {
+class Style extends utils.EventEmitter {
     constructor(data = {}) {
         super();
         this.onParentSetProperty = (propertyName, value, style) => {
@@ -22025,19 +18849,19 @@ class TextInput extends FocusableWidget {
         this.color = options.style && options.style.fill ? options.style.fill : '#000000';
         this.selectedColor = options.selectedColor || '#ffffff';
         this.selectedBackgroundColor = options.selectedBackgroundColor || '#318cfa';
-        this.tempText = new PIXI.Text('1', options.style);
+        this.tempText = new Text('1', options.style);
         this.textHeight = this.tempText.height;
         this.lineHeight = options.lineHeight || this.textHeight || this._height;
         this.tempText.destroy();
         // set cursor
         // this.container.cursor = "text";
         // selection graphics
-        this.selection = new PIXI.Graphics();
+        this.selection = new Graphics();
         this.selection.visible = false;
         this.selection._startIndex = 0;
         this.selection._endIndex = 0;
         // caret graphics
-        this.caret = new PIXI.Graphics();
+        this.caret = new Graphics();
         this.caret.visible = false;
         this.caret._index = 0;
         this.caret.lineStyle(options.caretWidth || 1, '#ffffff', 1);
@@ -22067,10 +18891,10 @@ class TextInput extends FocusableWidget {
             this.dragThreshold = 5;
         }
         // selection Vars
-        this.sp = new PIXI.Point(); // startposition
-        this._sp = new PIXI.Point();
-        this.ds = new PIXI.Point(); // dragStart
-        this.de = new PIXI.Point(); // dragend
+        this.sp = new Point$1(); // startposition
+        this._sp = new Point$1();
+        this.ds = new Point$1(); // dragStart
+        this.de = new Point$1(); // dragend
         this.rdd = false; // Reverse drag direction
         this.vrdd = false; // vertical Reverse drag direction
         this.selectionStart = -1;
@@ -22211,7 +19035,7 @@ class TextInput extends FocusableWidget {
             }
             let charText = this.chars[i];
             if (!charText) {
-                charText = new PIXI.Text(c, this.options.style);
+                charText = new Text(c, this.options.style);
                 this.innerContainer.addChild(charText);
                 this.chars.push(charText);
             }
@@ -22418,7 +19242,7 @@ class TextInput extends FocusableWidget {
  */
 class TilingSprite extends Widget {
     constructor(t, width, height) {
-        const sprite = new PIXI.extras.TilingSprite(t);
+        const sprite = new extras.TilingSprite(t);
         super(width || sprite.width, height || sprite.height);
         this.sprite = sprite;
         this.contentContainer.addChild(this.sprite);
@@ -22460,7 +19284,7 @@ class TilingSprite extends Widget {
  * @class
  * @extends PIXI.utils.EventEmitter
  */
-class Ticker$1 extends PIXI.utils.EventEmitter {
+class Ticker$1 extends utils.EventEmitter {
     constructor(autoStart) {
         super();
         this._disabled = true;
@@ -22514,6 +19338,19 @@ class Ticker$1 extends PIXI.utils.EventEmitter {
 }
 Ticker$1.shared = new Ticker$1(true);
 
+export { ALIGN, AnchorLayout, AnchorLayoutOptions, BorderLayout, BorderLayoutOptions, Button, CheckBox, ClickManager, Ease, EventBroker, EventManager, FastLayout, FastLayoutOptions, FocusableWidget, Helpers, ImageButton, ImageWidget, Insets, InteractiveGroup, LayoutOptions, LinearLayout, MeasureMode, ScrollBar, ScrollManager, ScrollWidget, SliceSprite, Slider, SortableList, Sprite, Stage, Style, StyleSheet, TEXT_STYLE_PROPERTIES, TextInput, TextWidget, Ticker$1 as Ticker, TilingSprite, Widget, WidgetGroup, create, wrapEase };
+//# sourceMappingURL=puxi-core.js.map
+ontext);
+    }
+    static once(event, fn, context) {
+        Ticker$1.shared.once(event, fn, context);
+    }
+    static removeListener(event, fn) {
+        Ticker$1.shared.removeListener(event, fn);
+    }
+}
+Ticker$1.shared = new Ticker$1(true);
+
 exports.AnchorLayout = AnchorLayout;
 exports.AnchorLayoutOptions = AnchorLayoutOptions;
 exports.BorderLayout = BorderLayout;
@@ -22526,6 +19363,7 @@ exports.EventBroker = EventBroker;
 exports.EventManager = EventManager;
 exports.FastLayout = FastLayout;
 exports.FastLayoutOptions = FastLayoutOptions;
+exports.FocusableWidget = FocusableWidget;
 exports.Helpers = Helpers;
 exports.ImageButton = ImageButton;
 exports.ImageWidget = ImageWidget;

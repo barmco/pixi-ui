@@ -2,7 +2,6 @@
 /// <reference types="pixi.js" />
 import * as PIXI from 'pixi.js';
 import { Texture } from 'pixi.js';
-import { Texture as Texture_2 } from '@pixi/core';
 
 /**
  * Alignments supported by layout managers in PuxiJS core.

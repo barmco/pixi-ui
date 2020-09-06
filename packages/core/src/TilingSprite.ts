@@ -13,11 +13,11 @@ import { Widget } from './Widget';
  */
 export class TilingSprite extends Widget
 {
-    protected sprite: PIXI.extras.TilingSprite;
+    protected sprite: PIXI.TilingSprite;
 
     constructor(t, width: number, height: number)
     {
-        const sprite = new PIXI.extras.TilingSprite(t);
+        const sprite = new PIXI.TilingSprite(t);
 
         super(width || sprite.width, height || sprite.height);
 

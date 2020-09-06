@@ -1,6 +1,6 @@
 /*!
  * @puxi/kit - v1.0.1
- * Compiled Thu, 13 Aug 2020 09:22:45 UTC
+ * Compiled Sun, 06 Sep 2020 04:47:42 UTC
  *
  * @puxi/kit is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license

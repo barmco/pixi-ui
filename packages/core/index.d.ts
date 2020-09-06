@@ -859,7 +859,7 @@ declare interface IFocusableOptions {
 }
 
 export declare interface IImageButtonOptions extends IButtonOptions {
-    icon: string | Texture_2 | ImageWidget;
+    icon: string | Texture | ImageWidget;
 }
 
 export declare interface ILayoutManager extends IMeasurable {

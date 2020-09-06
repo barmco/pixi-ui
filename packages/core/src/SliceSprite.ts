@@ -149,7 +149,7 @@ export class SliceSprite extends Widget
 
         // make sprites
         this.sf = this.tile
-            ? new PIXI.extras.TilingSprite(new PIXI.Texture(t, ff))
+            ? new PIXI.TilingSprite(new PIXI.Texture(t, ff))
             : new PIXI.Sprite(new PIXI.Texture(t, ff));
         this.contentContainer.addChildAt(this.sf, 0);
 
@@ -167,10 +167,10 @@ export class SliceSprite extends Widget
         if (hs)
         {
             this.sl = this.tile
-                ? new PIXI.extras.TilingSprite(new PIXI.Texture(t, fl))
+                ? new PIXI.TilingSprite(new PIXI.Texture(t, fl))
                 : new PIXI.Sprite(new PIXI.Texture(t, fl));
             this.sr = this.tile
-                ? new PIXI.extras.TilingSprite(new PIXI.Texture(t, fr))
+                ? new PIXI.TilingSprite(new PIXI.Texture(t, fr))
                 : new PIXI.Sprite(new PIXI.Texture(t, fr));
 
             this.contentContainer.addChildAt(this.sl, 0);
@@ -179,10 +179,10 @@ export class SliceSprite extends Widget
         if (this.vs)
         {
             this.st = this.tile
-                ? new PIXI.extras.TilingSprite(new PIXI.Texture(t, ft))
+                ? new PIXI.TilingSprite(new PIXI.Texture(t, ft))
                 : new PIXI.Sprite(new PIXI.Texture(t, ft));
             this.sb = this.tile
-                ? new PIXI.extras.TilingSprite(new PIXI.Texture(t, fb))
+                ? new PIXI.TilingSprite(new PIXI.Texture(t, fb))
                 : new PIXI.Sprite(new PIXI.Texture(t, fb));
             this.contentContainer.addChildAt(this.st, 0);
             this.contentContainer.addChildAt(this.sb, 0);

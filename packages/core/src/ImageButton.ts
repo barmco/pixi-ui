@@ -1,6 +1,6 @@
 import { IButtonOptions, Button } from './Button';
 import { ImageWidget } from './Sprite';
-import { Texture } from '@pixi/core';
+import { Texture } from 'pixi.js';
 import { LinearLayout } from './layout-manager';
 
 export interface IImageButtonOptions extends IButtonOptions

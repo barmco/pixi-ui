@@ -1,6 +1,6 @@
 /*!
  * @puxi/core - v1.0.1
- * Compiled Sun, 06 Sep 2020 04:57:19 UTC
+ * Compiled Sun, 06 Sep 2020 05:01:24 UTC
  *
  * @puxi/core is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
@@ -6081,7 +6081,7 @@ var _puxi_core = (function (exports, PIXI, filterDropShadow) {
      */
     class TilingSprite extends Widget {
         constructor(t, width, height) {
-            const sprite = new PIXI.extras.TilingSprite(t);
+            const sprite = new PIXI.TilingSprite(t);
             super(width || sprite.width, height || sprite.height);
             this.sprite = sprite;
             this.contentContainer.addChild(this.sprite);

@@ -1,12 +1,12 @@
 /*!
  * @puxi/core - v1.0.1
- * Compiled Sun, 06 Sep 2020 04:57:19 UTC
+ * Compiled Sun, 06 Sep 2020 05:01:24 UTC
  *
  * @puxi/core is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
  */
 // mjs
-import { Point, utils, Container, BLEND_MODES, Graphics, Rectangle, Text, TextStyle, Sprite as Sprite$1, Texture, BaseTexture, Ticker as Ticker$1, TilingSprite as TilingSprite$1, extras } from 'pixi.js';
+import { Point, utils, Container, BLEND_MODES, Graphics, Rectangle, Text, TextStyle, Sprite as Sprite$1, Texture, BaseTexture, Ticker as Ticker$1, TilingSprite as TilingSprite$1 } from 'pixi.js';
 import { DropShadowFilter } from '@pixi/filter-drop-shadow';
 
 const _items = [];
@@ -6049,7 +6049,7 @@ class TextInput extends FocusableWidget {
  */
 class TilingSprite extends Widget {
     constructor(t, width, height) {
-        const sprite = new extras.TilingSprite(t);
+        const sprite = new TilingSprite$1(t);
         super(width || sprite.width, height || sprite.height);
         this.sprite = sprite;
         this.contentContainer.addChild(this.sprite);
@@ -6146,4 +6146,60 @@ class Ticker extends utils.EventEmitter {
 Ticker.shared = new Ticker(true);
 
 export { ALIGN, AnchorLayout, AnchorLayoutOptions, BorderLayout, BorderLayoutOptions, Button, CheckBox, ClickManager, Ease, EventBroker, EventManager, FastLayout, FastLayoutOptions, FocusableWidget, Helpers, ImageButton, ImageWidget, Insets, InteractiveGroup, LayoutOptions, LinearLayout, MeasureMode, ScrollBar, ScrollManager, ScrollWidget, SliceSprite, Slider, SortableList, Sprite, Stage, Style, StyleSheet, TEXT_STYLE_PROPERTIES, TextInput, TextWidget, Ticker, TilingSprite, Widget, WidgetGroup, create, wrapEase };
+//# sourceMappingURL=puxi-core.js.map
+ if (!Ticker.shared._disabled) {
+            requestAnimationFrame(Ticker.shared.update);
+        }
+    }
+    static on(event, fn, context) {
+        Ticker.shared.on(event, fn, context);
+    }
+    static once(event, fn, context) {
+        Ticker.shared.once(event, fn, context);
+    }
+    static removeListener(event, fn) {
+        Ticker.shared.removeListener(event, fn);
+    }
+}
+Ticker.shared = new Ticker(true);
+
+exports.AnchorLayout = AnchorLayout;
+exports.AnchorLayoutOptions = AnchorLayoutOptions;
+exports.BorderLayout = BorderLayout;
+exports.BorderLayoutOptions = BorderLayoutOptions;
+exports.Button = Button;
+exports.CheckBox = CheckBox;
+exports.ClickManager = ClickManager;
+exports.Ease = Ease;
+exports.EventBroker = EventBroker;
+exports.EventManager = EventManager;
+exports.FastLayout = FastLayout;
+exports.FastLayoutOptions = FastLayoutOptions;
+exports.FocusableWidget = FocusableWidget;
+exports.Helpers = Helpers;
+exports.ImageButton = ImageButton;
+exports.ImageWidget = ImageWidget;
+exports.Insets = Insets;
+exports.InteractiveGroup = InteractiveGroup;
+exports.LayoutOptions = LayoutOptions;
+exports.LinearLayout = LinearLayout;
+exports.ScrollBar = ScrollBar;
+exports.ScrollManager = ScrollManager;
+exports.ScrollWidget = ScrollWidget;
+exports.SliceSprite = SliceSprite;
+exports.Slider = Slider;
+exports.SortableList = SortableList;
+exports.Sprite = Sprite;
+exports.Stage = Stage;
+exports.Style = Style;
+exports.StyleSheet = StyleSheet;
+exports.TEXT_STYLE_PROPERTIES = TEXT_STYLE_PROPERTIES;
+exports.TextInput = TextInput;
+exports.TextWidget = TextWidget;
+exports.Ticker = Ticker;
+exports.TilingSprite = TilingSprite;
+exports.Widget = Widget;
+exports.WidgetGroup = WidgetGroup;
+exports.create = create;
+exports.wrapEase = wrapEase;
 //# sourceMappingURL=puxi-core.js.map

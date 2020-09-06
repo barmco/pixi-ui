@@ -1,12 +1,12 @@
 /*!
  * @puxi/core - v1.0.1
- * Compiled Sun, 06 Sep 2020 04:47:42 UTC
+ * Compiled Sun, 06 Sep 2020 04:57:19 UTC
  *
  * @puxi/core is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
  */
 // mjs
-import { Point, utils, Container, BLEND_MODES, Graphics, Rectangle, Text, TextStyle, Sprite as Sprite$1, Texture, BaseTexture, Ticker as Ticker$1, extras } from 'pixi.js';
+import { Point, utils, Container, BLEND_MODES, Graphics, Rectangle, Text, TextStyle, Sprite as Sprite$1, Texture, BaseTexture, Ticker as Ticker$1, TilingSprite as TilingSprite$1, extras } from 'pixi.js';
 import { DropShadowFilter } from '@pixi/filter-drop-shadow';
 
 const _items = [];
@@ -4602,7 +4602,7 @@ class SliceSprite extends Widget {
         const { t, ff, fl, fr, ft, fb } = this;
         // make sprites
         this.sf = this.tile
-            ? new extras.TilingSprite(new Texture(t, ff))
+            ? new TilingSprite$1(new Texture(t, ff))
             : new Sprite$1(new Texture(t, ff));
         this.contentContainer.addChildAt(this.sf, 0);
         if (this.vs && this.hs) {
@@ -4617,20 +4617,20 @@ class SliceSprite extends Widget {
         }
         if (hs) {
             this.sl = this.tile
-                ? new extras.TilingSprite(new Texture(t, fl))
+                ? new TilingSprite$1(new Texture(t, fl))
                 : new Sprite$1(new Texture(t, fl));
             this.sr = this.tile
-                ? new extras.TilingSprite(new Texture(t, fr))
+                ? new TilingSprite$1(new Texture(t, fr))
                 : new Sprite$1(new Texture(t, fr));
             this.contentContainer.addChildAt(this.sl, 0);
             this.contentContainer.addChildAt(this.sr, 0);
         }
         if (this.vs) {
             this.st = this.tile
-                ? new extras.TilingSprite(new Texture(t, ft))
+                ? new TilingSprite$1(new Texture(t, ft))
                 : new Sprite$1(new Texture(t, ft));
             this.sb = this.tile
-                ? new extras.TilingSprite(new Texture(t, fb))
+                ? new TilingSprite$1(new Texture(t, fb))
                 : new Sprite$1(new Texture(t, fb));
             this.contentContainer.addChildAt(this.st, 0);
             this.contentContainer.addChildAt(this.sb, 0);

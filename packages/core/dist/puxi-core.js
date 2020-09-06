@@ -1,6 +1,6 @@
 /*!
  * @puxi/core - v1.0.1
- * Compiled Sun, 06 Sep 2020 04:47:42 UTC
+ * Compiled Sun, 06 Sep 2020 04:57:19 UTC
  *
  * @puxi/core is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
@@ -4634,7 +4634,7 @@ var _puxi_core = (function (exports, PIXI, filterDropShadow) {
             const { t, ff, fl, fr, ft, fb } = this;
             // make sprites
             this.sf = this.tile
-                ? new PIXI.extras.TilingSprite(new PIXI.Texture(t, ff))
+                ? new PIXI.TilingSprite(new PIXI.Texture(t, ff))
                 : new PIXI.Sprite(new PIXI.Texture(t, ff));
             this.contentContainer.addChildAt(this.sf, 0);
             if (this.vs && this.hs) {
@@ -4649,20 +4649,20 @@ var _puxi_core = (function (exports, PIXI, filterDropShadow) {
             }
             if (hs) {
                 this.sl = this.tile
-                    ? new PIXI.extras.TilingSprite(new PIXI.Texture(t, fl))
+                    ? new PIXI.TilingSprite(new PIXI.Texture(t, fl))
                     : new PIXI.Sprite(new PIXI.Texture(t, fl));
                 this.sr = this.tile
-                    ? new PIXI.extras.TilingSprite(new PIXI.Texture(t, fr))
+                    ? new PIXI.TilingSprite(new PIXI.Texture(t, fr))
                     : new PIXI.Sprite(new PIXI.Texture(t, fr));
                 this.contentContainer.addChildAt(this.sl, 0);
                 this.contentContainer.addChildAt(this.sr, 0);
             }
             if (this.vs) {
                 this.st = this.tile
-                    ? new PIXI.extras.TilingSprite(new PIXI.Texture(t, ft))
+                    ? new PIXI.TilingSprite(new PIXI.Texture(t, ft))
                     : new PIXI.Sprite(new PIXI.Texture(t, ft));
                 this.sb = this.tile
-                    ? new PIXI.extras.TilingSprite(new PIXI.Texture(t, fb))
+                    ? new PIXI.TilingSprite(new PIXI.Texture(t, fb))
                     : new PIXI.Sprite(new PIXI.Texture(t, fb));
                 this.contentContainer.addChildAt(this.st, 0);
                 this.contentContainer.addChildAt(this.sb, 0);

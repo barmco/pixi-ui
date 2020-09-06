@@ -1,6 +1,6 @@
 /*!
  * @puxi/core - v1.0.1
- * Compiled Sun, 06 Sep 2020 05:01:24 UTC
+ * Compiled Sun, 06 Sep 2020 09:08:24 UTC
  *
  * @puxi/core is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
@@ -680,7 +680,7 @@ class Widget extends utils.EventEmitter {
      */
     update() {
         if (this._layoutDirty) {
-            console.log('here');
+            // console.log('here');
             setTimeout(() => {
                 if (this._layoutDirty) {
                     this.stage.measureAndLayout();

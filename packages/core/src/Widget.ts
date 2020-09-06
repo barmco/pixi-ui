@@ -169,7 +169,7 @@ export class Widget extends PIXI.utils.EventEmitter implements IMeasurable
     {
         if (this._layoutDirty)
         {
-            console.log('here');
+            // console.log('here');
             setTimeout(() =>
             {
                 if (this._layoutDirty)

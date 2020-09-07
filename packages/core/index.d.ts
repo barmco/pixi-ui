@@ -1765,7 +1765,7 @@ export declare class TextInput extends FocusableWidget {
  * @public
  */
 export declare class TextWidget extends Widget {
-    public textDisplay;
+    public textDisplay: PIXI.Text;
     /**
      * @param {string} text - text content
      * @param {PIXI.TextStyle} textStyle - styled used for text

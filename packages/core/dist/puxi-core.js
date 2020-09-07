@@ -1,6 +1,6 @@
 /*!
  * @puxi/core - v1.0.1
- * Compiled Mon, 07 Sep 2020 07:09:39 UTC
+ * Compiled Mon, 07 Sep 2020 07:32:13 UTC
  *
  * @puxi/core is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
@@ -2160,6 +2160,7 @@ var _puxi_core = (function (exports, PIXI, filterDropShadow) {
             super.update();
             if (this.tint !== null) {
                 this.textDisplay.tint = this.tint;
+                this.textDisplay.style.fill = this.tint;
             }
             if (this.blendMode !== null) {
                 this.textDisplay.blendMode = this.blendMode;

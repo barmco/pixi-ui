@@ -31,6 +31,7 @@ export class TextWidget extends Widget
         if (this.tint !== null)
         {
             this.textDisplay.tint = this.tint;
+            this.textDisplay.style.fill = this.tint;
         }
 
         if (this.blendMode !== null)

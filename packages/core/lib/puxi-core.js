@@ -1,6 +1,6 @@
 /*!
  * @puxi/core - v1.0.1
- * Compiled Mon, 07 Sep 2020 07:44:57 UTC
+ * Compiled Mon, 07 Sep 2020 08:34:11 UTC
  *
  * @puxi/core is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
@@ -2158,6 +2158,10 @@ class TextWidget extends Widget {
     }
     update() {
         super.update();
+        const fill = this.textDisplay.style.fill;
+        if (!this.tint && typeof (fill) == "string" && fill.startsWith("#")) {
+            this.tint = parseInt(fill.slice(1), 16);
+        }
         if (this.tint !== null) {
             this.textDisplay.tint = this.tint;
             this.textDisplay.style.fill = this.tint;

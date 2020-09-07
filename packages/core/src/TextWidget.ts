@@ -28,6 +28,11 @@ export class TextWidget extends Widget
     {
         super.update();
 
+        const fill = this.textDisplay.style.fill
+        if (!this.tint && typeof(fill) == "string" && fill.startsWith("#")) {
+            this.tint = parseInt(fill.slice(1), 16)
+        }
+
         if (this.tint !== null)
         {
             this.textDisplay.tint = this.tint;

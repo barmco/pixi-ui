@@ -10,7 +10,7 @@ import { Style } from './Style';
  */
 export class TextWidget extends Widget
 {
-    private textDisplay: PIXI.Text;
+    public textDisplay: PIXI.Text;
 
     /**
      * @param {string} text - text content

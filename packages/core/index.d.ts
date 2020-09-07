@@ -1881,6 +1881,7 @@ export declare class Widget extends PIXI.utils.EventEmitter implements IMeasurab
     protected isDragging: boolean;
     private draggable;
     private droppable;
+    tint: number;
     dirty: boolean;
     _oldWidth: number;
     _oldHeight: number;
@@ -1888,7 +1889,6 @@ export declare class Widget extends PIXI.utils.EventEmitter implements IMeasurab
     parent: Widget;
     layoutMeasure: Insets;
     layoutOptions: LayoutOptions;
-    protected tint: number;
     protected blendMode: PIXI.BLEND_MODES;
     protected background: PIXI.Container;
     protected _measuredWidth: number;

@@ -50,7 +50,8 @@ export class Widget extends PIXI.utils.EventEmitter implements IMeasurable
 
     private draggable: boolean;
     private droppable: boolean;
-
+    
+    tint: number;
     dirty: boolean;
     _oldWidth: number;
     _oldHeight: number;
@@ -61,7 +62,6 @@ export class Widget extends PIXI.utils.EventEmitter implements IMeasurable
     public layoutMeasure: Insets;
     public layoutOptions: LayoutOptions;
 
-    protected tint: number;
     protected blendMode: PIXI.BLEND_MODES;
     protected background: PIXI.Container;
     protected _measuredWidth: number;

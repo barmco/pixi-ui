@@ -55,57 +55,57 @@ function initMockDOMInput(): void
  */
 export class TextInput extends FocusableWidget
 {
-    private options: ITextInputOptions;
+    protected options: ITextInputOptions;
 
-    private _dirtyText: boolean;
-    private _value: string;
-    private _lastValue: string;
+    protected _dirtyText: boolean;
+    protected _value: string;
+    protected _lastValue: string;
 
-    private _lastWidth: number;
-    private _lastHeight: number;
+    protected _lastWidth: number;
+    protected _lastHeight: number;
 
-    private selection: PIXI.Graphics;
-    private textContainer: ScrollWidget;
+    protected selection: PIXI.Graphics;
+    protected textContainer: ScrollWidget;
 
     public maxLength: number;
 
-    private chars: any[];
-    private multiLine: boolean;
-    private color: string;
-    private selectedColor: string;
-    private selectedBackgroundColor: string;
-    private tempText: PIXI.Text;
-    private textHeight: number;
-    private lineHeight: number;
+    protected chars: any[];
+    protected multiLine: boolean;
+    protected color: string;
+    protected selectedColor: string;
+    protected selectedBackgroundColor: string;
+    protected tempText: PIXI.Text;
+    protected textHeight: number;
+    protected lineHeight: number;
 
-    private caret: PIXI.Graphics;
-    private caretInterval: NodeJS.Timeout;
-    private si: number; // startIndex
-    private sie: boolean; // startIndexEnd
-    private ei: number; // endIndex
-    private eie: boolean; // endIndexEnd
-    private sp: PIXI.Point; // startposition
-    private ds: PIXI.Point; // dragStart
-    private de: PIXI.Point; // dragend
-    private rdd: boolean; // Reverse drag direction
-    private vrdd: boolean; // vertical Reverse drag direction
+    protected caret: PIXI.Graphics;
+    protected caretInterval: NodeJS.Timeout;
+    protected si: number; // startIndex
+    protected sie: boolean; // startIndexEnd
+    protected ei: number; // endIndex
+    protected eie: boolean; // endIndexEnd
+    protected sp: PIXI.Point; // startposition
+    protected ds: PIXI.Point; // dragStart
+    protected de: PIXI.Point; // dragend
+    protected rdd: boolean; // Reverse drag direction
+    protected vrdd: boolean; // vertical Reverse drag direction
 
-    private selectionStart: number;
-    private selectionEnd: number;
-    private hasSelection: boolean;
-    private t: number; // timestamp
-    private cc: number; // click counter
-    private textLengthPX: number;
-    private textHeightPX: number;
-    private lineIndexMax: number;
+    protected selectionStart: number;
+    protected selectionEnd: number;
+    protected hasSelection: boolean;
+    protected t: number; // timestamp
+    protected cc: number; // click counter
+    protected textLengthPX: number;
+    protected textHeightPX: number;
+    protected lineIndexMax: number;
 
-    private ctrlDown: boolean;
-    private shiftDown: boolean;
-    private shiftKey: number;
-    private ctrlKey: number;
-    private cmdKey: number;
+    protected ctrlDown: boolean;
+    protected shiftDown: boolean;
+    protected shiftKey: number;
+    protected ctrlKey: number;
+    protected cmdKey: number;
 
-    private _sp: PIXI.Point;
+    protected _sp: PIXI.Point;
 
     /**
      * @param {PUXI.ITextInputOptions} options
@@ -326,7 +326,7 @@ export class TextInput extends FocusableWidget
         };
     }
 
-    private get innerContainer(): PIXI.Container
+    protected get innerContainer(): PIXI.Container
     {
         return this.textContainer.innerContainer.insetContainer;
     }

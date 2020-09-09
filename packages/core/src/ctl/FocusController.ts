@@ -1,6 +1,6 @@
 import { Controller } from './Controller';
 import { Stage } from '../Stage';
-import { FocusableWidget } from '../FocusableWidget';
+import { IFocusable } from '../IFocusable';
 
 export type TabGroup = string;
 
@@ -18,12 +18,12 @@ export type TabGroup = string;
  * @class
  * @extends PUXI.Controller
  */
-export class FocusController extends Controller<FocusableWidget>
+export class FocusController extends Controller<IFocusable>
 {
     stage: Stage;
 
-    protected tabGroups: Map<TabGroup, FocusableWidget[]>;
-    protected currentItem: FocusableWidget;
+    protected tabGroups: Map<TabGroup, IFocusable[]>;
+    protected currentItem: IFocusable;
 
     useTab: boolean;
     useForward: boolean;
@@ -35,10 +35,10 @@ export class FocusController extends Controller<FocusableWidget>
 
         /**
          * Map of tab-group names to the widgets in those groups.
-         * @member {Map<PUXI.TabGroup, PUXI.FocusableWidget[]>}
+         * @member {Map<PUXI.TabGroup, PUXI.IFocusable[]>}
          * @protected
          */
-        this.tabGroups = new Map<TabGroup, FocusableWidget[]>();
+        this.tabGroups = new Map<TabGroup, IFocusable[]>();
 
         /**
          * Whether to enable tab-based focus movement.
@@ -63,11 +63,11 @@ export class FocusController extends Controller<FocusableWidget>
      * Adds the (focusable) widget to the tab group so that pressing tab repeatedly
      * will eventually bring it into focus.
      *
-     * @param {PUXI.FocusableWidget} widget - the widget to add
+     * @param {PUXI.IFocusable} widget - the widget to add
      * @param {number}[tabIndex=0] - unique index for the widget in tab group used for ordering
      * @param {PUXI.TabGroup}[tabGroup='default'] - tab group name
      */
-    in(widget: FocusableWidget, tabIndex = 0, tabGroup = 'default'): void
+    in(widget: IFocusable, tabIndex = 0, tabGroup = 'default'): void
     {
         let widgets = this.tabGroups.get(tabGroup);
 
@@ -91,10 +91,10 @@ export class FocusController extends Controller<FocusableWidget>
     }
 
     /**
-     * @param {PUXI.FocusableWidget} widget
+     * @param {PUXI.IFocusable} widget
      * @override
      */
-    out(widget: FocusableWidget): void
+    out(widget: IFocusable): void
     {
         const widgets = this.tabGroups.get(widget.tabGroup);
 
@@ -115,9 +115,9 @@ export class FocusController extends Controller<FocusableWidget>
     /**
      * Called when a widget comes into focus. Do not call this yourself.
      *
-     * @param {FocusableWidget} widget
+     * @param {IFocusable} widget
      */
-    notifyFocus(widget: FocusableWidget): void
+    notifyFocus(widget: IFocusable): void
     {
         const lastItem = this.currentItem;
 
@@ -148,9 +148,9 @@ export class FocusController extends Controller<FocusableWidget>
     /**
      * Brings the widget into focus.
      *
-     * @param {FocusableWidget} item
+     * @param {IFocusable} item
      */
-    focus(item: FocusableWidget): void
+    focus(item: IFocusable): void
     {
         const lastItem = this.currentItem;
 
@@ -256,21 +256,21 @@ export class FocusController extends Controller<FocusableWidget>
     /**
      * Fired when a widget gains focus.
      * @event focus
-     * @param {PUXI.FocusableWidget} widget - the widget that gained focus.
+     * @param {PUXI.IFocusable} widget - the widget that gained focus.
      */
 
     /**
      * Fired when a widget looses focus.
      * @event blur
-     * @param {PUXI.FocusableWidget} widget - the widget that lost focus.
+     * @param {PUXI.IFocusable} widget - the widget that lost focus.
      */
 
     /**
      * Fired when a new widget comes into focus or one looses focus.
      * @event focusChanged
-     * @param {PUXI.FocusableWidget}[newFocus] - the widget that came into focus. It may
+     * @param {PUXI.IFocusable}[newFocus] - the widget that came into focus. It may
      *      be null if only a blur occured.
-     * @param {PUXI.FocusableWidget}[oldFocus] - the widget that lost focus. It may be
+     * @param {PUXI.IFocusable}[oldFocus] - the widget that lost focus. It may be
      *      null if a widget gained focused for the first time.
      */
 }

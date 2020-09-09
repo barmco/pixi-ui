@@ -1,6 +1,7 @@
 import * as PIXI from 'pixi.js';
-import { TabGroup } from './ctl/FocusController';
+import { TabGroup, FocusController } from './ctl/FocusController';
 import { InteractiveGroup } from './InteractiveGroup';
+import { IFocusable } from './IFocusable';
 
 /**
  * @namespace PUXI
@@ -14,6 +15,7 @@ export interface IFocusableOptions
     background?: PIXI.Container;
     tabIndex?: number;
     tabGroup?: any;
+    focusController?: FocusController;
 }
 
 /**
@@ -26,13 +28,15 @@ export interface IFocusableOptions
  * @extends PUXI.Widget
  * @memberof PUXI
  */
-export abstract class FocusableWidget extends InteractiveGroup
+export abstract class FocusableWidget extends InteractiveGroup implements IFocusable
 {
     _isFocused: boolean;
     _isMousePressed: boolean;
+    _focusController: FocusController;
 
     tabIndex: number;
     tabGroup: TabGroup;
+
 
     /**
      * @param {PUXI.IInputBaseOptions} options
@@ -47,6 +51,12 @@ export abstract class FocusableWidget extends InteractiveGroup
         if (options.background)
         {
             super.setBackground(options.background);
+        }
+
+        // for detached context (from stage)
+        if (options.focusController)
+        {
+            this._focusController = options.focusController
         }
 
         // Prevents double focusing/blurring.
@@ -91,7 +101,7 @@ export abstract class FocusableWidget extends InteractiveGroup
             return;
         }
 
-        this.stage.focusController.notifyFocus(this);
+        this.focusController.notifyFocus(this);
 
         this._isFocused = true;
         this.bindEvents();
@@ -110,7 +120,7 @@ export abstract class FocusableWidget extends InteractiveGroup
             return;
         }
 
-        this.stage.focusController.notifyBlur();
+        this.focusController.notifyBlur();
 
         this._isFocused = false;
         this.clearEvents();
@@ -175,7 +185,7 @@ export abstract class FocusableWidget extends InteractiveGroup
     initialize(): void
     {
         super.initialize();
-        this.stage.focusController.in(this, this.tabIndex, this.tabGroup);
+        this.focusController.in(this, this.tabIndex, this.tabGroup);
     }
 
     /**
@@ -193,4 +203,8 @@ export abstract class FocusableWidget extends InteractiveGroup
      * @event focusChanged
      * @param {boolean} isFocused - whether the widget is in focus.
      */
+
+    protected get focusController() {
+        return this._focusController || this.stage.focusController
+    }
 }

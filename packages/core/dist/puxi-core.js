@@ -1,6 +1,6 @@
 /*!
  * @puxi/core - v1.0.1
- * Compiled Mon, 07 Sep 2020 08:34:11 UTC
+ * Compiled Wed, 09 Sep 2020 04:54:51 UTC
  *
  * @puxi/core is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
@@ -2076,6 +2076,10 @@ var _puxi_core = (function (exports, PIXI, filterDropShadow) {
             if (options.background) {
                 super.setBackground(options.background);
             }
+            // for detached context (from stage)
+            if (options.focusController) {
+                this._focusController = options.focusController;
+            }
             // Prevents double focusing/blurring.
             this._isFocused = false;
             // Used to lose focus when mouse-down outside widget.
@@ -2107,7 +2111,7 @@ var _puxi_core = (function (exports, PIXI, filterDropShadow) {
             if (this.isFocused) {
                 return;
             }
-            this.stage.focusController.notifyFocus(this);
+            this.focusController.notifyFocus(this);
             this._isFocused = true;
             this.bindEvents();
             this.emit('focusChanged', true);
@@ -2120,7 +2124,7 @@ var _puxi_core = (function (exports, PIXI, filterDropShadow) {
             if (!this._isFocused) {
                 return;
             }
-            this.stage.focusController.notifyBlur();
+            this.focusController.notifyBlur();
             this._isFocused = false;
             this.clearEvents();
             this.emit('focusChanged', false);
@@ -2136,7 +2140,23 @@ var _puxi_core = (function (exports, PIXI, filterDropShadow) {
         }
         initialize() {
             super.initialize();
-            this.stage.focusController.in(this, this.tabIndex, this.tabGroup);
+            this.focusController.in(this, this.tabIndex, this.tabGroup);
+        }
+        /**
+         * Fired when the widget comes into focus.
+         * @event focus
+         */
+        /**
+         * Fired when the widget goes out of focus.
+         * @event blur
+         */
+        /**
+         * Fired when the widgets comes into or goes out of focus.
+         * @event focusChanged
+         * @param {boolean} isFocused - whether the widget is in focus.
+         */
+        get focusController() {
+            return this._focusController || this.stage.focusController;
         }
     }
 
@@ -4824,7 +4844,7 @@ var _puxi_core = (function (exports, PIXI, filterDropShadow) {
             super(stage);
             /**
              * Map of tab-group names to the widgets in those groups.
-             * @member {Map<PUXI.TabGroup, PUXI.FocusableWidget[]>}
+             * @member {Map<PUXI.TabGroup, PUXI.IFocusable[]>}
              * @protected
              */
             this.tabGroups = new Map();
@@ -4848,7 +4868,7 @@ var _puxi_core = (function (exports, PIXI, filterDropShadow) {
          * Adds the (focusable) widget to the tab group so that pressing tab repeatedly
          * will eventually bring it into focus.
          *
-         * @param {PUXI.FocusableWidget} widget - the widget to add
+         * @param {PUXI.IFocusable} widget - the widget to add
          * @param {number}[tabIndex=0] - unique index for the widget in tab group used for ordering
          * @param {PUXI.TabGroup}[tabGroup='default'] - tab group name
          */
@@ -4868,7 +4888,7 @@ var _puxi_core = (function (exports, PIXI, filterDropShadow) {
             }
         }
         /**
-         * @param {PUXI.FocusableWidget} widget
+         * @param {PUXI.IFocusable} widget
          * @override
          */
         out(widget) {
@@ -4885,7 +4905,7 @@ var _puxi_core = (function (exports, PIXI, filterDropShadow) {
         /**
          * Called when a widget comes into focus. Do not call this yourself.
          *
-         * @param {FocusableWidget} widget
+         * @param {IFocusable} widget
          */
         notifyFocus(widget) {
             const lastItem = this.currentItem;
@@ -4909,7 +4929,7 @@ var _puxi_core = (function (exports, PIXI, filterDropShadow) {
         /**
          * Brings the widget into focus.
          *
-         * @param {FocusableWidget} item
+         * @param {IFocusable} item
          */
         focus(item) {
             const lastItem = this.currentItem;

@@ -666,6 +666,14 @@ export declare class FastLayoutOptions extends LayoutOptions {
     constructor(options: IFastLayoutParams);
 }
 
+export declare interface IFocusable {
+    tabIndex: number
+    tabGroup: string
+
+    blur(): void
+    focus(): void
+}
+
 /**
  * Represents a view that can gain or loose focus. It is primarily subclassed by
  * input/form widgets.
@@ -676,9 +684,11 @@ export declare class FastLayoutOptions extends LayoutOptions {
  * @extends PUXI.Widget
  * @memberof PUXI
  */
-export declare abstract class FocusableWidget extends InteractiveGroup {
+export declare abstract class FocusableWidget extends InteractiveGroup implements IFocusable {
     _isFocused: boolean;
     _isMousePressed: boolean;
+    _focusController: FocusController;
+
     tabIndex: number;
     tabGroup: TabGroup;
     /**
@@ -707,6 +717,8 @@ export declare abstract class FocusableWidget extends InteractiveGroup {
     protected onKeyDownImpl: (e: any) => void;
     private onDocumentPointerDownImpl;
     initialize(): void;
+
+    protected get focusController();
 }
 
 /**
@@ -722,10 +734,10 @@ export declare abstract class FocusableWidget extends InteractiveGroup {
  * @class
  * @extends PUXI.Controller
  */
-declare class FocusController extends Controller<FocusableWidget> {
+declare class FocusController extends Controller<IFocusable> {
     stage: Stage;
-    protected tabGroups: Map<TabGroup, FocusableWidget[]>;
-    protected currentItem: FocusableWidget;
+    protected tabGroups: Map<TabGroup, IFocusable[]>;
+    protected currentItem: IFocusable;
     useTab: boolean;
     useForward: boolean;
     useBack: boolean;
@@ -734,22 +746,22 @@ declare class FocusController extends Controller<FocusableWidget> {
      * Adds the (focusable) widget to the tab group so that pressing tab repeatedly
      * will eventually bring it into focus.
      *
-     * @param {PUXI.FocusableWidget} widget - the widget to add
+     * @param {PUXI.IFocusable} widget - the widget to add
      * @param {number}[tabIndex=0] - unique index for the widget in tab group used for ordering
      * @param {PUXI.TabGroup}[tabGroup='default'] - tab group name
      */
-    in(widget: FocusableWidget, tabIndex?: number, tabGroup?: string): void;
+    in(widget: IFocusable, tabIndex?: number, tabGroup?: string): void;
     /**
-     * @param {PUXI.FocusableWidget} widget
+     * @param {PUXI.IFocusable} widget
      * @override
      */
-    out(widget: FocusableWidget): void;
+    out(widget: IFocusable): void;
     /**
      * Called when a widget comes into focus. Do not call this yourself.
      *
-     * @param {FocusableWidget} widget
+     * @param {IFocusable} widget
      */
-    notifyFocus(widget: FocusableWidget): void;
+    notifyFocus(widget: IFocusable): void;
     /**
      * Clears the currently focused item without blurring it. It is called
      * when a widget goes out of focus.
@@ -758,9 +770,9 @@ declare class FocusController extends Controller<FocusableWidget> {
     /**
      * Brings the widget into focus.
      *
-     * @param {FocusableWidget} item
+     * @param {IFocusable} item
      */
-    focus(item: FocusableWidget): void;
+    focus(item: IFocusable): void;
     /**
      * Blurs the currently focused widget out of focus.
      */

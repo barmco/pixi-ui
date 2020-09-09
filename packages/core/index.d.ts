@@ -868,6 +868,7 @@ declare interface IFocusableOptions {
     background?: PIXI.Container;
     tabIndex?: number;
     tabGroup?: any;
+    focusController?: FocusController;
 }
 
 export declare interface IImageButtonOptions extends IButtonOptions {

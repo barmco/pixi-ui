@@ -734,7 +734,7 @@ export declare abstract class FocusableWidget extends InteractiveGroup implement
  * @class
  * @extends PUXI.Controller
  */
-declare class FocusController extends Controller<IFocusable> {
+export declare class FocusController extends Controller<IFocusable> {
     stage: Stage;
     protected tabGroups: Map<TabGroup, IFocusable[]>;
     protected currentItem: IFocusable;

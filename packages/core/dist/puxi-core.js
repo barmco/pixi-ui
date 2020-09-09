@@ -1,6 +1,6 @@
 /*!
  * @puxi/core - v1.0.1
- * Compiled Wed, 09 Sep 2020 04:54:51 UTC
+ * Compiled Wed, 09 Sep 2020 05:03:49 UTC
  *
  * @puxi/core is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
@@ -6214,6 +6214,7 @@ var _puxi_core = (function (exports, PIXI, filterDropShadow) {
     exports.EventManager = EventManager;
     exports.FastLayout = FastLayout;
     exports.FastLayoutOptions = FastLayoutOptions;
+    exports.FocusController = FocusController;
     exports.FocusableWidget = FocusableWidget;
     exports.Helpers = Helpers;
     exports.ImageButton = ImageButton;

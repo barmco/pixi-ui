@@ -1,6 +1,6 @@
 /*!
  * @puxi/core - v1.0.1
- * Compiled Wed, 09 Sep 2020 04:54:51 UTC
+ * Compiled Wed, 09 Sep 2020 05:03:49 UTC
  *
  * @puxi/core is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
@@ -6170,5 +6170,5 @@ class Ticker extends utils.EventEmitter {
 }
 Ticker.shared = new Ticker(true);
 
-export { ALIGN, AnchorLayout, AnchorLayoutOptions, BorderLayout, BorderLayoutOptions, Button, CheckBox, ClickManager, Ease, EventBroker, EventManager, FastLayout, FastLayoutOptions, FocusableWidget, Helpers, ImageButton, ImageWidget, Insets, InteractiveGroup, LayoutOptions, LinearLayout, MeasureMode, ScrollBar, ScrollManager, ScrollWidget, SliceSprite, Slider, SortableList, Sprite, Stage, Style, StyleSheet, TEXT_STYLE_PROPERTIES, TextInput, TextWidget, Ticker, TilingSprite, Widget, WidgetGroup, create, wrapEase };
+export { ALIGN, AnchorLayout, AnchorLayoutOptions, BorderLayout, BorderLayoutOptions, Button, CheckBox, ClickManager, Ease, EventBroker, EventManager, FastLayout, FastLayoutOptions, FocusController, FocusableWidget, Helpers, ImageButton, ImageWidget, Insets, InteractiveGroup, LayoutOptions, LinearLayout, MeasureMode, ScrollBar, ScrollManager, ScrollWidget, SliceSprite, Slider, SortableList, Sprite, Stage, Style, StyleSheet, TEXT_STYLE_PROPERTIES, TextInput, TextWidget, Ticker, TilingSprite, Widget, WidgetGroup, create, wrapEase };
 //# sourceMappingURL=puxi-core.js.map

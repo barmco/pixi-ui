@@ -1,6 +1,6 @@
 /*!
  * @puxi/core - v1.0.1
- * Compiled Wed, 09 Sep 2020 07:50:37 UTC
+ * Compiled Thu, 10 Sep 2020 02:01:32 UTC
  *
  * @puxi/core is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
@@ -5728,7 +5728,7 @@ var _puxi_core = (function (exports, PIXI, filterDropShadow) {
             this.caret = new PIXI.Graphics();
             this.caret.visible = false;
             this.caret._index = 0;
-            this.caret.lineStyle(options.caretWidth || 1, '#ffffff', 1);
+            this.caret.lineStyle(options.caretWidth || 1, typeof (this.color) == "number" ? this.color : parseInt(this.color.slice(1), 16), 1);
             this.caret.moveTo(0, 0);
             this.caret.lineTo(0, this.textHeight);
             // var padding

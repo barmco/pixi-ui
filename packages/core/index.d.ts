@@ -1747,13 +1747,13 @@ export declare class TextInput extends FocusableWidget {
     hideCaret(): void;
     showCaret(): void;
     insertTextAtCaret(c: string): void;
-    onKeyDown: (e: any) => void;
-    keyUpEvent: (e: any) => void;
-    copyEvent: (e: any) => void;
-    cutEvent: (e: any) => void;
-    pasteEvent: (e: any) => void;
-    inputEvent: (e: any) => void;
-    inputBlurEvent: (e: any) => void;
+    onKeyDown(e: any): void;
+    keyUpEvent(e: any): void;
+    copyEvent(e: any): void;
+    cutEvent(e: any): void;
+    pasteEvent(e: any): void;
+    inputEvent(e: any): void;
+    inputBlurEvent(e: any): void;
     focus: () => void;
     blur: () => void;
     setCaretIndex: (index: number) => void;
@@ -1769,6 +1769,7 @@ export declare class TextInput extends FocusableWidget {
     set value(val: string);
     get text(): string;
     set text(value: string);
+    get mock(): HTMLInputElement
 }
 
 /**

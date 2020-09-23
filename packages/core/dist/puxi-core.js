@@ -1,6 +1,6 @@
 /*!
  * @puxi/core - v1.0.1
- * Compiled Thu, 10 Sep 2020 02:01:32 UTC
+ * Compiled Wed, 23 Sep 2020 12:45:30 UTC
  *
  * @puxi/core is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
@@ -5350,203 +5350,6 @@ var _puxi_core = (function (exports, PIXI, filterDropShadow) {
          */
         constructor(options) {
             super(options);
-            this.onKeyDown = (e) => {
-                if (e.which === this.ctrlKey || e.which === this.cmdKey) {
-                    this.ctrlDown = true;
-                }
-                if (e.which === this.shiftKey) {
-                    this.shiftDown = true;
-                }
-                // FocusableWidget.onKeyDownImpl should've been called before this.
-                if (e.defaultPrevented) {
-                    return;
-                }
-                if (e.which === 13) { // enter
-                    this.insertTextAtCaret('\n');
-                    e.preventDefault();
-                    return;
-                }
-                if (this.ctrlDown) {
-                    // Handle Ctrl+<?> commands
-                    if (e.which === 65) {
-                        // Ctrl+A (Select all)
-                        this.select();
-                        e.preventDefault();
-                        return;
-                    }
-                    else if (e.which === 90) {
-                        // Ctrl+Z (Undo)
-                        if (this.value != this._lastValue) {
-                            this.valueEvent = this._lastValue;
-                        }
-                        this.setCaretIndex(this._lastValue.length + 1);
-                        e.preventDefault();
-                        return;
-                    }
-                }
-                if (e.which === 8) {
-                    // Handle backspace
-                    if (!this.deleteSelection()) {
-                        if (this.caret._index > 0 || (this.chars.length === 1 && this.caret._atEnd)) {
-                            if (this.caret._atEnd) {
-                                this.valueEvent = this.value.slice(0, this.chars.length - 1);
-                                this.setCaretIndex(this.caret._index);
-                            }
-                            else {
-                                this.valueEvent = this.value.slice(0, this.caret._index - 1) + this.value.slice(this.caret._index);
-                                this.setCaretIndex(this.caret._index - 1);
-                            }
-                        }
-                    }
-                    e.preventDefault();
-                    return;
-                }
-                if (e.which === 46) {
-                    // Delete selection
-                    if (!this.deleteSelection()) {
-                        if (!this.caret._atEnd) {
-                            this.valueEvent = this.value.slice(0, this.caret._index) + this.value.slice(this.caret._index + 1);
-                            this.setCaretIndex(this.caret._index);
-                        }
-                    }
-                    e.preventDefault();
-                    return;
-                }
-                else if (e.which === 37 || e.which === 39) {
-                    this.rdd = e.which === 37;
-                    if (this.shiftDown) {
-                        if (this.hasSelection) {
-                            const caretAtStart = this.selectionStart === this.caret._index;
-                            if (caretAtStart) {
-                                if (this.selectionStart === this.selectionEnd && this.rdd === this.caret._forward) {
-                                    this.setCaretIndex(this.caret._forward ? this.caret._index : this.caret._index + 1);
-                                }
-                                else {
-                                    const startindex = this.rdd ? this.caret._index - 1 : this.caret._index + 1;
-                                    this.selectRange(startindex, this.selectionEnd);
-                                    this.caret._index = Math.min(this.chars.length - 1, Math.max(0, startindex));
-                                }
-                            }
-                            else {
-                                const endIndex = this.rdd ? this.caret._index - 1 : this.caret._index + 1;
-                                this.selectRange(this.selectionStart, endIndex);
-                                this.caret._index = Math.min(this.chars.length - 1, Math.max(0, endIndex));
-                            }
-                        }
-                        else {
-                            const _i = this.caret._atEnd ? this.caret._index + 1 : this.caret._index;
-                            const selectIndex = this.rdd ? _i - 1 : _i;
-                            this.selectRange(selectIndex, selectIndex);
-                            this.caret._index = selectIndex;
-                            this.caret._forward = !rdd;
-                        }
-                    }
-                    else {
-                        // Navigation
-                        // eslint-disable-next-line no-lonely-if
-                        if (this.hasSelection) {
-                            this.setCaretIndex(this.rdd ? this.selectionStart : this.selectionEnd + 1);
-                        }
-                        else {
-                            this.setCaretIndex(this.caret._index + (this.rdd ? this.caret._atEnd ? 0 : -1 : 1));
-                        }
-                    }
-                    e.preventDefault();
-                    return;
-                }
-                else if (this.multiLine && (e.which === 38 || e.which === 40)) {
-                    this.vrdd = e.which === 38;
-                    if (this.shiftDown) {
-                        if (this.hasSelection) {
-                            this.de.y = Math.max(0, Math.min(this.textHeightPX, this.de.y + (this.vrdd ? -this.lineHeight : this.lineHeight)));
-                            this.updateClosestIndex(this.de, false);
-                            // console.log(si, ei);
-                            if (Math.abs(this.si - this.ei) <= 1) {
-                                // console.log(si, ei);
-                                this.setCaretIndex(this.sie ? this.si + 1 : this.si);
-                            }
-                            else {
-                                this.caret._index = (this.eie ? this.ei + 1 : this.ei) + (this.caret._down ? -1 : 0);
-                                this.selectRange(this.caret._down ? this.si : this.si - 1, this.caret._index);
-                            }
-                        }
-                        else {
-                            this.si = this.caret._index;
-                            this.sie = false;
-                            this.de.copyFrom(this.caret);
-                            this.de.y = Math.max(0, Math.min(this.textHeightPX, this.de.y + (this.vrdd ? -this.lineHeight : this.lineHeight)));
-                            this.updateClosestIndex(this.de, false);
-                            this.caret._index = (this.eie ? this.ei + 1 : ei) - (this.vrdd ? 0 : 1);
-                            this.selectRange(this.vrdd ? this.si - 1 : this.si, this.caret._index);
-                            this.caret._down = !this.vrdd;
-                        }
-                    }
-                    else if (this.hasSelection) {
-                        this.setCaretIndex(this.vrdd ? this.selectionStart : this.selectionEnd + 1);
-                    }
-                    else {
-                        this.ds.copyFrom(this.caret);
-                        this.ds.y += this.vrdd ? -this.lineHeight : this.lineHeight;
-                        this.ds.x += 1;
-                        this.updateClosestIndex(this.ds, true);
-                        this.setCaretIndex(this.sie ? this.si + 1 : this.si);
-                    }
-                    e.preventDefault();
-                    return;
-                }
-            };
-            this.keyUpEvent = (e) => {
-                if (e.which === this.ctrlKey || e.which === this.cmdKey)
-                    this.ctrlDown = false;
-                if (e.which === this.shiftKey)
-                    this.shiftDown = false;
-                this.emit('keyup', e);
-                if (e.defaultPrevented) {
-                    return;
-                }
-            };
-            this.copyEvent = (e) => {
-                this.emit('copy', e);
-                if (e.defaultPrevented) {
-                    return;
-                }
-                if (this.hasSelection) {
-                    const clipboardData = e.clipboardData || window.clipboardData;
-                    clipboardData.setData('Text', this.value.slice(this.selectionStart, this.selectionEnd + 1));
-                }
-                e.preventDefault();
-            };
-            this.cutEvent = (e) => {
-                this.emit('cut', e);
-                if (e.defaultPrevented) {
-                    return;
-                }
-                if (this.hasSelection) {
-                    this.copyEvent(e);
-                    this.deleteSelection();
-                }
-                e.preventDefault();
-            };
-            this.pasteEvent = (e) => {
-                this.emit('paste', e);
-                if (e.defaultPrevented) {
-                    return;
-                }
-                const clipboardData = e.clipboardData || window.clipboardData;
-                this.insertTextAtCaret(clipboardData.getData('Text'));
-                e.preventDefault();
-            };
-            this.inputEvent = (e) => {
-                const c = mockDOMInput.value;
-                if (c.length) {
-                    this.insertTextAtCaret(c);
-                    mockDOMInput.value = '';
-                }
-                e.preventDefault();
-            };
-            this.inputBlurEvent = (e) => {
-                this.blur();
-            };
             this.focus = () => {
                 if (!this._isFocused) {
                     super.focus();
@@ -5559,13 +5362,20 @@ var _puxi_core = (function (exports, PIXI, filterDropShadow) {
                     mockDOMInput.focus();
                     mockDOMInput.setAttribute('style', 'position:fixed; left:-10px; top:-10px; width:0px; height: 0px;');
                     this.innerContainer.cacheAsBitmap = false;
-                    mockDOMInput.addEventListener('blur', this.inputBlurEvent, false);
-                    document.addEventListener('keydown', this.onKeyDown, false);
-                    document.addEventListener('keyup', this.keyUpEvent, false);
-                    document.addEventListener('paste', this.pasteEvent, false);
-                    document.addEventListener('copy', this.copyEvent, false);
-                    document.addEventListener('cut', this.cutEvent, false);
-                    mockDOMInput.addEventListener('input', this.inputEvent, false);
+                    this._listeners.blur = e => this.inputBlurEvent(e);
+                    this._listeners.keydown = e => this.onKeyDown(e);
+                    this._listeners.keyup = e => this.keyUpEvent(e);
+                    this._listeners.paste = e => this.pasteEvent(e);
+                    this._listeners.copy = e => this.copyEvent(e);
+                    this._listeners.cut = e => this.cutEvent(e);
+                    this._listeners.input = e => this.inputEvent(e);
+                    mockDOMInput.addEventListener('blur', this._listeners.blur, false);
+                    document.addEventListener('keydown', this._listeners.keydown, false);
+                    document.addEventListener('keyup', this._listeners.keyup, false);
+                    document.addEventListener('paste', this._listeners.paste, false);
+                    document.addEventListener('copy', this._listeners.copy, false);
+                    document.addEventListener('cut', this._listeners.cut, false);
+                    mockDOMInput.addEventListener('input', this._listeners.input, false);
                     setTimeout(() => {
                         if (!this.caret.visible && !this.selection.visible && !this.multiLine) {
                             this.setCaretIndex(this.chars.length);
@@ -5583,14 +5393,15 @@ var _puxi_core = (function (exports, PIXI, filterDropShadow) {
                     if (this.chars.length > 1) {
                         this.innerContainer.cacheAsBitmap = true;
                     }
-                    mockDOMInput.removeEventListener('blur', this.inputBlurEvent);
-                    document.removeEventListener('keydown', this.onKeyDown);
-                    document.removeEventListener('keyup', this.keyUpEvent);
-                    document.removeEventListener('paste', this.pasteEvent);
-                    document.removeEventListener('copy', this.copyEvent);
-                    document.removeEventListener('cut', this.cutEvent);
-                    mockDOMInput.removeEventListener('input', this.inputEvent);
+                    mockDOMInput.removeEventListener('blur', this._listeners.blur);
+                    document.removeEventListener('keydown', this._listeners.keydown);
+                    document.removeEventListener('keyup', this._listeners.keyup);
+                    document.removeEventListener('paste', this._listeners.paste);
+                    document.removeEventListener('copy', this._listeners.copy);
+                    document.removeEventListener('cut', this._listeners.cut);
+                    mockDOMInput.removeEventListener('input', this._listeners.input);
                     mockDOMInput.blur();
+                    this._listeners = {};
                 }
                 if (!this.multiLine) {
                     this.resetScrollPosition();
@@ -5702,6 +5513,7 @@ var _puxi_core = (function (exports, PIXI, filterDropShadow) {
             };
             initMockDOMInput();
             this.options = options;
+            this._listeners = {};
             this._dirtyText = true;
             this.maxLength = options.maxLength || 0;
             this._value = this._lastValue = options.value || '';
@@ -6034,6 +5846,210 @@ var _puxi_core = (function (exports, PIXI, filterDropShadow) {
                 }
             }
         }
+        onKeyDown(e) {
+            if (e.which === this.ctrlKey || e.which === this.cmdKey) {
+                this.ctrlDown = true;
+            }
+            if (e.which === this.shiftKey) {
+                this.shiftDown = true;
+            }
+            // FocusableWidget.onKeyDownImpl should've been called before this.
+            if (e.defaultPrevented) {
+                return;
+            }
+            if (e.which === 13) { // enter
+                this.insertTextAtCaret('\n');
+                e.preventDefault();
+                return;
+            }
+            if (this.ctrlDown) {
+                // Handle Ctrl+<?> commands
+                if (e.which === 65) {
+                    // Ctrl+A (Select all)
+                    this.select();
+                    e.preventDefault();
+                    return;
+                }
+                else if (e.which === 90) {
+                    // Ctrl+Z (Undo)
+                    if (this.value != this._lastValue) {
+                        this.valueEvent = this._lastValue;
+                    }
+                    this.setCaretIndex(this._lastValue.length + 1);
+                    e.preventDefault();
+                    return;
+                }
+            }
+            if (e.which === 8) {
+                // Handle backspace
+                if (!this.deleteSelection()) {
+                    if (this.caret._index > 0 || (this.chars.length === 1 && this.caret._atEnd)) {
+                        if (this.caret._atEnd) {
+                            this.valueEvent = this.value.slice(0, this.chars.length - 1);
+                            this.setCaretIndex(this.caret._index);
+                        }
+                        else {
+                            this.valueEvent = this.value.slice(0, this.caret._index - 1) + this.value.slice(this.caret._index);
+                            this.setCaretIndex(this.caret._index - 1);
+                        }
+                    }
+                }
+                e.preventDefault();
+                return;
+            }
+            if (e.which === 46) {
+                // Delete selection
+                if (!this.deleteSelection()) {
+                    if (!this.caret._atEnd) {
+                        this.valueEvent = this.value.slice(0, this.caret._index) + this.value.slice(this.caret._index + 1);
+                        this.setCaretIndex(this.caret._index);
+                    }
+                }
+                e.preventDefault();
+                return;
+            }
+            else if (e.which === 37 || e.which === 39) {
+                this.rdd = e.which === 37;
+                if (this.shiftDown) {
+                    if (this.hasSelection) {
+                        const caretAtStart = this.selectionStart === this.caret._index;
+                        if (caretAtStart) {
+                            if (this.selectionStart === this.selectionEnd && this.rdd === this.caret._forward) {
+                                this.setCaretIndex(this.caret._forward ? this.caret._index : this.caret._index + 1);
+                            }
+                            else {
+                                const startindex = this.rdd ? this.caret._index - 1 : this.caret._index + 1;
+                                this.selectRange(startindex, this.selectionEnd);
+                                this.caret._index = Math.min(this.chars.length - 1, Math.max(0, startindex));
+                            }
+                        }
+                        else {
+                            const endIndex = this.rdd ? this.caret._index - 1 : this.caret._index + 1;
+                            this.selectRange(this.selectionStart, endIndex);
+                            this.caret._index = Math.min(this.chars.length - 1, Math.max(0, endIndex));
+                        }
+                    }
+                    else {
+                        const _i = this.caret._atEnd ? this.caret._index + 1 : this.caret._index;
+                        const selectIndex = this.rdd ? _i - 1 : _i;
+                        this.selectRange(selectIndex, selectIndex);
+                        this.caret._index = selectIndex;
+                        this.caret._forward = !rdd;
+                    }
+                }
+                else {
+                    // Navigation
+                    // eslint-disable-next-line no-lonely-if
+                    if (this.hasSelection) {
+                        this.setCaretIndex(this.rdd ? this.selectionStart : this.selectionEnd + 1);
+                    }
+                    else {
+                        this.setCaretIndex(this.caret._index + (this.rdd ? this.caret._atEnd ? 0 : -1 : 1));
+                    }
+                }
+                e.preventDefault();
+                return;
+            }
+            else if (this.multiLine && (e.which === 38 || e.which === 40)) {
+                this.vrdd = e.which === 38;
+                if (this.shiftDown) {
+                    if (this.hasSelection) {
+                        this.de.y = Math.max(0, Math.min(this.textHeightPX, this.de.y + (this.vrdd ? -this.lineHeight : this.lineHeight)));
+                        this.updateClosestIndex(this.de, false);
+                        // console.log(si, ei);
+                        if (Math.abs(this.si - this.ei) <= 1) {
+                            // console.log(si, ei);
+                            this.setCaretIndex(this.sie ? this.si + 1 : this.si);
+                        }
+                        else {
+                            this.caret._index = (this.eie ? this.ei + 1 : this.ei) + (this.caret._down ? -1 : 0);
+                            this.selectRange(this.caret._down ? this.si : this.si - 1, this.caret._index);
+                        }
+                    }
+                    else {
+                        this.si = this.caret._index;
+                        this.sie = false;
+                        this.de.copyFrom(this.caret);
+                        this.de.y = Math.max(0, Math.min(this.textHeightPX, this.de.y + (this.vrdd ? -this.lineHeight : this.lineHeight)));
+                        this.updateClosestIndex(this.de, false);
+                        this.caret._index = (this.eie ? this.ei + 1 : ei) - (this.vrdd ? 0 : 1);
+                        this.selectRange(this.vrdd ? this.si - 1 : this.si, this.caret._index);
+                        this.caret._down = !this.vrdd;
+                    }
+                }
+                else if (this.hasSelection) {
+                    this.setCaretIndex(this.vrdd ? this.selectionStart : this.selectionEnd + 1);
+                }
+                else {
+                    this.ds.copyFrom(this.caret);
+                    this.ds.y += this.vrdd ? -this.lineHeight : this.lineHeight;
+                    this.ds.x += 1;
+                    this.updateClosestIndex(this.ds, true);
+                    this.setCaretIndex(this.sie ? this.si + 1 : this.si);
+                }
+                e.preventDefault();
+                return;
+            }
+        }
+        ;
+        keyUpEvent(e) {
+            if (e.which === this.ctrlKey || e.which === this.cmdKey)
+                this.ctrlDown = false;
+            if (e.which === this.shiftKey)
+                this.shiftDown = false;
+            this.emit('keyup', e);
+            if (e.defaultPrevented) {
+                return;
+            }
+        }
+        ;
+        copyEvent(e) {
+            this.emit('copy', e);
+            if (e.defaultPrevented) {
+                return;
+            }
+            if (this.hasSelection) {
+                const clipboardData = e.clipboardData || window.clipboardData;
+                clipboardData.setData('Text', this.value.slice(this.selectionStart, this.selectionEnd + 1));
+            }
+            e.preventDefault();
+        }
+        ;
+        cutEvent(e) {
+            this.emit('cut', e);
+            if (e.defaultPrevented) {
+                return;
+            }
+            if (this.hasSelection) {
+                this.copyEvent(e);
+                this.deleteSelection();
+            }
+            e.preventDefault();
+        }
+        ;
+        pasteEvent(e) {
+            this.emit('paste', e);
+            if (e.defaultPrevented) {
+                return;
+            }
+            const clipboardData = e.clipboardData || window.clipboardData;
+            this.insertTextAtCaret(clipboardData.getData('Text'));
+            e.preventDefault();
+        }
+        ;
+        inputEvent(e) {
+            const c = mockDOMInput.value;
+            if (c.length) {
+                this.insertTextAtCaret(c);
+                mockDOMInput.value = '';
+            }
+            e.preventDefault();
+        }
+        ;
+        inputBlurEvent(e) {
+            this.blur();
+        }
+        ;
         get valueEvent() {
             return this._value;
         }
@@ -6065,6 +6081,9 @@ var _puxi_core = (function (exports, PIXI, filterDropShadow) {
         }
         set text(value) {
             this.value = value;
+        }
+        get mock() {
+            return mockDOMInput;
         }
     }
     /*

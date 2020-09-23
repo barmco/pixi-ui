@@ -57,6 +57,7 @@ export class TextInput extends FocusableWidget
 {
     protected options: ITextInputOptions;
 
+    protected _listeners: any;
     protected _dirtyText: boolean;
     protected _value: string;
     protected _lastValue: string;
@@ -135,6 +136,7 @@ export class TextInput extends FocusableWidget
 
         this.options = options;
 
+        this._listeners = {};
         this._dirtyText = true;
         this.maxLength = options.maxLength || 0;
         this._value = this._lastValue = options.value || '';
@@ -619,8 +621,7 @@ export class TextInput extends FocusableWidget
         }
     }
 
-    onKeyDown = (e): void =>
-    {
+    public onKeyDown(e) {
         if (e.which === this.ctrlKey || e.which === this.cmdKey)
         {
             this.ctrlDown = true;
@@ -830,8 +831,7 @@ export class TextInput extends FocusableWidget
         }
     };
 
-    keyUpEvent = (e): void =>
-    {
+    public keyUpEvent(e) {
         if (e.which === this.ctrlKey || e.which === this.cmdKey) this.ctrlDown = false;
         if (e.which === this.shiftKey) this.shiftDown = false;
 
@@ -841,8 +841,7 @@ export class TextInput extends FocusableWidget
         { return; }
     };
 
-    copyEvent = (e): void =>
-    {
+    public copyEvent(e) {
         this.emit('copy', e);
 
         if (e.defaultPrevented)
@@ -858,8 +857,7 @@ export class TextInput extends FocusableWidget
         e.preventDefault();
     };
 
-    cutEvent = (e): void =>
-    {
+    public cutEvent(e) {
         this.emit('cut', e);
 
         if (e.defaultPrevented)
@@ -874,8 +872,7 @@ export class TextInput extends FocusableWidget
         e.preventDefault();
     };
 
-     pasteEvent = (e): void =>
-     {
+    public pasteEvent(e) {
          this.emit('paste', e);
 
          if (e.defaultPrevented)
@@ -887,8 +884,7 @@ export class TextInput extends FocusableWidget
          e.preventDefault();
      };
 
-    inputEvent = (e): void =>
-    {
+    public inputEvent(e) {
         const c = mockDOMInput.value;
 
         if (c.length)
@@ -900,8 +896,7 @@ export class TextInput extends FocusableWidget
         e.preventDefault();
     };
 
-    inputBlurEvent = (e): void =>
-    {
+    public inputBlurEvent(e) {
         this.blur();
     };
 
@@ -922,13 +917,22 @@ export class TextInput extends FocusableWidget
             mockDOMInput.setAttribute('style', 'position:fixed; left:-10px; top:-10px; width:0px; height: 0px;');
 
             this.innerContainer.cacheAsBitmap = false;
-            mockDOMInput.addEventListener('blur', this.inputBlurEvent, false);
-            document.addEventListener('keydown', this.onKeyDown, false);
-            document.addEventListener('keyup', this.keyUpEvent, false);
-            document.addEventListener('paste', this.pasteEvent, false);
-            document.addEventListener('copy', this.copyEvent, false);
-            document.addEventListener('cut', this.cutEvent, false);
-            mockDOMInput.addEventListener('input', this.inputEvent, false);
+
+            this._listeners.blur = e => this.inputBlurEvent(e);
+            this._listeners.keydown = e => this.onKeyDown(e);
+            this._listeners.keyup = e => this.keyUpEvent(e);
+            this._listeners.paste = e => this.pasteEvent(e);
+            this._listeners.copy = e => this.copyEvent(e);
+            this._listeners.cut = e => this.cutEvent(e);
+            this._listeners.input = e => this.inputEvent(e);
+
+            mockDOMInput.addEventListener('blur', this._listeners.blur, false);
+            document.addEventListener('keydown', this._listeners.keydown, false);
+            document.addEventListener('keyup', this._listeners.keyup, false);
+            document.addEventListener('paste', this._listeners.paste, false);
+            document.addEventListener('copy', this._listeners.copy, false);
+            document.addEventListener('cut', this._listeners.cut, false);
+            mockDOMInput.addEventListener('input', this._listeners.input, false);
 
             setTimeout(() =>
             {
@@ -956,14 +960,16 @@ export class TextInput extends FocusableWidget
                 this.innerContainer.cacheAsBitmap = true;
             }
 
-            mockDOMInput.removeEventListener('blur', this.inputBlurEvent);
-            document.removeEventListener('keydown', this.onKeyDown);
-            document.removeEventListener('keyup', this.keyUpEvent);
-            document.removeEventListener('paste', this.pasteEvent);
-            document.removeEventListener('copy', this.copyEvent);
-            document.removeEventListener('cut', this.cutEvent);
-            mockDOMInput.removeEventListener('input', this.inputEvent);
+            mockDOMInput.removeEventListener('blur', this._listeners.blur);
+            document.removeEventListener('keydown', this._listeners.keydown);
+            document.removeEventListener('keyup', this._listeners.keyup);
+            document.removeEventListener('paste', this._listeners.paste);
+            document.removeEventListener('copy', this._listeners.copy);
+            document.removeEventListener('cut', this._listeners.cut);
+            mockDOMInput.removeEventListener('input', this._listeners.input);
             mockDOMInput.blur();
+
+            this._listeners = {}
         }
 
         if (!this.multiLine)
@@ -1164,6 +1170,10 @@ export class TextInput extends FocusableWidget
     set text(value: string)
     {
         this.value = value;
+    }
+
+    get mock() {
+        return mockDOMInput
     }
 }
 

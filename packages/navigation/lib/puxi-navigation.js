@@ -1,6 +1,6 @@
 /*!
  * @puxi/navigation - v1.0.1
- * Compiled Thu, 10 Sep 2020 02:01:32 UTC
+ * Compiled Wed, 23 Sep 2020 12:45:30 UTC
  *
  * @puxi/navigation is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license

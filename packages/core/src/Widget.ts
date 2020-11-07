@@ -1050,6 +1050,8 @@ export class Widget extends PIXI.utils.EventEmitter implements IMeasurable
                 }, 0);
             }
         };
+
+        dnd.startEvent()
     }
 
     /**

@@ -1,6 +1,6 @@
 /*!
  * @puxi/core - v1.0.1
- * Compiled Wed, 23 Sep 2020 12:45:30 UTC
+ * Compiled Sat, 07 Nov 2020 17:57:12 UTC
  *
  * @puxi/core is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
@@ -457,7 +457,6 @@ var _puxi_core = (function (exports, PIXI, filterDropShadow) {
             this.onDragStart = () => null;
             this.onDragMove = () => null;
             this.onDragEnd = () => null;
-            this.startEvent();
         }
         startEvent() {
             if (this.isEnabled) {
@@ -1331,6 +1330,7 @@ var _puxi_core = (function (exports, PIXI, filterDropShadow) {
                     }, 0);
                 }
             };
+            dnd.startEvent();
         }
         /**
          * Makes this widget `droppable`.

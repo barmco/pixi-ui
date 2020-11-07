@@ -1,6 +1,6 @@
 /*!
  * @puxi/core - v1.0.1
- * Compiled Wed, 23 Sep 2020 12:45:30 UTC
+ * Compiled Sat, 07 Nov 2020 17:57:12 UTC
  *
  * @puxi/core is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
@@ -458,7 +458,6 @@ class DragManager extends EventManager {
         this.onDragStart = () => null;
         this.onDragMove = () => null;
         this.onDragEnd = () => null;
-        this.startEvent();
     }
     startEvent() {
         if (this.isEnabled) {
@@ -1330,6 +1329,7 @@ class Widget extends utils.EventEmitter {
                 }, 0);
             }
         };
+        dnd.startEvent();
     }
     /**
      * Makes this widget `droppable`.

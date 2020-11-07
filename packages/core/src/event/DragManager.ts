@@ -53,8 +53,6 @@ export class DragManager extends EventManager
         this.onDragStart = (): void => null;
         this.onDragMove = (): void => null;
         this.onDragEnd = (): void => null;
-
-        this.startEvent();
     }
 
     startEvent(): void

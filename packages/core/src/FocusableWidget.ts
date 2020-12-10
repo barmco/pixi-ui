@@ -81,9 +81,9 @@ export abstract class FocusableWidget extends InteractiveGroup implements IFocus
          */
         this.tabGroup = options.tabGroup;
 
-        this.insetContainer.on('pointerdown', () =>
+        this.insetContainer.on('pointerdown', (ev: PIXI.interaction.InteractionEvent) =>
         {
-            this.focus();
+            this.focus(ev);
             this._isMousePressed = true;
         });
 
@@ -94,7 +94,7 @@ export abstract class FocusableWidget extends InteractiveGroup implements IFocus
     /**
      * Brings this widget into focus.
      */
-    focus(): void
+    focus(ev?: PIXI.interaction.InteractionEvent): void
     {
         if (this.isFocused)
         {

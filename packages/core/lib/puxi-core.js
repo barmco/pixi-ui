@@ -1,6 +1,6 @@
 /*!
  * @puxi/core - v1.0.1
- * Compiled Sat, 07 Nov 2020 17:57:12 UTC
+ * Compiled Thu, 10 Dec 2020 11:56:53 UTC
  *
  * @puxi/core is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
@@ -2097,8 +2097,8 @@ class FocusableWidget extends InteractiveGroup {
          * @readonly
          */
         this.tabGroup = options.tabGroup;
-        this.insetContainer.on('pointerdown', () => {
-            this.focus();
+        this.insetContainer.on('pointerdown', (ev) => {
+            this.focus(ev);
             this._isMousePressed = true;
         });
         this.insetContainer.on('pointerup', () => { this._isMousePressed = false; });
@@ -2107,7 +2107,7 @@ class FocusableWidget extends InteractiveGroup {
     /**
      * Brings this widget into focus.
      */
-    focus() {
+    focus(ev) {
         if (this.isFocused) {
             return;
         }
@@ -5327,7 +5327,6 @@ class TextInput extends FocusableWidget {
                 const w = `${this.contentContainer.width}px`;
                 mockDOMInput.setAttribute('style', `position:fixed; left:${l}; top:${t}; height:${h}; width:${w};`);
                 mockDOMInput.value = '';
-                mockDOMInput.focus();
                 mockDOMInput.setAttribute('style', 'position:fixed; left:-10px; top:-10px; width:0px; height: 0px;');
                 this.innerContainer.cacheAsBitmap = false;
                 this._listeners.blur = e => this.inputBlurEvent(e);
@@ -5345,6 +5344,7 @@ class TextInput extends FocusableWidget {
                 document.addEventListener('cut', this._listeners.cut, false);
                 mockDOMInput.addEventListener('input', this._listeners.input, false);
                 setTimeout(() => {
+                    mockDOMInput.focus();
                     if (!this.caret.visible && !this.selection.visible && !this.multiLine) {
                         this.setCaretIndex(this.chars.length);
                     }

@@ -913,7 +913,6 @@ export class TextInput extends FocusableWidget
 
             mockDOMInput.setAttribute('style', `position:fixed; left:${l}; top:${t}; height:${h}; width:${w};`);
             mockDOMInput.value = '';
-            mockDOMInput.focus();
             mockDOMInput.setAttribute('style', 'position:fixed; left:-10px; top:-10px; width:0px; height: 0px;');
 
             this.innerContainer.cacheAsBitmap = false;
@@ -936,6 +935,8 @@ export class TextInput extends FocusableWidget
 
             setTimeout(() =>
             {
+                mockDOMInput.focus();
+                
                 if (!this.caret.visible && !this.selection.visible && !this.multiLine)
                 {
                     this.setCaretIndex(this.chars.length);

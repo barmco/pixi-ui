@@ -1,6 +1,6 @@
 /*!
  * @puxi/core - v1.0.1
- * Compiled Thu, 10 Dec 2020 11:56:53 UTC
+ * Compiled Thu, 10 Dec 2020 13:33:26 UTC
  *
  * @puxi/core is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
@@ -5934,7 +5934,7 @@ var _puxi_core = (function (exports, PIXI, filterDropShadow) {
                         const selectIndex = this.rdd ? _i - 1 : _i;
                         this.selectRange(selectIndex, selectIndex);
                         this.caret._index = selectIndex;
-                        this.caret._forward = !rdd;
+                        this.caret._forward = !this.rdd;
                     }
                 }
                 else {

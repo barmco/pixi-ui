@@ -752,7 +752,7 @@ export class TextInput extends FocusableWidget
 
                     this.selectRange(selectIndex, selectIndex);
                     this.caret._index = selectIndex;
-                    this.caret._forward = !rdd;
+                    this.caret._forward = !this.rdd;
                 }
             }
             else

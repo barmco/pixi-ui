@@ -203,7 +203,7 @@ export class Stage extends PIXI.Container
 
             if (index !== -1)
             {
-                this.children.splice(index, 1);
+                this.widgetChildren.splice(index, 1);
                 UIObject.parent = null;
             }
         }

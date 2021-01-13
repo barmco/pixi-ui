@@ -1,6 +1,6 @@
 /*!
  * @puxi/core - v1.0.1
- * Compiled Thu, 10 Dec 2020 13:33:26 UTC
+ * Compiled Wed, 13 Jan 2021 06:08:52 UTC
  *
  * @puxi/core is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
@@ -5092,7 +5092,7 @@ class Stage extends Container {
             super.removeChild(UIObject.insetContainer);
             const index = this.widgetChildren.indexOf(UIObject);
             if (index !== -1) {
-                this.children.splice(index, 1);
+                this.widgetChildren.splice(index, 1);
                 UIObject.parent = null;
             }
         }
